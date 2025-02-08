@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:Universal_x86_Tuning_Utility.Views.Pages"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Title="{Binding ViewModel.ApplicationTitle, Mode=OneWay}"
+    Title="Universal x86 Tuning Utility"
     MinWidth="980"
     MinHeight="420"
     Width="1080"
@@ -48,6 +48,7 @@
             </Grid.ColumnDefinitions>
 
             <!--  This is the main navigation of the application.  -->
+            
             <ui:NavigationStore
                 x:Name="RootNavigation"
                 Grid.Column="0"

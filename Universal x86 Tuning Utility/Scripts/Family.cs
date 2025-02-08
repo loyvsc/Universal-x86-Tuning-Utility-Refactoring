@@ -11,6 +11,8 @@ using System.Windows;
 using Universal_x86_Tuning_Utility.Scripts.AMD_Backend;
 using Universal_x86_Tuning_Utility.Scripts.Intel_Backend;
 
+//TODO: UPDATE MAIN CLASS AND DELETE THIS
+
 namespace Universal_x86_Tuning_Utility.Scripts
 {
     public class Family

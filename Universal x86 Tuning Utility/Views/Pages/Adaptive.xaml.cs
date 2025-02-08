@@ -34,7 +34,6 @@ using GameLib.Plugin.Steam.Model;
 using Windows.ApplicationModel.Search;
 using Windows.Gaming.Preview.GamesEnumeration;
 using System.Management;
-using RyzenSmu;
 using Universal_x86_Tuning_Utility.Scripts.GPUs.AMD;
 using static Universal_x86_Tuning_Utility.Scripts.Game_Manager;
 using System.ComponentModel;

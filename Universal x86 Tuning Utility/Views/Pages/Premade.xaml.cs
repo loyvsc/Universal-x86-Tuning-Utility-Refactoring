@@ -1,5 +1,4 @@
 ﻿using ABI.System;
-using RyzenSmu;
 using System;
 using System.Collections.Generic;
 using System.Linq;

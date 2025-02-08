@@ -1,41 +1,33 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
-using RyzenSmu;
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
-using System;
-using System.Configuration;
 using System.Diagnostics;
+using System;
 using System.IO;
-using System.Net.NetworkInformation;
 using System.Reflection;
-using System.Security.Policy;
-using System.Security.Principal;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Threading;
 using Universal_x86_Tuning_Utility.Models;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.Scripts;
+using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
+using Universal_x86_Tuning_Utility.Scripts.AMD_Backend;
 using Universal_x86_Tuning_Utility.Scripts.AMD_Backend;
 using Universal_x86_Tuning_Utility.Scripts.ASUS;
 using Universal_x86_Tuning_Utility.Scripts.Misc;
 using Universal_x86_Tuning_Utility.Services;
 using Universal_x86_Tuning_Utility.Views.Pages;
-using Wpf.Ui.Mvvm.Contracts;
-using Wpf.Ui.Mvvm.Services;
 
 namespace Universal_x86_Tuning_Utility
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App
+    public partial class App //TODO: update for multiplatform
     {
         // The.NET Generic Host provides dependency injection, configuration, logging, and other services.
         // https://docs.microsoft.com/dotnet/core/extensions/generic-host
@@ -45,23 +37,8 @@ namespace Universal_x86_Tuning_Utility
         private static IHost _host;
 
         public static ASUSWmi wmi;
-        public static XgMobileConnectionService xgMobileConnectionService;
         private static ILogger<App>? _logger;
-        public static Mem_Timings memTimings = new Mem_Timings();
-
-        /// <summary>
-        /// Gets registered service.
-        /// </summary>
-        /// <typeparam name="T">Type of the service to get.</typeparam>
-        /// <returns>Instance of the service or <see langword="null"/>.</returns>
-        public static T GetService<T>()
-            where T : class
-        {
-            return _host.Services.GetService(typeof(T)) as T;
-        }
-
-        public static string version = "2.5.6";
-        private Mutex mutex;
+        
         private const string MutexName = "UniversalX86TuningUtility";
 
         public static readonly string SCALE_MODELS_JSON_PATH = ".\\ScaleModels.json";
@@ -84,6 +61,7 @@ namespace Universal_x86_Tuning_Utility
                 )
                 .CreateLogger();
 
+            #if WINDOWS
             if (!IsVcRedistInstalled("x64") && !IsVcRedistInstalled("x86"))
             {
                 var downloadVcRedist = MessageBox.Show("Microsoft Visual C++ Redistributable is not installed.\n" +
@@ -101,6 +79,7 @@ namespace Universal_x86_Tuning_Utility
                 Shutdown();
                 return;
             }
+            #endif
 
             try
             {
@@ -244,6 +223,7 @@ namespace Universal_x86_Tuning_Utility
                 {
                     Settings.Default.Path = path;
                     Settings.Default.FirstBoot = false;
+                    if (Family.FAM > Family.RyzenFamily.Rembrandt || Family.FAM == Family.RyzenFamily.Mendocino) Settings.Default.polling = 3;
                     Settings.Default.Save();
 
                     //PowerPlans.SetPowerValue("scheme_current", "sub_processor", "PERFAUTONOMOUS", 1, true);
@@ -340,7 +320,7 @@ namespace Universal_x86_Tuning_Utility
         /// </summary>
         private async void OnExit(object sender, ExitEventArgs e)
         {
-            if (Family.TYPE != Family.ProcessorType.Intel) SMUCommands.RyzenAccess.Deinitialize();
+           if (Family.TYPE != Family.ProcessorType.Intel) SMUCommands.RyzenAccess.Dispose();
 
             await _host.StopAsync();
 

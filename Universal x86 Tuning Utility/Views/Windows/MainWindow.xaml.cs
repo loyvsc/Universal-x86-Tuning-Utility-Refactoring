@@ -5,8 +5,6 @@ using Gma.System.MouseKeyHook;
 using HidSharp.Utility;
 using Microsoft.Win32;
 using RTSSSharedMemoryNET;
-using RyzenSmu;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

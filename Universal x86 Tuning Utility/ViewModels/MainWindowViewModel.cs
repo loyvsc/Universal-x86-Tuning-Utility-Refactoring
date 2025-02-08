@@ -1,23 +1,17 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Input;
+using ApplicationCore.Utilities;
+using FluentAvalonia.UI.Controls;
 using Universal_x86_Tuning_Utility.Scripts;
-using Wpf.Ui.Common;
-using Wpf.Ui.Controls;
-using Wpf.Ui.Controls.Interfaces;
-using Wpf.Ui.Mvvm.Contracts;
 
 namespace Universal_x86_Tuning_Utility.ViewModels
 {
-    public partial class MainWindowViewModel : ObservableObject
+    public partial class MainWindowViewModel : NotifyPropertyChanged
     {
         private bool _isInitialized = false;
-
-        [ObservableProperty]
-        private string _applicationTitle = String.Empty;
 
         [ObservableProperty]
         private ObservableCollection<INavigationControl> _navigationItems = new();
@@ -42,14 +36,13 @@ namespace Universal_x86_Tuning_Utility.ViewModels
 
         private void InitializeViewModel()
         {
-            ApplicationTitle = "Universal x86 Tuning Utility";
             if (Family.TYPE == Family.ProcessorType.Intel)
             {
                 NavigationItems = new ObservableCollection<INavigationControl>
                 {
-                new NavigationItem()
+                new NavigationViewItem()
                 {
-                    Content = "Home",
+                    Content = "Home", 
                     PageTag = "dashboard",
                     Icon = SymbolRegular.Home20,
                     PageType = typeof(Views.Pages.DashboardPage)
@@ -224,6 +217,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels
 
             _isInitialized = true;
         }
+        
         private ICommand _navigateCommand;
         public ICommand NavigateCommand => _navigateCommand ??= new RelayCommand<string>(OnNavigate);
 
@@ -236,7 +230,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels
                     return;
 
                 case "discord":
-                    Process.Start(new ProcessStartInfo("http://www.discord.gg/3EkYMZGJwq") { UseShellExecute = true });
+                    Process.Start(new ProcessStartInfo("https://www.discord.gg/3EkYMZGJwq") { UseShellExecute = true });
                     return;
 
                 case "support":

@@ -1,0 +1,32 @@
+namespace ApplicationCore.Enums;
+
+public enum RyzenFamily
+{
+    Unknown = -1,
+    SummitRidge,
+    PinnacleRidge,
+    RavenRidge,
+    Dali,
+    Pollock,
+    Picasso,
+    FireFlight,
+    Matisse,
+    Renoir,
+    Lucienne,
+    VanGogh,
+    Mendocino,
+    Vermeer,
+    Cezanne_Barcelo,
+    Rembrandt,
+    Raphael,
+    DragonRange,
+    PhoenixPoint,
+    PhoenixPoint2,
+    HawkPoint,
+    SonomaValley,
+    GraniteRidge,
+    FireRange,
+    StrixHalo,
+    StrixPoint,
+    StrixPoint2,
+}
