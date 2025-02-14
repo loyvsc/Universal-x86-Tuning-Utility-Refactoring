@@ -6,20 +6,25 @@ using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using ApplicationCore.Utilities;
+using DesktopNotifications;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
+using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Scripts;
+using Universal_x86_Tuning_Utility.Services.RyzenAdj;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class CustomPresetsViewModel : NotifyPropertyChanged
+public class CustomPresetsViewModel : NotifyPropertyChangedBase
 {
     private readonly IPresetService _apuPresetService;
     private readonly IPresetService _amdDtCpuPresetService;
     private readonly IPresetService _intelPresetService;
     private readonly ILogger<CustomPresetsViewModel> _logger;
     private readonly ISystemInfoService _systemInfoService;
-    
+    private readonly INotificationManager _notificationManager;
+    private readonly IRyzenAdjService _ryzenAdjService;
+
     public ICommand ApplyPresetCommand { get; }
     public ICommand SavePresetCommand { get; }
     public ICommand DeletePresetCommand { get; }
@@ -56,15 +61,19 @@ public class CustomPresetsViewModel : NotifyPropertyChanged
     private bool _undoActionAvailable;
 
     public CustomPresetsViewModel(ILogger<CustomPresetsViewModel> logger,
-                                  ISystemInfoService systemInfoService)
+                                  ISystemInfoService systemInfoService,
+                                  INotificationManager notificationManager,
+                                  IRyzenAdjService ryzenAdjService)
     {
         _logger = logger;
         _systemInfoService = systemInfoService;
-        
+        _notificationManager = notificationManager;
+        _ryzenAdjService = ryzenAdjService;
+
         DeletePresetCommand = ReactiveCommand.CreateFromTask(DeleteCurrentPreset);
     }
 
-    private Task ApplyPreset()
+    private async Task ApplyPreset()
     {
         try
         {
@@ -72,24 +81,19 @@ public class CustomPresetsViewModel : NotifyPropertyChanged
             
             commandValues = getCommandValues();
 
-            if (commandValues != "" && commandValues != null)
+            if (!string.IsNullOrEmpty(commandValues))
             {
-                await Task.Run(() => RyzenAdj_To_UXTU.Translate(commandValues));
-                ToastNotification.ShowToastNotification("Preset Applied",
-                    $"Your custom preset settings have been applied!");
+                await _ryzenAdjService.Translate(commandValues);
+                await _notificationManager.ShowTextNotification("Preset Applied", "Your custom preset settings have been applied!");
             }
 
-            //Settings.Default.CommandString = commandValues;
-            //Settings.Default.Save();
-
-            if (_systemInfoService.RadeonGpuCount < 1) sdADLX.Visibility = Visibility.Collapsed;
-            else sdADLX.Visibility = Visibility.Visible;
-            if (_systemInfoService.NvidiaGpuCount < 1) sdNVIDIA.Visibility = Visibility.Collapsed;
-            else sdNVIDIA.Visibility = Visibility.Visible;
+            RadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
+            NvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
         }
-        catch
+        catch (Exception ex)
         {
-            //show tosts there
+            _logger.LogError(ex, "Exception occurred when applying preset");
+            await _notificationManager.ShowTextNotification("Preset not applied", "Error occurred when applying preset!", NotificationManagerExtensions.NotificationType.Error);
         }
     }
 
@@ -120,7 +124,7 @@ public class CustomPresetsViewModel : NotifyPropertyChanged
                 }
             }
             
-            ToastNotification.ShowToastNotification("Preset Deleted",
+            await _notificationManager.ShowTextNotification("Preset Deleted",
                 $"Your preset {deletePresetName} has been deleted successfully!");
         }
         catch (Exception ex)
@@ -129,7 +133,7 @@ public class CustomPresetsViewModel : NotifyPropertyChanged
         }
     }
 
-    private Task RelaodPresetValues()
+    private Task ReloadPreset()
     {
         apuPresetManager = new PresetManager(Settings.Default.Path + "apuPresets.json");
         amdDtCpuPresetManager = new PresetManager(Settings.Default.Path + "amdDtCpuPresets.json");
@@ -137,7 +141,7 @@ public class CustomPresetsViewModel : NotifyPropertyChanged
         if (cbxPowerPreset.Text != null && cbxPowerPreset.Text != "") updateValues(cbxPowerPreset.SelectedItem.ToString());
     }
 
-    public Task SavePreset()
+    private async Task SavePreset()
     {
         if (!tbxPresetName.Text.Contains("PM -"))
         {
@@ -293,6 +297,7 @@ public class CustomPresetsViewModel : NotifyPropertyChanged
                         powerMode = (int)cbxPowerMode.SelectedIndex,
 
                     };
+                    
                     apuPresetManager.SavePreset(tbxPresetName.Text, preset);
 
                     apuPresetManager = new PresetManager(Settings.Default.Path + "apuPresets.json");
@@ -308,16 +313,14 @@ public class CustomPresetsViewModel : NotifyPropertyChanged
                         cbxPowerPreset.Items.Add(presetName);
                     }
 
-                    ToastNotification.ShowToastNotification("Preset Saved", $"Your preset {tbxPresetName.Text} has been saved successfully!");
+                    await _notificationManager.ShowTextNotification("Preset Saved", $"Your preset {tbxPresetName.Text} has been saved successfully!");
 
-                    if (GetRadeonGPUCount() < 1) sdADLX.Visibility = Visibility.Collapsed;
-                    else sdADLX.Visibility = Visibility.Visible;
-                    if (GetNVIDIAGPUCount() < 1) sdNVIDIA.Visibility = Visibility.Collapsed;
-                    else sdNVIDIA.Visibility = Visibility.Visible;
+                    RadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
+                    NvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
                 }
             }
 
-            if (Family.TYPE == Family.ProcessorType.Amd_Desktop_Cpu)
+            if (_systemInfoService.CpuInfo.AmdProcessorType == AmdProcessorType.Desktop)
             {
                 if (tbxPresetName.Text != "" && tbxPresetName.Text != null)
                 {
@@ -430,11 +433,11 @@ public class CustomPresetsViewModel : NotifyPropertyChanged
                         cbxPowerPreset.Items.Add(presetName);
                     }
 
-                    ToastNotification.ShowToastNotification("Preset Saved", $"Your preset {tbxPresetName.Text} has been saved successfully!");
+                    await _notificationManager.ShowTextNotification("Preset Saved", $"Your preset {tbxPresetName.Text} has been saved successfully!");
                 }
             }
 
-            if (Family.TYPE == Family.ProcessorType.Intel)
+            if (_systemInfoService.CpuInfo.Manufacturer == Manufacturer.Intel)
             {
                 if (tbxPresetName.Text != "" && tbxPresetName.Text != null)
                 {
@@ -499,12 +502,12 @@ public class CustomPresetsViewModel : NotifyPropertyChanged
                         intelClockRatioC7 = (int)nudIntelRatioC7.Value,
                         intelClockRatioC8 = (int)nudIntelRatioC8.Value,
                     };
-                    intelPresetManager.SavePreset(tbxPresetName.Text, preset);
+                    _intelPresetService.SavePreset(tbxPresetName.Text, preset);
 
                     intelPresetManager = new PresetManager(Settings.Default.Path + "intelPresets.json");
 
                     // Get the names of all the stored presets
-                    IEnumerable<string> presetNames = intelPresetManager.GetPresetNames();
+                    IEnumerable<string> presetNames = _intelPresetService.GetPresetNames();
 
                     cbxPowerPreset.Items.Clear();
 
@@ -514,7 +517,7 @@ public class CustomPresetsViewModel : NotifyPropertyChanged
                         cbxPowerPreset.Items.Add(presetName);
                     }
 
-                    ToastNotification.ShowToastNotification("Preset Saved", $"Your preset {tbxPresetName.Text} has been saved successfully!");
+                    await _notificationManager.ShowTextNotification("Preset Saved", $"Your preset {tbxPresetName.Text} has been saved successfully!");
                 }
             }
         }

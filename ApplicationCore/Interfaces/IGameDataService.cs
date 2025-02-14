@@ -2,10 +2,10 @@ using ApplicationCore.Models;
 
 namespace ApplicationCore.Interfaces;
 
-public interface IGameDataManager
+public interface IGameDataService
 {
-    IEnumerable<string> GetPresetNames();
-    GameData GetPreset(string presetName);
-    void SavePreset(string name, GameData preset);
-    void DeletePreset(string name);
+    public IEnumerable<string> GetPresetNames();
+    public GameData? GetPreset(string presetName);
+    public void SavePreset(string name, GameData preset);
+    public void DeletePreset(string name);
 }

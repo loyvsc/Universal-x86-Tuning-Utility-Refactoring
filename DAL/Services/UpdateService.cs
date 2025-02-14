@@ -16,7 +16,7 @@ public class UpdateService : IUpdateService
         _logger = logger;
     }
 
-    public async Task<bool> IsUpdateAvailable(string currentVersion)
+    public async Task<bool> IsUpdatesAvailable(string currentVersion)
     {
         try
         {
@@ -36,7 +36,7 @@ public class UpdateService : IUpdateService
         return false;
     }
     
-    public async Task<bool> DownloadLastUpdate(string currentVersion, string downloadPath)
+    public async Task DownloadNewestPackage(string downloadPath)
     {
         try
         {
@@ -44,35 +44,29 @@ public class UpdateService : IUpdateService
             var releases = await client.Repository.Release.GetAll(Owner, RepositoryName);
 
             var latestRelease = releases[0];
-            var latestVersion = latestRelease.TagName;
+            var assets = latestRelease.Assets;
+            
+            var downloadUrl = assets[0].BrowserDownloadUrl;
 
-            if (Version.Parse(currentVersion) != Version.Parse(latestVersion))
+            var packageName = Path.GetFileName(downloadUrl);
+            var savePackagePath = Path.Combine(downloadPath, packageName);
+
+            using (var httpClient = new HttpClient())
             {
-                var assets = latestRelease.Assets;
-                var downloadUrl = assets[0].BrowserDownloadUrl;
-
-                var packageName = Path.GetFileName(downloadUrl);
-                var savePackagePath = Path.Combine(downloadPath, packageName);
-
-                using (var httpClient = new HttpClient())
+                await using (var stream = await httpClient.GetStreamAsync(downloadUrl))
                 {
-                    await using (var stream = await httpClient.GetStreamAsync(downloadUrl))
+                    await using (var fileStream = new FileStream(savePackagePath, FileMode.Create))
                     {
-                        await using (var fileStream = new FileStream(savePackagePath, FileMode.Create))
-                        {
-                            await fileStream.CopyToAsync(stream);
-                        }
+                        await fileStream.CopyToAsync(stream);
                     }
                 }
-
-                return true;
             }
+
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception occurred when download last update");
+            throw;
         }
-
-        return false;
     }
 }

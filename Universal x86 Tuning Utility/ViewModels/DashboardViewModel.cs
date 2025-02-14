@@ -10,8 +10,10 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.Scripts;
-using Universal_x86_Tuning_Utility.Scripts.UXTU_Super_Resolution;
 using Windows.System;
+using ApplicationCore.Interfaces;
+using Universal_x86_Tuning_Utility.Services;
+using Universal_x86_Tuning_Utility.Services.GameLauncherServices;
 using Wpf.Ui.Common.Interfaces;
 using Wpf.Ui.Mvvm.Contracts;
 using Settings = Universal_x86_Tuning_Utility.Properties.Settings;
@@ -31,6 +33,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels
         }
 
         private readonly INavigationService _navigationService;
+        private readonly ISystemInfoService _systemInfoService;
 
 
         private ICommand _navigateCommand;
@@ -42,9 +45,17 @@ namespace Universal_x86_Tuning_Utility.ViewModels
         public ICommand OpenWindowCommand => _openWindowCommand ??= new RelayCommand<string>(OnOpenWindow);
 
         public DispatcherTimer autoAdaptive = new DispatcherTimer();
-        public DashboardViewModel(INavigationService navigationService)
+        public DashboardViewModel(INavigationService navigationService,
+            ISystemInfoService systemInfoService)
         {
             _navigationService = navigationService;
+            _systemInfoService = systemInfoService;
+
+            if (Family.TYPE == Family.ProcessorType.Intel)
+            {
+                caPremade.IsEnabled = false;
+                btnPremade.IsEnabled = false;
+            }
 
             autoAdaptive.Interval = TimeSpan.FromSeconds(1);
             autoAdaptive.Tick += AutoAdaptive_Tick;
@@ -53,7 +64,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels
 
         public void AutoAdaptive_Tick(object sender, EventArgs e)
         {
-           if(Settings.Default.isStartAdpative) _navigationService.Navigate(typeof(Views.Pages.Adaptive));
+           if(Settings.Default.isStartAdpative) _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));
             autoAdaptive.Stop();
         }
 
@@ -72,23 +83,23 @@ namespace Universal_x86_Tuning_Utility.ViewModels
             switch (parameter)
             {
                 case "premade":
-                    _navigationService.Navigate(typeof(Views.Pages.Premade));
+                    _navigationService.Navigate(typeof(Views.Pages.PremadePage));
                     return;
 
                 case "custom":
-                    _navigationService.Navigate(typeof(Views.Pages.CustomPresets));
+                    _navigationService.Navigate(typeof(Views.Pages.CustomPresetsPage));
                     return;
 
                 case "adaptive":
-                    _navigationService.Navigate(typeof(Views.Pages.Adaptive));
+                    _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));
                     return;
 
                 case "auto":
-                    _navigationService.Navigate(typeof(Views.Pages.Automations));
+                    _navigationService.Navigate(typeof(Views.Pages.AutomationsPage));
                     return;
 
                 case "info":
-                    _navigationService.Navigate(typeof(Views.Pages.SystemInfo));
+                    _navigationService.Navigate(typeof(Views.Pages.SystemInfoPage));
                     return;
 
                 case "help":
@@ -100,13 +111,13 @@ namespace Universal_x86_Tuning_Utility.ViewModels
                     Process.Start(new ProcessStartInfo("https://patreon.com/uxtusoftware") { UseShellExecute = true });
                     return;
                 case "games":
-                    _navigationService.Navigate(typeof(Views.Pages.Games));
+                    _navigationService.Navigate(typeof(Views.Pages.GamesPage));
                     return;
                 default:
                     string[] parts = parameter.Split('-');
                     MessageBox.Show("Worked!");
-                    if (!parts[0].Contains("Microsoft Store")) Game_Manager.LaunchApp(parts[2], parts[0], parts[1], parts[1]);
-                    else Game_Manager.LaunchApp(parts[1], parts[0], parts[1], parts[1]);
+                    if (!parts[0].Contains("Microsoft Store")) WindowsGameLauncherService.LaunchGame(parts[2], parts[0], parts[1], parts[1]);
+                    else WindowsGameLauncherService.LaunchGame(parts[1], parts[0], parts[1], parts[1]);
                     return;
             }
         }

@@ -1,22 +1,14 @@
-﻿using Wpf.Ui.Common.Interfaces;
+﻿using Avalonia.Controls;
 
-namespace Universal_x86_Tuning_Utility.Views.Pages
+namespace Universal_x86_Tuning_Utility.Views.Pages;
+
+/// <summary>
+/// Interaction logic for DataView.xaml
+/// </summary>
+public partial class DataPage : UserControl
 {
-    /// <summary>
-    /// Interaction logic for DataView.xaml
-    /// </summary>
-    public partial class DataPage : INavigableView<ViewModels.DataViewModel>
+    public DataPage()
     {
-        public ViewModels.DataViewModel ViewModel
-        {
-            get;
-        }
-
-        public DataPage(ViewModels.DataViewModel viewModel)
-        {
-            ViewModel = viewModel;
-
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

@@ -4,8 +4,8 @@ namespace ApplicationCore.Interfaces;
 
 public interface IPresetService
 {
-    IEnumerable<string> GetPresetNames();
-    Preset GetPreset(string presetName);
-    void SavePreset(string name, Preset preset);
-    void DeletePreset(string name);
+    public IEnumerable<string> GetPresetNames();
+    public Preset? GetPreset(string presetName);
+    public void SavePreset(string name, Preset preset);
+    public void DeletePreset(string name);
 }

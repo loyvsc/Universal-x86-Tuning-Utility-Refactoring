@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Universal_x86_Tuning_Utility.Views.Pages.CustomPresets"
+﻿<UserControl x:Class="Universal_x86_Tuning_Utility.Views.Pages.CustomPresetsPage"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"

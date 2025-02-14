@@ -1,45 +1,53 @@
-﻿
-using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Input;
+using ApplicationCore.Enums;
+using ApplicationCore.Interfaces;
 using ApplicationCore.Utilities;
 using FluentAvalonia.UI.Controls;
-using Universal_x86_Tuning_Utility.Scripts;
 
-namespace Universal_x86_Tuning_Utility.ViewModels
+namespace Universal_x86_Tuning_Utility.ViewModels;
+
+public partial class MainWindowViewModel : NotifyPropertyChangedBase
 {
-    public partial class MainWindowViewModel : NotifyPropertyChanged
+    private readonly ISystemInfoService _systemInfoService;
+    private bool _isInitialized = false;
+
+    [ObservableProperty]
+    private ObservableCollection<INavigationControl> _navigationItems = new();
+
+    [ObservableProperty]
+    private ObservableCollection<INavigationControl> _navigationFooter = new();
+
+    [ObservableProperty]
+    private ObservableCollection<MenuItem> _trayMenuItems = new();
+
+    [ObservableProperty]
+    private string _downloads = "Downloads: ";
+
+    [ObservableProperty]
+    private bool _isDownloads = false;
+
+    public string Title
     {
-        private bool _isInitialized = false;
+        get => _title;
+        set => SetValue(ref _title, value);
+    }
 
-        [ObservableProperty]
-        private ObservableCollection<INavigationControl> _navigationItems = new();
+    private string _title;
 
-        [ObservableProperty]
-        private ObservableCollection<INavigationControl> _navigationFooter = new();
+    public MainWindowViewModel(ISystemInfoService systemInfoService)
+    {
+        _systemInfoService = systemInfoService;
+        InitializeViewModel();
+    }
 
-        [ObservableProperty]
-        private ObservableCollection<MenuItem> _trayMenuItems = new();
-
-        [ObservableProperty]
-        private string _downloads = "Downloads: ";
-
-        [ObservableProperty]
-        private bool _isDownloads = false;
-
-        public MainWindowViewModel(INavigationService navigationService)
+    private void InitializeViewModel()
+    {
+        if (_systemInfoService.CpuInfo.Manufacturer == Manufacturer.Intel)
         {
-            if (!_isInitialized)
-                InitializeViewModel();
-        }
-
-        private void InitializeViewModel()
-        {
-            if (Family.TYPE == Family.ProcessorType.Intel)
+            NavigationItems = new ObservableCollection<INavigationControl>
             {
-                NavigationItems = new ObservableCollection<INavigationControl>
-                {
                 new NavigationViewItem()
                 {
                     Content = "Home", 
@@ -59,28 +67,28 @@ namespace Universal_x86_Tuning_Utility.ViewModels
                     Content = "Custom",
                     PageTag = "custom",
                     Icon = SymbolRegular.Book20,
-                    PageType = typeof(Views.Pages.CustomPresets)
+                    PageType = typeof(Views.Pages.CustomPresetsPage)
                 },
                 new NavigationItem()
                 {
                     Content = "Adaptive",
                     PageTag = "adaptive",
                     Icon = SymbolRegular.Radar20,
-                    PageType = typeof(Views.Pages.Adaptive)
+                    PageType = typeof(Views.Pages.AdaptivePage)
                 },
                 new NavigationItem()
                 {
                     Content = "Games",
                     PageTag = "games",
                     Icon = SymbolRegular.Games20,
-                    PageType = typeof(Views.Pages.Games)
+                    PageType = typeof(Views.Pages.GamesPage)
                 },
                 new NavigationItem()
                 {
                     Content = "Auto",
                     PageTag = "auto",
                     Icon = SymbolRegular.Transmission20,
-                    PageType = typeof(Views.Pages.Automations)
+                    PageType = typeof(Views.Pages.AutomationsPage)
                 },
                 //new NavigationItem()
                 //{
@@ -101,11 +109,11 @@ namespace Universal_x86_Tuning_Utility.ViewModels
                     Content = "Info",
                     PageTag = "info",
                     Icon = SymbolRegular.Info20,
-                    PageType = typeof(Views.Pages.SystemInfo)
+                    PageType = typeof(Views.Pages.SystemInfoPage)
                 }
             };
 
-                NavigationFooter = new ObservableCollection<INavigationControl>
+            NavigationFooter = new ObservableCollection<INavigationControl>
             {
                 new NavigationItem()
                 {
@@ -116,7 +124,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels
                 }
             };
 
-                TrayMenuItems = new ObservableCollection<MenuItem>
+            TrayMenuItems = new ObservableCollection<MenuItem>
             {
                 new MenuItem
                 {
@@ -124,11 +132,11 @@ namespace Universal_x86_Tuning_Utility.ViewModels
                     Tag = "tray_home"
                 }
             };
-            }
-            else
+        }
+        else
+        {
+            NavigationItems = new ObservableCollection<INavigationControl>
             {
-                NavigationItems = new ObservableCollection<INavigationControl>
-                {
                 new NavigationItem()
                 {
                     Content = "Home",
@@ -141,35 +149,35 @@ namespace Universal_x86_Tuning_Utility.ViewModels
                     Content = "Premade",
                     PageTag = "premade",
                     Icon = SymbolRegular.Predictions20,
-                    PageType = typeof(Views.Pages.Premade)
+                    PageType = typeof(Views.Pages.PremadePage)
                 },
                 new NavigationItem()
                 {
                     Content = "Custom",
                     PageTag = "custom",
                     Icon = SymbolRegular.Book20,
-                    PageType = typeof(Views.Pages.CustomPresets)
+                    PageType = typeof(Views.Pages.CustomPresetsPage)
                 },
                 new NavigationItem()
                 {
                     Content = "Adaptive",
                     PageTag = "adaptive",
                     Icon = SymbolRegular.Radar20,
-                    PageType = typeof(Views.Pages.Adaptive)
+                    PageType = typeof(Views.Pages.AdaptivePage)
                 },
                 new NavigationItem()
                 {
                     Content = "Games",
                     PageTag = "games",
                     Icon = SymbolRegular.Games20,
-                    PageType = typeof(Views.Pages.Games)
+                    PageType = typeof(Views.Pages.GamesPage)
                 },
                 new NavigationItem()
                 {
                     Content = "Auto",
                     PageTag = "auto",
                     Icon = SymbolRegular.Transmission20,
-                    PageType = typeof(Views.Pages.Automations)
+                    PageType = typeof(Views.Pages.AutomationsPage)
                 },
                 //new NavigationItem()
                 //{
@@ -190,11 +198,11 @@ namespace Universal_x86_Tuning_Utility.ViewModels
                     Content = "Info",
                     PageTag = "info",
                     Icon = SymbolRegular.Info20,
-                    PageType = typeof(Views.Pages.SystemInfo)
+                    PageType = typeof(Views.Pages.SystemInfoPage)
                 }
             };
 
-                NavigationFooter = new ObservableCollection<INavigationControl>
+            NavigationFooter = new ObservableCollection<INavigationControl>
             {
                 new NavigationItem()
                 {
@@ -205,7 +213,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels
                 }
             };
 
-                TrayMenuItems = new ObservableCollection<MenuItem>
+            TrayMenuItems = new ObservableCollection<MenuItem>
             {
                 new MenuItem
                 {
@@ -213,31 +221,30 @@ namespace Universal_x86_Tuning_Utility.ViewModels
                     Tag = "tray_home"
                 }
             };
-            }
-
-            _isInitialized = true;
         }
+
+        _isInitialized = true;
+    }
         
-        private ICommand _navigateCommand;
-        public ICommand NavigateCommand => _navigateCommand ??= new RelayCommand<string>(OnNavigate);
+    private ICommand _navigateCommand;
+    public ICommand NavigateCommand => _navigateCommand ??= new RelayCommand<string>(OnNavigate);
 
-        private void OnNavigate(string parameter)
+    private void OnNavigate(string parameter)
+    {
+        switch (parameter)
         {
-            switch (parameter)
-            {
-                case "download":
-                    Process.Start(new ProcessStartInfo("https://github.com/JamesCJ60/Universal-x86-Tuning-Utility/releases") { UseShellExecute = true });
-                    return;
+            case "download":
+                Process.Start(new ProcessStartInfo("https://github.com/JamesCJ60/Universal-x86-Tuning-Utility/releases") { UseShellExecute = true });
+                return;
 
-                case "discord":
-                    Process.Start(new ProcessStartInfo("https://www.discord.gg/3EkYMZGJwq") { UseShellExecute = true });
-                    return;
+            case "discord":
+                Process.Start(new ProcessStartInfo("https://www.discord.gg/3EkYMZGJwq") { UseShellExecute = true });
+                return;
 
-                case "support":
-                    Process.Start(new ProcessStartInfo("https://www.paypal.com/paypalme/JamesCJ60") { UseShellExecute = true });
-                    Process.Start(new ProcessStartInfo("https://patreon.com/uxtusoftware") { UseShellExecute = true });
-                    return;
-            }
+            case "support":
+                Process.Start(new ProcessStartInfo("https://www.paypal.com/paypalme/JamesCJ60") { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo("https://patreon.com/uxtusoftware") { UseShellExecute = true });
+                return;
         }
     }
 }

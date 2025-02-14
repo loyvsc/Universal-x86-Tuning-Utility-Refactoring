@@ -1,37 +1,25 @@
-﻿<ui:UiPage x:Class="Universal_x86_Tuning_Utility.Views.Pages.DashboardPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<UserControl x:Class="Universal_x86_Tuning_Utility.Views.Pages.DashboardPage"
+    xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Universal_x86_Tuning_Utility.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Title="DashboardPage"
-    d:DataContext="{d:DesignInstance local:DashboardPage, IsDesignTimeCreatable=False}"
+    xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}"
     d:DesignHeight="1000"
     d:DesignWidth="800"
     d:Background="{DynamicResource ApplicationBackgroundBrush}"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    Scrollable="True"
-    ScrollViewer.PanningMode="VerticalFirst"
-    Stylus.IsFlicksEnabled="False"
-    Stylus.IsTouchFeedbackEnabled="True"
-    ScrollViewer.IsDeferredScrollingEnabled="False"
-    mc:Ignorable="d">
-
-    <Grid VerticalAlignment="Top">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="164" />
-        </Grid.RowDefinitions>
-        <Border
-            Grid.Row="0"
-            MinHeight="425"
-            CornerRadius="8,0,0,0">
-                <Border.Background>
-                    <ImageBrush
-                    ImageSource="pack://application:,,,/Assets/pexels-photo-8037008.jpeg"
-                    RenderOptions.BitmapScalingMode="HighQuality"
-                    Stretch="UniformToFill" />
+    ScrollViewer.IsDeferredScrollingEnabled="False">
+    
+    <Grid RowDefinitions="*, 164" VerticalAlignment="Top">
+        <Border Grid.Row="0"
+                MinHeight="425"
+                CornerRadius="8,0,0,0">
+            <Border.Background>
+                    <ImageBrush Source="pack://application:,,,/Assets/pexels-photo-8037008.jpeg"
+                                RenderOptions.BitmapInterpolationMode="HighQuality"
+                                Stretch="UniformToFill" />
                 </Border.Background>
                 <Border CornerRadius="8,0,0,0">
                     <Border.Background>
@@ -43,44 +31,39 @@
                     <Grid>
                         <!--Background="#66242424"-->
                         <Border Margin="64"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center" CornerRadius="8" Padding="9">
-                        <StackPanel
-                        
-                        Background="Transparent">
-                            <TextBlock
-                            FontSize="18"
-                            Foreground="#B7FFFFFF"
-                            Text="Welcome To" />
-                            <TextBlock
-                            FontSize="28"
-                            FontWeight="Bold"
-                            Foreground="#FFFFFF"
-                            Text="Universal x86 Tuning Utility" />
-                            <TextBlock
-                            FontSize="18"
-                            Foreground="#B7FFFFFF"
-                            Text="V2.5.6 Stable" />
-                            <ui:Button
-                                Name="btnPremade"
-                            Height="36"
-                            Margin="0,12,0,0"
-                            Padding="30,6"
-                            HorizontalAlignment="Left"
-                            Appearance="Transparent"
-                            Command="{Binding ViewModel.NavigateCommand}"
-                            CommandParameter="premade"
-                            Content="Try Out The Premade Presets"
-                            Foreground="{DynamicResource TextFillColorLightPrimaryBrush}" />
-                        </StackPanel>
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                CornerRadius="8"
+                                Padding="9">
+                            <StackPanel Background="Transparent">
+                                <TextBlock FontSize="18"
+                                           Foreground="#B7FFFFFF"
+                                           Text="Welcome To" />
+                                <TextBlock FontSize="28"
+                                           FontWeight="Bold"
+                                           Foreground="#FFFFFF"
+                                           Text="Universal x86 Tuning Utility" />
+                                <TextBlock FontSize="18"
+                                           Foreground="#B7FFFFFF"
+                                           Text="V2.5.6 Stable" />
+                                <Button Name="btnPremade"
+                                        Height="36"
+                                        Margin="0,12,0,0"
+                                        Padding="30,6"
+                                        HorizontalAlignment="Left"
+                                        Appearance="Transparent"
+                                        Command="{Binding ViewModel.NavigateCommand}"
+                                        CommandParameter="premade"
+                                        Content="Try Out The Premade Presets"
+                                        Foreground="{DynamicResource TextFillColorLightPrimaryBrush}" />
+                            </StackPanel>
                         </Border>
-                        <TextBlock
-                        Margin="12"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        FontSize="10"
-                        Foreground="#57FFFFFF"
-                        Text="Created by JamesCJ, sbski, ProjectSBC, and you!" />
+                        <TextBlock Margin="12"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Bottom"
+                                   FontSize="10"
+                                   Foreground="#57FFFFFF"
+                                   Text="Created by JamesCJ, sbski and ProjectSBC" />
 
                     <Border Width="320" Height="120" HorizontalAlignment="Left" VerticalAlignment="Bottom" CornerRadius="0,4,0,0">
                         <Border.Background>
@@ -94,27 +77,18 @@
                 </Border>
             </Border>
 
-        <Grid Grid.Row="1" Margin="12,18,12,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <ui:CardAction
-                Name="caPremade"
-                Grid.Row="0"
-                Grid.Column="0"
-                Margin="0,0,4,0"
-                Command="{Binding ViewModel.NavigateCommand}"
-                CommandParameter="premade"
-                Icon="Predictions20"
-                IsChevronVisible="True">
+        <Grid Grid.Row="1"
+              RowDefinitions="Auto, Auto"
+              ColumnDefinitions="*, *, *, *"
+              Margin="12,18,12,0">
+            <ui:CardAction Name="caPremade"
+                           Grid.Row="0"
+                           Grid.Column="0"
+                           Margin="0,0,4,0"
+                           Command="{Binding ViewModel.NavigateCommand}"
+                           CommandParameter="premade"
+                           Icon="Predictions20"
+                           IsChevronVisible="True">
                 <StackPanel>
                     <TextBlock
                         Margin="0"
@@ -234,4 +208,4 @@
             </ui:CardAction>
         </Grid>
     </Grid>
-</ui:UiPage>
+</UserControl>

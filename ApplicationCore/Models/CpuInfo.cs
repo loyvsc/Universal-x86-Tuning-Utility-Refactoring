@@ -3,7 +3,7 @@ using ApplicationCore.Utilities;
 
 namespace ApplicationCore.Models;
 
-public class CpuInfo : NotifyPropertyChanged
+public class CpuInfo : NotifyPropertyChangedBase
 {
     public string Name
     {
@@ -35,9 +35,9 @@ public class CpuInfo : NotifyPropertyChanged
         set => SetValue(ref _manufacturer, value);
     }
 
-    public AmdProcessorType AmdProcessorType { get; set; } = AmdProcessorType.Unkown;
+    public AmdProcessorType AmdProcessorType { get; set; } = AmdProcessorType.Unknown;
     public RyzenFamily RyzenFamily { get; set; } = RyzenFamily.Unknown;
-    public RyzenGenerations RyzenGeneration { get; set; } = RyzenGenerations.Unkown;
+    public RyzenGenerations RyzenGeneration { get; set; } = RyzenGenerations.Unknown;
 
     private string _name;
     private int _family;
