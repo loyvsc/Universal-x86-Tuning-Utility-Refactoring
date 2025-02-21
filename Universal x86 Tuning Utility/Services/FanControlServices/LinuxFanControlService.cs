@@ -8,7 +8,7 @@ public class LinuxFanControlService : IFanControlService
     public int MinFanSpeed { get; }
     public int MinFanSpeedPercentage { get; }
     public double FanSpeed { get; }
-    public bool FanControlEnabled { get; }
+    public bool IsFanControlEnabled { get; }
     public bool IsFanEnabled { get; }
     
     public void UpdateAddresses()

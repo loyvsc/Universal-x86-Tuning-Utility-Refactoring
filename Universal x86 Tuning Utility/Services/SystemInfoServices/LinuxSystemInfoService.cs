@@ -16,6 +16,7 @@ public class LinuxSystemInfoService : ISystemInfoService
     public int NvidiaGpuCount { get; }
     public int RadeonGpuCount { get; }
     public CpuInfo Cpu { get; }
+    public RamInfo Ram { get; }
     public LaptopInfo? LaptopInfo { get; }
     public string Manufacturer { get; }
     public string Product { get; }
@@ -55,22 +56,7 @@ public class LinuxSystemInfoService : ISystemInfoService
         throw new System.NotImplementedException();
     }
 
-    public List<uint> GetCacheSize(CacheLevel level)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public string GetCodename()
-    {
-        throw new System.NotImplementedException();
-    }
-
     public string GetBigLITTLE(int cores, double l2)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public string GetInstructionSets()
     {
         throw new System.NotImplementedException();
     }

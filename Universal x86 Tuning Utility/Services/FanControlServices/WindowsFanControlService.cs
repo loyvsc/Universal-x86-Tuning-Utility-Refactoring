@@ -15,7 +15,7 @@ public class WindowsFanControlService : IFanControlService
 
     public double FanSpeed { get; private set; }
 
-    public bool FanControlEnabled { get; private set; }
+    public bool IsFanControlEnabled { get; private set; }
 
     public bool IsFanEnabled => WinRingECManagement.ECRamRead(FanToggleAddress) == 0;
     
@@ -64,13 +64,13 @@ public class WindowsFanControlService : IFanControlService
     public void EnableFanControl()
     {
         WinRingECManagement.ECRamWrite(FanToggleAddress, EnableToggleAddress);
-        FanControlEnabled = true;
+        IsFanControlEnabled = true;
     }
 
     public void DisableFanControl()
     {
         WinRingECManagement.ECRamWrite(FanToggleAddress, DisableToggleAddress);
-        FanControlEnabled = false;
+        IsFanControlEnabled = false;
     }
 
     public void SetFanSpeed(int speedPercentage)
