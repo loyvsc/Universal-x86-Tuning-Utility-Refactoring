@@ -8,31 +8,29 @@ namespace Universal_x86_Tuning_Utility.Services.SystemInfoServices;
 
 public class LinuxSystemInfoService : ISystemInfoService
 {
-    private readonly ILogger<LinuxSystemInfoService> _logger;
-
     public void AnalyzeSystem()
     {
         throw new System.NotImplementedException();
     }
 
-    public LinuxSystemInfoService(ILogger<LinuxSystemInfoService> logger)
-    {
-        _logger = logger;
-    }
-
     public int NvidiaGpuCount { get; }
     public int RadeonGpuCount { get; }
-    public CpuInfo CpuInfo { get; set; }
+    public CpuInfo Cpu { get; }
+    public LaptopInfo? LaptopInfo { get; }
     public string Manufacturer { get; }
     public string Product { get; }
     public string SystemName { get; }
-    
     public bool IsGPUPresent(string gpuName)
     {
         throw new System.NotImplementedException();
     }
 
     public decimal GetBatteryRate()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public BatteryStatus GetBatteryStatus()
     {
         throw new System.NotImplementedException();
     }

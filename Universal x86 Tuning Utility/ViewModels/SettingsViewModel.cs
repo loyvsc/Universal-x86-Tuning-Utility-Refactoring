@@ -95,6 +95,7 @@ public class SettingsViewModel : NotifyPropertyChangedBase
     
     private readonly ILogger<SettingsViewModel> _logger;
     private readonly IUpdateService _updateService;
+    private readonly IUpdateInstallerService _updateInstallerService;
     private readonly INotificationManager _toastNotificationsManager;
     private readonly ISystemBootService _systemBootService;
     private string _appVersion = string.Empty;
@@ -112,11 +113,13 @@ public class SettingsViewModel : NotifyPropertyChangedBase
 
     public SettingsViewModel(ILogger<SettingsViewModel> logger,
                              IUpdateService updateService,
+                             IUpdateInstallerService updateInstallerService,
                              INotificationManager toastNotificationsManager,
                              ISystemBootService systemBootService)
     {
         _logger = logger;
         _updateService = updateService;
+        _updateInstallerService = updateInstallerService;
         _toastNotificationsManager = toastNotificationsManager;
         _systemBootService = systemBootService;
 
@@ -152,6 +155,7 @@ public class SettingsViewModel : NotifyPropertyChangedBase
 
     private async Task StartStressTest()
     {
+        // todo: create new service for run stress tests??
         if (File.Exists(Settings.Default.Path + @"\Assets\Stress-Test\AVX2 Stress Test.exe"))
         {
             using (var process = new Process())
@@ -164,25 +168,21 @@ public class SettingsViewModel : NotifyPropertyChangedBase
 
     private async Task DownloadUpdate()
     {
-        var isUpdateAvailable = await _updateService.IsUpdatesAvailable(App.Version);
+        await _toastNotificationsManager.ShowTextNotification(
+            title: "Update available!",
+            text: "Universal x86 Tuning Utility will close and the installer will open when the download is complete");
 
-        if (isUpdateAvailable)
+        try
         {
-            UpdatesMessage = "Universal x86 Tuning Utility will close and the installer will open when the download is complete";
-
-            try
-            {
-                var downloadFilePath = @"C:\";
-                await _updateService.InstallLastUpdate(downloadFilePath);
-            }
-            catch (Exception ex)
-            {
-                // log error or display error message to user
-                _logger.LogError(ex, "Error occurred at downloading or installing update");
-                await _toastNotificationsManager.ShowTextNotification(title: "Error",
-                    text: "Error occurred at downloading or installing update",
-                    notificationType: NotificationManagerExtensions.NotificationType.Error);
-            }
+            await _updateInstallerService.DownloadAndInstallNewestPackage();
+        }
+        catch (Exception ex)
+        {
+            // log error or display error message to user
+            _logger.LogError(ex, "Error occurred at downloading or installing update");
+            await _toastNotificationsManager.ShowTextNotification(title: "Error",
+                text: "Error occurred at downloading or installing update",
+                notificationType: NotificationManagerExtensions.NotificationType.Error);
         }
     }
 

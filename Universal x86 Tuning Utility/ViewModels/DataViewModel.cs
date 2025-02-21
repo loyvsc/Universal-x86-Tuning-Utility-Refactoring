@@ -1,47 +1,37 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Media;
+using ApplicationCore.Utilities;
 using Universal_x86_Tuning_Utility.Models;
-using Wpf.Ui.Common.Interfaces;
 
-namespace Universal_x86_Tuning_Utility.ViewModels
+namespace Universal_x86_Tuning_Utility.ViewModels;
+
+public partial class DataViewModel : NotifyPropertyChangedBase
 {
-    public partial class DataViewModel : ObservableObject, INavigationAware
+    private List<DataColor> _colors;
+
+    public List<DataColor> Colors
     {
-        private bool _isInitialized = false;
+        get => _colors;
+        set => SetValue(ref _colors, value);
+    }
 
-        [ObservableProperty]
-        private IEnumerable<DataColor> _colors;
+    //todo: for what this code?
+    private void InitializeViewModel()
+    {
+        var random = new Random();
+        var colorCollection = new List<DataColor>();
 
-        public void OnNavigatedTo()
-        {
-            if (!_isInitialized)
-                InitializeViewModel();
-        }
+        for (int i = 0; i < 8192; i++)
+            colorCollection.Add(new DataColor
+            {
+                Color = new SolidColorBrush(Color.FromArgb(
+                    (byte)200,
+                    (byte)random.Next(0, 250),
+                    (byte)random.Next(0, 250),
+                    (byte)random.Next(0, 250)))
+            });
 
-        public void OnNavigatedFrom()
-        {
-        }
-
-        private void InitializeViewModel()
-        {
-            var random = new Random();
-            var colorCollection = new List<DataColor>();
-
-            for (int i = 0; i < 8192; i++)
-                colorCollection.Add(new DataColor
-                {
-                    Color = new SolidColorBrush(Color.FromArgb(
-                        (byte)200,
-                        (byte)random.Next(0, 250),
-                        (byte)random.Next(0, 250),
-                        (byte)random.Next(0, 250)))
-                });
-
-            Colors = colorCollection;
-
-            _isInitialized = true;
-        }
+        Colors = colorCollection;
     }
 }

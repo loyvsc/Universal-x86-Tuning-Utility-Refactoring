@@ -1,3 +1,4 @@
+using ApplicationCore.Enums;
 using ApplicationCore.Models;
 
 namespace ApplicationCore.Interfaces;
@@ -8,7 +9,8 @@ public interface ISystemInfoService
     
     public int NvidiaGpuCount { get; }
     public int RadeonGpuCount { get; }
-    public CpuInfo CpuInfo { get; }
+    public CpuInfo Cpu { get; }
+    public RamInfo Ram { get; }
     public LaptopInfo? LaptopInfo { get; }
     
     public string Manufacturer { get; }
@@ -16,14 +18,11 @@ public interface ISystemInfoService
     public string SystemName { get; }
     public bool IsGPUPresent(string gpuName);
     public decimal GetBatteryRate();
+    public BatteryStatus GetBatteryStatus();
     public decimal ReadFullChargeCapacity();
     public decimal ReadDesignCapacity();
     public int GetBatteryCycle();
     public decimal GetBatteryHealth();
 
-    public List<uint> GetCacheSize(ApplicationCore.Enums.CacheLevel level);
-
-    public string GetCodename();
     public string GetBigLITTLE(int cores, double l2);
-    public string GetInstructionSets();
 }

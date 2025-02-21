@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 
@@ -5,12 +6,12 @@ namespace Universal_x86_Tuning_Utility.Services.Intel;
 
 public class LinuxIntelManagementService : IIntelManagementService
 {
-    public void ChangeTdpAll(int pl)
+    public Task ChangeTdpAll(int pl)
     {
         throw new System.NotImplementedException();
     }
 
-    public void ChangePowerBalance(int value, IntelPowerBalanceUnit powerBalanceUnit)
+    public Task ChangePowerBalance(int value, IntelPowerBalanceUnit powerBalanceUnit)
     {
         throw new System.NotImplementedException();
     }
@@ -20,22 +21,22 @@ public class LinuxIntelManagementService : IIntelManagementService
         throw new System.NotImplementedException();
     }
 
-    public void ChangeClockRatioOffset(int[] clockRatios)
+    public Task ChangeClockRatioOffset(int[] clockRatios)
     {
         throw new System.NotImplementedException();
     }
 
-    public int[] ReadClockRatios()
+    public Task<int[]> ReadClockRatios()
     {
         throw new System.NotImplementedException();
     }
 
-    public void SetGpuClock(int newGpuClock)
+    public Task SetGpuClock(int newGpuClock)
     {
         throw new System.NotImplementedException();
     }
 
-    public void DetermineCpu()
+    public Task DetermineCpu()
     {
         throw new System.NotImplementedException();
     }

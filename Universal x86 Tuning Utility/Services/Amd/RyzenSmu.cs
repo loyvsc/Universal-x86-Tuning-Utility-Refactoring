@@ -8,7 +8,6 @@ using ApplicationCore.Models;
 
 [assembly: CLSCompliant(false)]
 
-
 namespace Universal_x86_Tuning_Utility.Services.Amd;
 
 static class Addresses

@@ -10,6 +10,7 @@ public class PremadePresets : IPremadePresets
 {
     private readonly ISystemInfoService _systemInfoService;
 
+    public PrematePresetType PrematePresetType { get; private set; }
     public List<PremadePreset> PremadePresetsList { get; }
 
     public PremadePresets(ISystemInfoService systemInfoService)
@@ -21,9 +22,9 @@ public class PremadePresets : IPremadePresets
 
     public void InitializePremadePresets()
     {
-        if (_systemInfoService.CpuInfo.AmdProcessorType is AmdProcessorType.Apu or AmdProcessorType.Desktop)
+        if (_systemInfoService.Cpu.AmdProcessorType is AmdProcessorType.Apu or AmdProcessorType.Desktop)
         {
-            string cpuName = _systemInfoService.CpuInfo.Name.Replace("AMD", null).Replace("with", null)
+            string cpuName = _systemInfoService.Cpu.Name.Replace("AMD", null).Replace("with", null)
                 .Replace("Mobile", null).Replace("Ryzen", null).Replace("Radeon", null).Replace("Graphics", null)
                 .Replace("Vega", null).Replace("Gfx", null);
 
@@ -32,14 +33,15 @@ public class PremadePresets : IPremadePresets
             RyzenAdjParameters.RyzenAdjParametersBuilder performancePresetParameters = new();
             RyzenAdjParameters.RyzenAdjParametersBuilder extremePresetParameters = new();
 
-            if (_systemInfoService.CpuInfo.AmdProcessorType == AmdProcessorType.Apu)
+            if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
             {
                 var product = _systemInfoService.Product.ToLower();
 
                 if (product.Contains("laptop 16 (amd ryzen 7040") &&
                     _systemInfoService.Manufacturer.ToLower().Contains("framework"))
                 {
-                    uri = new Uri("pack://application:,,,/Assets/Laptops/Framework/framework-laptop-16.png");
+                    PrematePresetType = PrematePresetType.Laptop16;
+                    // uri = new Uri("pack://application:,,,/Assets/Laptops/Framework/framework-laptop-16.png");
                     bool has7700S = _systemInfoService.IsGPUPresent("AMD Radeon(TM) RX 7700S");
 
                     ecoPresetParameters
@@ -49,7 +51,7 @@ public class PremadePresets : IPremadePresets
                         .WithVrm(180000, 180000)
                         .WithVrmSoc(180000, 180000)
                         .WithVrmGfx(180000)
-                        .WithWinPower(0)
+                        .WithWinPower(PowerPlan.PowerSave)
                         .WithStampLimit(has7700S ? 30000 : 6000)
                         .WithFastLimit(has7700S ? 35000 : 8000)
                         .WithSlowLimit(has7700S ? 30000 : 6000);
@@ -61,7 +63,7 @@ public class PremadePresets : IPremadePresets
                         .WithVrm(180000, 180000)
                         .WithVrmSoc(180000, 180000)
                         .WithVrmGfx(180000)
-                        .WithWinPower(1)
+                        .WithWinPower(PowerPlan.Balance)
                         .WithStampLimit(has7700S ? 95000 : 35000)
                         .WithFastLimit(has7700S ? 95000 : 45000)
                         .WithSlowLimit(has7700S ? 95000 : 38000);
@@ -73,7 +75,7 @@ public class PremadePresets : IPremadePresets
                         .WithVrm(180000, 180000)
                         .WithVrmSoc(180000, 180000)
                         .WithVrmGfx(180000)
-                        .WithWinPower(2)
+                        .WithWinPower(PowerPlan.HighPerformance)
                         .WithStampLimit(has7700S ? 100000 : 45000)
                         .WithFastLimit(has7700S ? 100000 : 55000)
                         .WithSlowLimit(has7700S ? 125000 : 50000);
@@ -82,7 +84,7 @@ public class PremadePresets : IPremadePresets
                         .WithTctlTemp(100)
                         .WithCHTCTemp(100)
                         .WithApuSkinTemp(50)
-                        .WithWinPower(2)
+                        .WithWinPower(PowerPlan.HighPerformance)
                         .WithStampLimit(has7700S ? 120000 : 55000)
                         .WithFastLimit(has7700S ? 147000 : 70000)
                         .WithSlowLimit(has7700S ? 120000 : 65000)
@@ -93,7 +95,7 @@ public class PremadePresets : IPremadePresets
                 else if (product.Contains("laptop 13 (amd ryzen 7040") &&
                          _systemInfoService.Manufacturer.ToLower().Contains("framework"))
                 {
-                    uri = new Uri("pack://application:,,,/Assets/Laptops/Framework/framework-laptop-13.png");
+                    // uri = new Uri("pack://application:,,,/Assets/Laptops/Framework/framework-laptop-13.png");
 
                     ecoPresetParameters
                         .WithTctlTemp(100)
@@ -117,7 +119,7 @@ public class PremadePresets : IPremadePresets
                         .WithVrm(180000, 180000)
                         .WithVrmSoc(180000, 180000)
                         .WithVrmGfx(180000)
-                        .WithWinPower(1);
+                        .WithWinPower(PowerPlan.Balance);
 
                     performancePresetParameters
                         .WithTctlTemp(100)
@@ -129,7 +131,7 @@ public class PremadePresets : IPremadePresets
                         .WithVrm(180000, 180000)
                         .WithVrmSoc(180000, 180000)
                         .WithVrmGfx(180000)
-                        .WithWinPower(2);
+                        .WithWinPower(PowerPlan.HighPerformance);
 
                     extremePresetParameters
                         .WithTctlTemp(100)
@@ -141,11 +143,11 @@ public class PremadePresets : IPremadePresets
                         .WithVrm(180000, 180000)
                         .WithVrmSoc(180000, 180000)
                         .WithVrmGfx(180000)
-                        .WithWinPower(2);
+                        .WithWinPower(PowerPlan.HighPerformance);
                 }
                 else
                 {
-                    if (_systemInfoService.CpuInfo.RyzenFamily < RyzenFamily.Matisse)
+                    if (_systemInfoService.Cpu.RyzenFamily < RyzenFamily.Matisse)
                     {
                         if (cpuName.Contains('U') || cpuName.Contains('e') || cpuName.Contains("Ce"))
                         {
@@ -241,8 +243,8 @@ public class PremadePresets : IPremadePresets
                         }
                         else if (cpuName.Contains("GE"))
                         {
-                            uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
-
+                            // uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
+                            PrematePresetType = PrematePresetType.AM4;
                             ecoPresetParameters
                                 .WithTctlTemp(95)
                                 .WithCHTCTemp(95)
@@ -289,8 +291,8 @@ public class PremadePresets : IPremadePresets
                         }
                         else if (cpuName.Contains("G"))
                         {
-                            uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
-
+                            // uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
+                            PrematePresetType = PrematePresetType.AM4;
                             ecoPresetParameters
                                 .WithTctlTemp(95)
                                 .WithCHTCTemp(95)
@@ -337,7 +339,7 @@ public class PremadePresets : IPremadePresets
                         }
                     }
 
-                    if (_systemInfoService.CpuInfo.RyzenFamily > RyzenFamily.Matisse)
+                    if (_systemInfoService.Cpu.RyzenFamily > RyzenFamily.Matisse)
                     {
                         if (cpuName.Contains("U"))
                         {
@@ -525,8 +527,8 @@ public class PremadePresets : IPremadePresets
                         }
                         else if (cpuName.Contains("GE"))
                         {
-                            uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
-
+                            // uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
+                            PrematePresetType = PrematePresetType.AM4;
                             ecoPresetParameters
                                 .WithTctlTemp(95)
                                 .WithCHTCTemp(95)
@@ -573,8 +575,8 @@ public class PremadePresets : IPremadePresets
                         }
                         else if (cpuName.Contains("G"))
                         {
-                            uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
-
+                            // uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
+                            PrematePresetType = PrematePresetType.AM4;
                             ecoPresetParameters
                                 .WithTctlTemp(95)
                                 .WithCHTCTemp(95)
@@ -620,7 +622,7 @@ public class PremadePresets : IPremadePresets
                                 .WithVrmGfx(180000);
                         }
 
-                        if (_systemInfoService.CpuInfo.RyzenFamily == RyzenFamily.Mendocino)
+                        if (_systemInfoService.Cpu.RyzenFamily == RyzenFamily.Mendocino)
                         {
                             if (cpuName.Contains('U'))
                             {
@@ -673,14 +675,15 @@ public class PremadePresets : IPremadePresets
                 }
             }
 
-            if (_systemInfoService.CpuInfo.AmdProcessorType == AmdProcessorType.Desktop)
+            if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
             {
                 var cpuNameParts = cpuName.Split(" ");
 
-                uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
-
+                // uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
+                PrematePresetType = PrematePresetType.AM4;
+                
                 cpuName = cpuNameParts[3];
-                if (_systemInfoService.CpuInfo.RyzenFamily < RyzenFamily.Raphael)
+                if (_systemInfoService.Cpu.RyzenFamily < RyzenFamily.Raphael)
                 {
                     if (cpuName.Contains('E'))
                     {
@@ -815,8 +818,10 @@ public class PremadePresets : IPremadePresets
                 }
                 else
                 {
-                    uri = new Uri("pack://application:,,,/Assets/config-DT-AM5.png");
-                    if (cpuName.Contains("E"))
+                    // uri = new Uri("pack://application:,,,/Assets/config-DT-AM5.png");
+                    PrematePresetType = PrematePresetType.AM5;
+                    
+                    if (cpuName.Contains('E'))
                     {
                         ecoPresetParameters
                             .WithTctlTemp(95)

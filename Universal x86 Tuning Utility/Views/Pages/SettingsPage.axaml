@@ -1,0 +1,112 @@
+﻿<UserControl
+    x:Class="Universal_x86_Tuning_Utility.Views.Pages.SettingsPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance viewModels:SettingsViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800">
+
+    <StackPanel Margin="18,10,18,0">
+        <!--<TextBlock
+            FontSize="26"
+            FontWeight="Medium"
+            Text="Personalization" />
+        <TextBlock Margin="0,12,0,0" Text="Theme" />
+        <RadioButton
+            Margin="0,12,0,0"
+            Command="{Binding ViewModel.ChangeThemeCommand, Mode=OneWay}"
+            CommandParameter="theme_light"
+            Content="Light"
+            GroupName="themeSelect"
+            IsChecked="{Binding ViewModel.CurrentTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}" />
+        <RadioButton
+            Margin="0,8,0,0"
+            Command="{Binding ViewModel.ChangeThemeCommand, Mode=OneWay}"
+            CommandParameter="theme_dark"
+            Content="Dark"
+            GroupName="themeSelect"
+            IsChecked="{Binding ViewModel.CurrentTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}" />-->
+        <CheckBox Content="Start on System Boot"
+                  IsChecked="{Binding IsAutoStartEnabled, UpdateSourceTrigger=PropertyChanged}"
+                  Command="{Binding StartOnSystemBootCommand}"/>
+        <CheckBox Content="Start Minimized"
+                  IsChecked="{Binding IsStartMinimizedEnabled, UpdateSourceTrigger=PropertyChanged }"/>
+        <CheckBox Content="Minimize on close"
+                  IsChecked="{Binding IsMinimizeOnClose, UpdateSourceTrigger=PropertyChanged }"/>
+        <CheckBox Content="Reapply On Start"
+                  IsChecked="{Binding IsReapplyOnStart, UpdateSourceTrigger=PropertyChanged }"/>
+        <StackPanel>
+            <CheckBox Content="Auto Reapply (s)"
+                      IsChecked="{Binding IsAutoReapply, UpdateSourceTrigger=PropertyChanged }"/>
+            <controls:NumberBox Margin="9,0,0,0"
+                                Minimum="1"
+                                Maximum="90"
+                                Value="{Binding ReapplySecond, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+        <CheckBox Content="Auto Update Check"
+                  IsChecked="{Binding IsAutoCheckUpdates, UpdateSourceTrigger=PropertyChanged}"/>
+        <CheckBox Content="Auto Start Adaptive Mode"
+                  IsChecked="{Binding IsAutoStartAdaptiveMode, UpdateSourceTrigger=PropertyChanged}"/>
+        <CheckBox Content="Track Games"
+                  IsChecked="{Binding IsAutoTrackGames, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Width="178"
+                Margin="0,9,0,0"
+                Command="{Binding StartStressTestCommand}">
+            <StackPanel Orientation="Horizontal">
+                <controls:SymbolIcon Symbol="Fire20" 
+                                     FontSize="24"
+                                     Margin="0,0,9,0"/>
+                <TextBlock VerticalAlignment="Center"
+                           Text="Start Stress Test"/>
+            </StackPanel>
+        </Button>
+
+        <TextBlock Foreground="DarkRed" 
+                   Margin="0,4.5,0,0" 
+                   Text="WARNING: This will put extreme stress on your CPU. Use at your own risk!" />
+
+        <TextBlock
+            Margin="0,24,0,0"
+            FontSize="20"
+            FontWeight="Medium"
+            Text="About Universal x86 Tuning Utility" />
+        <TextBlock Margin="0,12,0,9" 
+                   Text="{Binding ApplicationVersion, Mode=OneWay}" />
+
+        <StackPanel>
+            <Button Width="178"
+                    Command="{Binding CheckUpdateCommand}">
+                <StackPanel>
+                    <controls:SymbolIcon Symbol="Sync" 
+                                         FontSize="24"
+                                         Margin="0,0,9,0"/>
+                    <TextBlock VerticalAlignment="Center"
+                               Text="Check for Updates"/>
+                </StackPanel>
+            </Button>
+
+            <Button Margin="9,0,0,0"
+                    Width="178" 
+                    IsVisible="{Binding IsUpdateAvailable, UpdateSourceTrigger=PropertyChanged}"
+                    Command="{Binding DownloadUpdateCommand}">
+                <StackPanel>
+                    <controls:SymbolIcon Symbol="Download" 
+                                         FontSize="24"
+                                         Margin="0,0,9,0"/>
+                    <TextBlock VerticalAlignment="Center"
+                               Text="Download Update"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <TextBlock HorizontalAlignment="Left" 
+                   Margin="0,9,0,0" 
+                   TextWrapping="Wrap"
+                   Width="351"/>
+    </StackPanel>
+</UserControl>

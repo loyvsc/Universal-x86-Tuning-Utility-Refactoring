@@ -17,9 +17,7 @@ using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
-using Universal_x86_Tuning_Utility.Services;
 using Universal_x86_Tuning_Utility.Views.Windows;
-using Settings = Universal_x86_Tuning_Utility.Properties.Settings;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
@@ -89,7 +87,7 @@ public class GamesViewModel : NotifyPropertyChangedBase, IDisposable
     {
         try
         {
-            if (!MainWindow.isMini && _systemInfoService.CpuInfo.Manufacturer == Manufacturer.Intel)
+            if (!MainWindow.isMini && _systemInfoService.Cpu.Manufacturer == Manufacturer.Intel)
             {
                 var presetNames = _gameDataService.GetPresetNames();
                 foreach (var name in presetNames)
@@ -153,7 +151,7 @@ public class GamesViewModel : NotifyPropertyChangedBase, IDisposable
                 GameName = gameName,
                 GameType = GameType.Custom,
                 Path = Path.GetDirectoryName(filePath)!,
-                Exe = filePath,
+                Executable = filePath,
                 IconPath = iconPath
             };
             

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Management.Deployment;
 using ApplicationCore.Enums;
@@ -11,7 +12,6 @@ using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using GameLib;
 using Microsoft.Extensions.Logging;
-using Universal_x86_Tuning_Utility.Services.Intel;
 
 namespace Universal_x86_Tuning_Utility.Services.GameLauncherServices;
 
@@ -20,12 +20,14 @@ public class WindowsGameLauncherService : IGameLauncherService
     public Lazy<List<GameLauncherItem>> InstalledGames { get; }
     
     private readonly ILogger<WindowsGameLauncherService> _logger;
-    private List<GameLauncherItem>? _installedGames;
-    
-    public WindowsGameLauncherService(ILogger<WindowsGameLauncherService> logger)
+    private readonly ICliService _cliService;
+
+    public WindowsGameLauncherService(ILogger<WindowsGameLauncherService> logger,
+                                      ICliService cliService)
     {
         _logger = logger;
-        
+        _cliService = cliService;
+
         InstalledGames = new Lazy<List<GameLauncherItem>>(() => ReSearchGames());
     }
 
@@ -47,63 +49,66 @@ public class WindowsGameLauncherService : IGameLauncherService
                     case "Steam":
                         foreach (var game in launcher.Games)
                         {
-                            if (!game.Name.Contains("Steamworks") && !game.Name.Contains("SteamVR") && !game.Name.Contains("Google Earth") && !game.Name.Contains("Wallpaper Engine") && !game.Name.Contains("tModLoader") && !game.Name.Contains("- Original Soundtrack"));
+                            if (!game.Name.Contains("Steamworks")
+                                && !game.Name.Contains("SteamVR") 
+                                && !game.Name.Contains("Google Earth")
+                                && !game.Name.Contains("Wallpaper Engine") 
+                                && !game.Name.Contains("tModLoader") 
+                                && !game.Name.Contains("- Original Soundtrack"))
                             {
-                                if (game.Id != "228980")
+                                if (game.Id == "228980") continue; // Steamworks Common Redistributables id
+                                
+                                var launcherItem = new GameLauncherItem
                                 {
-                                    var launcherItem = new GameLauncherItem
-                                    {
-                                        GameName = game.Name,
-                                        GameId = game.Id
-                                    };
-                                    //launcherItem.iconPath = game.ExecutableIcon;
+                                    GameName = game.Name,
+                                    GameId = game.Id
+                                };
+                                //launcherItem.iconPath = game.ExecutableIcon;
 
-                                    if (game.Executables.Count() == 1)
+                                if (game.Executables.Count() == 1)
+                                {
+                                    launcherItem.Path = game.InstallDir;
+                                    launcherItem.Executable = Path.GetFileNameWithoutExtension(game.Executables.First());
+                                }
+                                else
+                                {
+                                    string[] array = launcherItem.GameName.Split(' ');
+                                    foreach (var exe in game.Executables)
                                     {
-                                        launcherItem.Path = game.InstallDir;
-                                        launcherItem.Exe = Path.GetFileNameWithoutExtension(game.Executables.First());
-                                    }
-                                    else
-                                    {
-                                        string[] array = launcherItem.GameName.Split(' ');
-                                        foreach (var exe in game.Executables)
+
+                                        string exeName = Path.GetFileNameWithoutExtension(exe);
+                                        if (game.Name.Contains("Call of duty", StringComparison.OrdinalIgnoreCase))
                                         {
-
-                                            string exeName = Path.GetFileNameWithoutExtension(exe);
-                                            if (game.Name.Contains("Call of duty", StringComparison.OrdinalIgnoreCase))
+                                            if (exeName.Contains("cod", StringComparison.OrdinalIgnoreCase))
                                             {
-                                                if (exeName.Contains("cod", StringComparison.OrdinalIgnoreCase))
-                                                {
-                                                    launcherItem.Path = game.InstallDir;
-                                                    launcherItem.Exe = exeName;
-                                                    break;
-                                                }
-                                            }
-                                            foreach (string arr in array)
-                                            {
-                                                if (exeName.Contains(arr, StringComparison.OrdinalIgnoreCase))
-                                                {
-                                                    launcherItem.Path = game.InstallDir;
-                                                    launcherItem.Exe = exeName;
-                                                    break;
-                                                }
-                                            }
-
-                                            if (launcherItem.Path != null)
-                                            {
+                                                launcherItem.Path = game.InstallDir;
+                                                launcherItem.Executable = exeName;
                                                 break;
                                             }
                                         }
-                                    }
-                                    if (launcherItem.Path == "" || launcherItem.Exe == "")
-                                    {
-                                        launcherItem.Path = Path.GetFileNameWithoutExtension(game.Executables.Last());
-                                        launcherItem.Exe = Path.GetFileNameWithoutExtension(game.Executables.Last());
-                                    }
-                                    
-                                    list.Add(launcherItem);
-                                }
+                                        foreach (string arr in array)
+                                        {
+                                            if (exeName.Contains(arr, StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                launcherItem.Path = game.InstallDir;
+                                                launcherItem.Executable = exeName;
+                                                break;
+                                            }
+                                        }
 
+                                        if (launcherItem.Path != null)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (launcherItem.Path == "" || launcherItem.Executable == "")
+                                {
+                                    launcherItem.Path = Path.GetFileNameWithoutExtension(game.Executables.Last());
+                                    launcherItem.Executable = Path.GetFileNameWithoutExtension(game.Executables.Last());
+                                }
+                                    
+                                list.Add(launcherItem);
                             }
                         }
                         break;
@@ -120,12 +125,12 @@ public class WindowsGameLauncherService : IGameLauncherService
                             {
                                 case "Call of Duty Black Ops Cold War":
                                     launcherItem.Path = game.InstallDir;
-                                    launcherItem.Exe = "BlackOpsColdWar";
+                                    launcherItem.Executable = "BlackOpsColdWar";
                                     break;
 
                                 default:
                                     launcherItem.Path = game.InstallDir;
-                                    launcherItem.Exe = Path.GetFileNameWithoutExtension(launcherItem.Path);
+                                    launcherItem.Executable = Path.GetFileNameWithoutExtension(launcherItem.Path);
                                     break;
                             }
                             
@@ -140,7 +145,7 @@ public class WindowsGameLauncherService : IGameLauncherService
                                 GameName = game.Name,
                                 GameId = game.Id,
                                 Path = game.InstallDir,
-                                Exe = Path.GetFileNameWithoutExtension(game.InstallDir),
+                                Executable = Path.GetFileNameWithoutExtension(game.InstallDir),
                                 GameType = GameType.EpicGamesStore
                             };
                             list.Add(launcherItem);
@@ -155,7 +160,7 @@ public class WindowsGameLauncherService : IGameLauncherService
                                 GameName = game.Name,
                                 GameId = game.Id,
                                 Path = game.InstallDir,
-                                Exe = Path.GetFileNameWithoutExtension(game.InstallDir)
+                                Executable = Path.GetFileNameWithoutExtension(game.InstallDir)
                             };
                             list.Add(launcherItem);
                         }
@@ -182,9 +187,9 @@ public class WindowsGameLauncherService : IGameLauncherService
 
                         if (filesInDirectory.Length > 0)
                         {
-                            var strings = filesInDirectory.Select(x => Path.GetFileName(x)).ToArray();
+                            var files = filesInDirectory.Select(x => Path.GetFileName(x)).ToArray();
 
-                            if (strings.Length > 0)
+                            if (files.Length > 0)
                             {
                                 foreach (var package in packages)
                                 {
@@ -194,7 +199,7 @@ public class WindowsGameLauncherService : IGameLauncherService
                                     if (install.Contains("WindowsApps") && sig == "Store" &&
                                         package.IsFramework == false)
                                     {
-                                        if (strings.Contains(package.DisplayName))
+                                        if (files.Contains(package.DisplayName))
                                         {
                                             var launcherItem = new GameLauncherItem()
                                             {
@@ -251,13 +256,13 @@ public class WindowsGameLauncherService : IGameLauncherService
             return list.Distinct(new GameLauncherItemEqualityComparer()).ToList();
     }
     
-    public void LaunchGame(GameLauncherItem gameLauncherItem)
+    public async Task LaunchGame(GameLauncherItem gameLauncherItem)
     {
         if (gameLauncherItem.GameType == GameType.Custom)
         {
             if (File.Exists(gameLauncherItem.Path))
             {
-                RunGame(gameLauncherItem.Path);
+                await RunGame(gameLauncherItem.Path);
             }
         }
         else
@@ -267,48 +272,42 @@ public class WindowsGameLauncherService : IGameLauncherService
                 switch (gameLauncherItem.GameType)
                 {
                     case GameType.EpicGamesStore:
-                        RunLaunchString(gameLauncherItem);
+                        await _cliService.RunProcess(gameLauncherItem.Executable);
                         break;
                     case GameType.Steam:
-                        RunLaunchString(launchcommand);
+                        await _cliService.RunProcess(gameLauncherItem.Executable);
                         break;
                     case GameType.BattleNet:
                         string battlenetfile = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "Battle.net\\Battle.net.exe");
                         if (BattleNetRunning())
                         {
-                            RunCli.RunCommand(" --exec=\"launch " + gameLauncherItem.GameId.ToUpper() + "\"", false, battlenetfile, 3000, true);
+                            await _cliService.RunProcess(battlenetfile, " --exec=\"launch " + gameLauncherItem.GameId.ToUpper() + "\"");
                         }
                         else
                         {
-                            RunGame(battlenetfile);
+                            await _cliService.RunProcess(battlenetfile);
                             Thread.Sleep(15000);
-                            RunCli.RunCommand(" --exec=\"launch " + gameLauncherItem.GameId.ToUpper() + "\"", false, battlenetfile, 3000, true);
+                            await _cliService.RunProcess(battlenetfile, " --exec=\"launch " + gameLauncherItem.GameId.ToUpper() + "\"");
                         }
                         break;
                     case GameType.Gog:
-                        RunCli.RunCommand(" /command=runGame /gameId=" + gameLauncherItem.GameId, false, 
-                            Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "GOG Galaxy", "GalaxyClient.exe"));
+                        await _cliService.RunProcess("cmd.exe", " /command=runGame /gameId=" + gameLauncherItem.GameId); 
+                            Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "GOG Galaxy", "GalaxyClient.exe");
                         break;
                     case GameType.MicrosoftStore:
-                        var pm = new PackageManager();
-                        pm.FindPackage(gameLauncherItem.GameId).GetAppListEntries().First().LaunchAsync();
+                        var packageManager = new PackageManager();
+                        packageManager.FindPackage(gameLauncherItem.GameId).GetAppListEntries().First().LaunchAsync();
                         break;
-                    default: break;
                 }
             }
         }
     }
 
-    public void RunGame(string executableFilePath)
+    public async Task RunGame(string executableFilePath)
     {
         if (File.Exists(executableFilePath))
         {
-            Process.Start(new ProcessStartInfo()
-            {
-                UseShellExecute = true,
-                FileName = Path.GetFileName(executableFilePath),
-                WorkingDirectory = Path.GetDirectoryName(executableFilePath)
-            });
+            await _cliService.RunProcess(executableFilePath);
         }
     }
 

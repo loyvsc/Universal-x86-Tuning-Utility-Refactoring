@@ -9,41 +9,38 @@ using Microsoft.Extensions.Logging;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.Services.Amd;
 using Universal_x86_Tuning_Utility.Services.Asus;
+using Universal_x86_Tuning_Utility.Services.PowerPlanServices;
 
 namespace Universal_x86_Tuning_Utility.Services.RyzenAdj;
 
 public class RyzenAdjService : IRyzenAdjService
 {
     private readonly ILogger<RyzenAdjService> _logger;
-    private readonly IDisplayService _displayService;
+    private readonly IDisplayInfoService _displayInfoService;
     private readonly IIntelManagementService _intelManagementService;
     private readonly IAmdGpuService _amdGpuService;
     private readonly INvidiaGpuService _nvidiaGpuService;
     private readonly ISystemInfoService _systemInfoService;
     private readonly IASUSWmiService _asusWmiService;
+    private readonly IPowerPlanService _powerPlanService;
 
-    [DllImport("powrprof.dll", EntryPoint = "PowerSetActiveOverlayScheme")]
-    private static extern uint PowerSetActiveOverlayScheme(Guid OverlaySchemeGuid);
-
-    private const string BalancedPowerScheme = "00000000-0000-0000-0000-000000000000";
-    private const string HighPerformancePowerScheme = "DED574B5-45A0-4F42-8737-46345C09C238";
-    private const string PowerSaverPowerScheme = "961CC777-2547-4F9D-8174-7D86181b8A7A";
-    
     public RyzenAdjService(ILogger<RyzenAdjService> logger,
-                           IDisplayService displayService,
+                           IDisplayInfoService displayInfoService,
                            IIntelManagementService intelManagementService,
                            IAmdGpuService amdGpuService,
                            INvidiaGpuService nvidiaGpuService,
                            ISystemInfoService systemInfoService,
-                           IASUSWmiService asusWmiService)
+                           IASUSWmiService asusWmiService,
+                           IPowerPlanService powerPlanService)
     {
         _logger = logger;
-        _displayService = displayService;
+        _displayInfoService = displayInfoService;
         _intelManagementService = intelManagementService;
         _amdGpuService = amdGpuService;
         _nvidiaGpuService = nvidiaGpuService;
         _systemInfoService = systemInfoService;
         _asusWmiService = asusWmiService;
+        _powerPlanService = powerPlanService;
     }
 
     //Translate RyzenAdj like cli arguments to UXTU
@@ -79,28 +76,11 @@ public class RyzenAdjService : IRyzenAdjService
                             UXTUSR(ryzenAdjCommandString, ryzenAdjCommandValueString);
                             Task.Delay(50);
                         }
-                        else if (ryzenAdjCommandString.Contains("Win-Power"))
+                        else if (ryzenAdjCommandString.Contains("Power-Plan"))
                         {
-                            switch (ryzenAdjCommandValueString)
+                            if (Enum.TryParse<PowerPlan>(ryzenAdjCommandString, out var powerPlan))
                             {
-                                case "0":
-                                {
-                                    _ = PowerSetActiveOverlayScheme(new Guid(PowerSaverPowerScheme.ToLower()));
-                                    break;
-                                }
-                                case "1":
-                                {
-                                    _ = PowerSetActiveOverlayScheme(new Guid(BalancedPowerScheme.ToLower()));
-                                    break;
-                                }
-                                case "2":
-                                {
-                                    _ = PowerSetActiveOverlayScheme(new Guid(HighPerformancePowerScheme.ToLower()));
-                                    break;
-                                }
-                                default:
-                                    throw new ArgumentOutOfRangeException(nameof(ryzenAdjArgs),
-                                        ryzenAdjCommandValueString, "Invalid Win-Power argument value");
+                                _powerPlanService.SetPowerPlan(powerPlan);
                             }
                         }
                         else if (ryzenAdjCommandString.Contains("ASUS"))
@@ -109,7 +89,7 @@ public class RyzenAdjService : IRyzenAdjService
                         }
                         else if (ryzenAdjCommandString.Contains("Refresh-Rate"))
                         {
-                            _displayService.ApplySettings(Convert.ToInt32(ryzenAdjCommandValueString));
+                            _displayInfoService.ApplySettings(Convert.ToInt32(ryzenAdjCommandValueString));
                         }
                         else if (ryzenAdjCommandString.Contains("ADLX"))
                         {

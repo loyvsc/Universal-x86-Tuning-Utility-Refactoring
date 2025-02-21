@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using Microsoft.Win32;
@@ -8,29 +9,35 @@ namespace Universal_x86_Tuning_Utility.Services.Intel;
 
 public class WindowsIntelManagementService : IIntelManagementService
 {
+    private readonly ICliService _cliService;
     private const string ProcessMsr = @".\Assets\Intel\MSR\msr-cmd.exe";
     private const string ProcessKx = @".\Assets\Intel\KX\KX.exe";
     private readonly object _lock = new();
 
-    public void ChangeTdpAll(int pl)
+    public WindowsIntelManagementService(ICliService cliService)
     {
-        RunIntelTDPChangeMSR(pl, pl);
-        RunIntelTDPChangeMMIOKX(pl, pl); 
+        _cliService = cliService;
     }
 
-    public void ChangePowerBalance(int value, IntelPowerBalanceUnit powerBalanceUnit)
+    public async Task ChangeTdpAll(int pl)
+    {
+        RunIntelTDPChangeMSR(pl, pl);
+        await RunIntelTDPChangeMMIOKX(pl, pl); 
+    }
+
+    public async Task ChangePowerBalance(int value, IntelPowerBalanceUnit powerBalanceUnit)
     {
         if (value is < 0 or > 31) throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 31");
         switch (powerBalanceUnit)
         {
             case IntelPowerBalanceUnit.Cpu:
             {
-                ChangePowerBalance("0x0000063a 0x00000000", value);
+                await ChangePowerBalance("0x0000063a 0x00000000", value);
                 break;
             }
             case IntelPowerBalanceUnit.Gpu:
             {
-                ChangePowerBalance("0x00000642 0x00000000", value);
+                await ChangePowerBalance("0x00000642 0x00000000", value);
                 break;
             }
             default: throw new ArgumentOutOfRangeException(nameof(powerBalanceUnit), powerBalanceUnit, null);
@@ -48,10 +55,10 @@ public class WindowsIntelManagementService : IIntelManagementService
             _ => throw new ArgumentOutOfRangeException(nameof(voltagePlan), voltagePlan, null)
         };
 
-        RunCliHelper.RunCommand(commandArguments, false, ProcessMsr);
+        _cliService.RunProcess(ProcessMsr, commandArguments, false);
     }
 
-    public void ChangeClockRatioOffset(int[] clockRatios)
+    public async Task ChangeClockRatioOffset(int[] clockRatios)
     {
         string hexValue = "";
         foreach (var clockRatio in clockRatios)
@@ -60,13 +67,13 @@ public class WindowsIntelManagementService : IIntelManagementService
         }
 
         string commandArguments = $"-s write 0x1AD 0x0 0x{hexValue};";
-        RunCli.RunCommand(commandArguments, false, ProcessMsr);
+        await _cliService.RunProcess(ProcessMsr, commandArguments, false);
     }
 
     //refactor this
-    public int[] ReadClockRatios()
+    public async Task<int[]> ReadClockRatios()
     {
-        string output = RunCli.RunCommand("read 0x1AD;", true, ProcessMsr);
+        string output = await _cliService.RunProcess(ProcessMsr, "read 0x1AD;", true);
 
         var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         
@@ -92,76 +99,75 @@ public class WindowsIntelManagementService : IIntelManagementService
         return intParts;
     }
     
-    public void SetGpuClock(int newGpuClock)
+    public async Task SetGpuClock(int newGpuClock)
     {
         var clockHex = ConvertClockToHexMMIO(newGpuClock);
         var commandArguments = "/wrmem8 " + _mchbar + "5994 " + clockHex;
 
-        RunCli.RunCommand(commandArguments, true, ProcessKx);
+        await _cliService.RunProcess(ProcessKx, commandArguments, true);
     }
 
-    private void RunIntelTDPChangeMMIOKX(int pl1Tdp, int pl2Tdp)
+    private async Task RunIntelTDPChangeMMIOKX(int pl1Tdp, int pl2Tdp)
     {
         if (pl1Tdp < 1) throw new ArgumentOutOfRangeException(nameof(pl1Tdp), "Pl1 tdp must be greater than zero");
-        if (pl2Tdp < 1) throw new ArgumentOutOfRangeException(nameof(pl2Tdp), "Pl1 tdp must be greater than zero");
+        if (pl2Tdp < 1) throw new ArgumentOutOfRangeException(nameof(pl2Tdp), "Pl2 tdp must be greater than zero");
         
         var pl1TdpHex = ConvertTDPToHexMMIO(pl1Tdp);
         var pl2TdpHex = ConvertTDPToHexMMIO(pl2Tdp);
 
         var commandArgumentsPl1 = "/wrmem16 " + _mchbar + "a0 0x" + pl1TdpHex;
-        RunCli.RunCommand(commandArgumentsPl1, true, ProcessKx);
+        await _cliService.RunProcess(ProcessKx, commandArgumentsPl1, true);
         
         var commandArgumentsPl2 = "/wrmem16 " + _mchbar + "a4 0x" + pl2TdpHex;
-        RunCli.RunCommand(commandArgumentsPl2, true, ProcessKx);
+        await _cliService.RunProcess(ProcessKx, commandArgumentsPl2, true);
     }
 
     private void RunIntelTDPChangeMSR(int pl1Tdp, int pl2Tdp)
     {
         if (pl1Tdp < 1) throw new ArgumentOutOfRangeException(nameof(pl1Tdp), "Pl1 tdp must be greater than zero");
-        if (pl2Tdp < 1) throw new ArgumentOutOfRangeException(nameof(pl2Tdp), "Pl1 tdp must be greater than zero");
+        if (pl2Tdp < 1) throw new ArgumentOutOfRangeException(nameof(pl2Tdp), "Pl2 tdp must be greater than zero");
         
         var pl1TdpHex = ConvertTDPToHexMSR(pl1Tdp);
         var pl2TdpHex = ConvertTDPToHexMSR(pl2Tdp);
         
+        if (pl1TdpHex.Length < 3)
+        {
+            if (pl1TdpHex.Length == 1)
+            {
+                pl1TdpHex = "00" + pl1TdpHex;
+            }
+
+            if (pl1TdpHex.Length == 2)
+            {
+                pl1TdpHex = "0" + pl1TdpHex;
+            }
+        }
+        if (pl2TdpHex.Length < 3)
+        {
+            if (pl2TdpHex.Length == 1)
+            {
+                pl2TdpHex = "00" + pl2TdpHex;
+            }
+
+            if (pl2TdpHex.Length == 2)
+            {
+                pl2TdpHex = "0" + pl2TdpHex;
+            }
+        }
+        
         lock (_lock)
         {
-            if (pl1TdpHex.Length < 3)
-            {
-                if (pl1TdpHex.Length == 1)
-                {
-                    pl1TdpHex = "00" + pl1TdpHex;
-                }
-
-                if (pl1TdpHex.Length == 2)
-                {
-                    pl1TdpHex = "0" + pl1TdpHex;
-                }
-            }
-            if (pl2TdpHex.Length < 3)
-            {
-                if (pl2TdpHex.Length == 1)
-                {
-                    pl2TdpHex = "00" + pl2TdpHex;
-                }
-
-                if (pl2TdpHex.Length == 2)
-                {
-                    pl2TdpHex = "0" + pl2TdpHex;
-                }
-            }
-
             var commandArguments = "-s write 0x610 0x00438" + pl2TdpHex + " 0x00dd8" + pl1TdpHex;
-            RunCli.RunCommand(commandArguments, false, ProcessMsr);
+            _cliService.RunProcess(ProcessMsr, commandArguments, false);
         }
     }
     
-    //todo: add this to interface and create new functional
-    private void ChangePowerBalance(string address, int value)
+    private async Task ChangePowerBalance(string address, int value)
     {
         var hexValue = "0x" + value.ToString("X");
         var commandArguments = "-s write " + address + " " + hexValue;
         
-        RunCli.RunCommand(commandArguments, false, ProcessMsr);
+        await _cliService.RunProcess(ProcessMsr, commandArguments, false);
     }
 
     private void CheckDriverBlockRegistry()
@@ -177,19 +183,19 @@ public class WindowsIntelManagementService : IIntelManagementService
         }
     }
 
-    public void DetermineCpu()
+    public async Task DetermineCpu()
     {
         CheckDriverBlockRegistry();
-        DetermineIntelMCHBAR();
+        await DetermineIntelMCHBAR();
     }
 
     private string _mchbar = string.Empty;
 
-    private void DetermineIntelMCHBAR()
+    private async Task DetermineIntelMCHBAR()
     {
         if (!File.Exists(ProcessKx)) return;
 
-        string output = RunCli.RunCommand("/RdPci32 0 0 0 0x48", true, ProcessKx);
+        string output = await _cliService.RunProcess(ProcessKx, "/RdPci32 0 0 0 0x48", true);
 
         int index = output.IndexOf("Return", StringComparison.InvariantCulture);
         

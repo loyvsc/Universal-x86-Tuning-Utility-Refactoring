@@ -1,0 +1,70 @@
+﻿<Window x:Class="Universal_x86_Tuning_Utility.Views.Windows.MainWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
+        Title="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+        Icon="pack://application:,,,/Assets/applicationIcon-256.png"
+        Width="1080"
+        MinWidth="980"
+        Height="640"
+        MinHeight="420"
+        WindowStartupLocation="CenterScreen"
+        Closing="UiWindow_Closing"
+        Loaded="MainWindowLoaded">
+    <ui:TitleBar.Header>
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+            <Button Appearance="Transparent" Margin="0,0,9,0" Command="{Binding ViewModel.NavigateCommand}"
+                       CommandParameter="download" Content="{Binding ViewModel.Downloads}"
+                       Visibility="{Binding ViewModel.IsDownloads, Converter={StaticResource BooleanToVisibilityConverter}}">
+            </Button>
+            <Button Appearance="Transparent" Margin="0,0,9,0" Command="{Binding ViewModel.NavigateCommand}"
+                       CommandParameter="support">
+                Buy us a beer! &#9829;
+            </Button>
+            <Button Appearance="Transparent" Margin="0,0,9,0" Command="{Binding ViewModel.NavigateCommand}"
+                       CommandParameter="discord">
+                Join our Discord!
+            </Button>
+        </StackPanel>
+    </ui:TitleBar.Header>
+
+    <Grid ColumnDefinitions="448*, 39*, 13*, 40*"
+          RowDefinitions="Auto, *">
+        <Grid x:Name="RootMainGrid"
+              Grid.Row="1"
+              Grid.Column="0"
+              Grid.ColumnSpan="4"
+              ColumnDefinitions="Auto,*">
+            <!--  This is the main navigation of the application.  -->
+
+            <ui:NavigationStore
+                x:Name="RootNavigation"
+                Grid.Column="0"
+                Margin="6,0,6,1.5"
+                Footer="{Binding ViewModel.NavigationFooter, Mode=TwoWay}"
+                Frame="{Binding ElementName=RootFrame, Mode=OneWay}"
+                Items="{Binding ViewModel.NavigationItems, Mode=TwoWay}" />
+
+            <!--  We display our pages inside this element.  -->
+            <Border Grid.Column="1"
+                    Background="{DynamicResource ControlFillColorDefaultBrush}"
+                    CornerRadius="8,0,0,0">
+                <Grid RowDefinitions="Auto,*">
+                    <Frame x:Name="RootFrame" Grid.Row="1" />
+                    <!--<ui:Breadcrumb
+                        Grid.Row="0"
+                        Margin="56,36"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        FontSize="28"
+                        Navigation="{Binding ElementName=RootNavigation, Mode=OneWay}" />-->
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

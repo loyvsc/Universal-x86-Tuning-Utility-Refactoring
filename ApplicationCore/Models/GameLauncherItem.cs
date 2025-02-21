@@ -9,7 +9,7 @@ public class GameLauncherItem : NotifyPropertyChangedBase
     public GameType GameType { get; set; }
     public string GameName { get; set; }
     public string Path { get; set; }
-    public string Exe { get; set; }
+    public string Executable { get; set; }
     public string ImageLocation { get; set; }
     public string IconPath { get; set; }
 

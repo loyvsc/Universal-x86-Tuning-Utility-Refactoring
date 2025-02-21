@@ -64,7 +64,7 @@ public class ImageService : IImageService
         }
     }
     
-    private string CleanFileName(string fileName)
+    public string CleanFileName(string fileName)
     {
         string illegalChars = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
         string pattern = "[" + Regex.Escape(illegalChars) + "]";

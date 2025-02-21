@@ -147,7 +147,7 @@ public class App : Application
     /// </summary>
     private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
     {
-        if (_systemInfoService.CpuInfo.Manufacturer != Manufacturer.Intel)
+        if (_systemInfoService.Cpu.Manufacturer != Manufacturer.Intel)
         {
             SMUCommands.RyzenAccess.Dispose();
         }

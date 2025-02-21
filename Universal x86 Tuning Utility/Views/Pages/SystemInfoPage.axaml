@@ -1,0 +1,198 @@
+﻿<UserControl x:Class="Universal_x86_Tuning_Utility.Views.Pages.SystemInfoPage"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModels:SystemInfoViewModel}"
+             d:DesignHeight="1500"
+             d:DesignWidth="800">
+    <Grid>
+        <DockPanel Margin="15,0,0,0">
+            <TextBlock FontSize="26"
+                       FontWeight="Medium"
+                       Text="System Info"
+                       DockPanel.Dock="Top" Margin="3,10,0,0" />
+
+            <ScrollViewer Name="mainScroll"
+                          Margin="0,12,0,0"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          IsDeferredScrollingEnabled="False"
+                          DockPanel.Dock="Top">
+                <StackPanel>
+                    <Expander IsExpanded="True"
+                              VerticalAlignment="Top"
+                              Margin="0,0,15,0">
+                        <Expander.Header>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <controls:SymbolIcon Symbol="Desktop" />
+                                <TextBlock
+                                    FontSize="14"
+                                    FontWeight="Medium"
+                                    Text="Device Information" />
+                            </StackPanel>
+                        </Expander.Header>
+                        <!--  Expander content  -->
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Margin="24,0,12,0" Width="80">
+                                    <TextBlock FontWeight="DemiBold"
+                                               Text="Name" />
+                                    <TextBlock FontWeight="DemiBold"
+                                               Margin="0,8,0,0"
+                                               Text="Producer" />
+                                    <TextBlock FontWeight="DemiBold"
+                                               Margin="0,8,0,0"
+                                               Text="Model" />
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DeviceName, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Text="{Binding DeviceManufacturer, UpdateSourceTrigger=PropertyChanged}"
+                                               Margin="0,8,0,0" />
+                                    <TextBlock Text="{Binding DeviceModel, UpdateSourceTrigger=PropertyChanged}"
+                                               Margin="0,8,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander>
+                    <Expander IsExpanded="True"
+                              VerticalAlignment="Top"
+                              Margin="0,9,15,0">
+                        <Expander.Header>
+                            <StackPanel VerticalAlignment="Center">
+                                <controls:SymbolIcon Symbol="DeveloperBoard20" />
+                                <TextBlock
+                                    FontSize="14"
+                                    FontWeight="Medium"
+                                    Text="Processor Information" />
+                            </StackPanel>
+                        </Expander.Header>
+                        <!--  Expander content  -->
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Margin="24,0,12,0" Width="80">
+                                    <TextBlock FontWeight="DemiBold" Text="Processor" />
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Producer" />
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Name="tbCode" Text="Codename" />
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Caption" />
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Cores"/>
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Threads"/>
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Base Clock"/>
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="L1 Cache"/>
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="L2 Cache"/>
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="L3 Cache"/>
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Instructions"/>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding CpuInfo.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding CpuInfo.Manufacturer, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding CpuInfo.CodeName, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding CpuInfo.Description, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding CpuCoresInfo, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding CpuInfo.LogicalCoresCount}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding CpuBaseClock, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding CpuL1Cache, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding CpuL2Cache, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding CpuL3Cache, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding CpuInstructions, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander>
+                    <Expander IsExpanded="True"
+                              VerticalAlignment="Top" Margin="0,9,15,0">
+                        <Expander.Header>
+                            <StackPanel VerticalAlignment="Center">
+                                <controls:SymbolIcon Symbol="Ram20"/>
+                                <TextBlock
+                                    FontSize="14"
+                                    FontWeight="Medium"
+                                    Text="Memory Information" />
+                            </StackPanel>
+                        </Expander.Header>
+                        <!--  Expander content  -->
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Margin="24,0,12,0"
+                                            Width="80">
+                                    <TextBlock FontWeight="DemiBold" Text="Memory"/>
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Producer"/>
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Model"/>
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Width"/>
+                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Modules"/>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding RamInfo, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding RamProducer, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding RamModel, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding RamWidth, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding RamSlots, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander>
+                    <Expander IsVisible="{Binding IsBatteryInfoAvailable, UpdateSourceTrigger=PropertyChanged}"
+                              IsExpanded="True"
+                              VerticalAlignment="Top"
+                              Margin="0,9,15,15">
+                        <Expander.Header>
+                            <StackPanel Grid.Column="0"
+                                        VerticalAlignment="Center">
+                                <controls:SymbolIcon Symbol="Battery920"/>
+                                <TextBlock
+                                    FontSize="14"
+                                    FontWeight="Medium"
+                                    Text="Battery Information" />
+                            </StackPanel>
+                        </Expander.Header>
+                        <!--  Expander content  -->
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Margin="24,0,12,0" Width="80">
+                                    <TextBlock FontWeight="DemiBold"
+                                               Text="Health"/>
+                                    <TextBlock FontWeight="DemiBold"
+                                               Margin="0,8,0,0"
+                                               Text="Cycles"/>
+                                    <TextBlock FontWeight="DemiBold"
+                                               Margin="0,8,0,0"
+                                               Text="Capacity"/>
+                                    <TextBlock FontWeight="DemiBold"
+                                               Margin="0,8,0,0"
+                                               Text="Charge Rate"/>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding BatteryHealth, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding BatteryCycle, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding BatteryCapacity, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="{Binding BatteryChargeRate, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander>
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+    </Grid>
+</UserControl>

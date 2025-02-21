@@ -19,7 +19,7 @@ public class WindowsUpdateInstallerService : IUpdateInstallerService
         _updateService = updateService;
     }
 
-    public async Task InstallNewestPackage()
+    public async Task DownloadAndInstallNewestPackage()
     {
         try
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Management;
 using System.Runtime.Intrinsics.X86;
@@ -22,12 +23,15 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
     private readonly ManagementObjectSearcher _systemInfoSearcher;
     private readonly ManagementObjectSearcher _processorInfoSearcher;
     private readonly ManagementObjectSearcher _batteryInfoSearcher;
+    private readonly ManagementObjectSearcher _memoryInfoSearcher;
+    
     private readonly ManagementEventWatcher _installDeviceEventWatcher;
     private readonly ManagementEventWatcher _uninstallDeviceEventWatcher;
     
     public int NvidiaGpuCount { get; private set; }
     public int RadeonGpuCount { get; private set; }
-    public CpuInfo CpuInfo { get; }
+    public CpuInfo Cpu { get; }
+    public RamInfo Ram { get; }
     public LaptopInfo? LaptopInfo { get; private set; }
     public List<string> GpuNames { get; }
     
@@ -42,13 +46,15 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         _systemInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_ComputerSystemProduct");
         _processorInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
         _batteryInfoSearcher = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM BatteryStatus");
+        _memoryInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_PhysicalMemory");
         
         _installDeviceEventWatcher = new ManagementEventWatcher("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2");
         _installDeviceEventWatcher.EventArrived += OnNewDeviceInstalled;
         _uninstallDeviceEventWatcher = new ManagementEventWatcher("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2");
         _uninstallDeviceEventWatcher.EventArrived += OnDeviceUninstalled;
         
-        CpuInfo = new CpuInfo();
+        Cpu = new CpuInfo();
+        Ram = new RamInfo();
         GpuNames = new List<string>();
     }
 
@@ -111,32 +117,74 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             var modelIndex = Array.IndexOf(words, "Model") + 1;
             var steppingIndex = Array.IndexOf(words, "Stepping") + 1;
 
-            CpuInfo.Family = int.Parse(words[familyIndex]);
-            CpuInfo.Model = int.Parse(words[modelIndex]);
-            CpuInfo.Stepping = int.Parse(words[steppingIndex].TrimEnd(','));
-
+            Cpu.Family = int.Parse(words[familyIndex]);
+            Cpu.Model = int.Parse(words[modelIndex]);
+            Cpu.Stepping = int.Parse(words[steppingIndex].TrimEnd(','));
+            
             foreach (var cpuInfo in _processorInfoSearcher.Get()) //todo test this shit
             {
-                CpuInfo.Name = cpuInfo["Name"].ToString();
+                Cpu.Name = cpuInfo["Name"].ToString();
+                Cpu.Description = cpuInfo["Description"].ToString();
+                Cpu.CoresCount = Convert.ToInt32(cpuInfo["NumberOfCores"]);
+                Cpu.LogicalCoresCount = Convert.ToInt32(cpuInfo["NumberOfLogicalProcessors"]);
+                Cpu.L2Size = Convert.ToDouble(cpuInfo["L2CacheSize"]) / 1024;
+                Cpu.L3Size = Convert.ToDouble(cpuInfo["L3CacheSize"]) / 1024;
+                Cpu.BaseClock = cpuInfo["MaxClockSpeed"].ToString(); //todo: check why is base clock here
             }
         }
-        catch (ManagementException ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred when analyzing cpu information");
         }
 
-        if (CpuInfo.Name.Contains("Intel"))
+        Cpu.CodeName = GetCodename();
+        
+        List<string> supportedInstructions = [];
+        if (IsMMXSupported()) supportedInstructions.Add("MMX");
+        if (Sse.IsSupported) supportedInstructions.Add("SSE");
+        if (Sse2.IsSupported) supportedInstructions.Add("SSE2");
+        if (Sse3.IsSupported) supportedInstructions.Add("SSE3");
+        if (Ssse3.IsSupported) supportedInstructions.Add("SSSE3");
+        if (Sse41.IsSupported) supportedInstructions.Add("SSE4.1");
+        if (Sse42.IsSupported) supportedInstructions.Add("SSE4.2");
+        if (IsEM64TSupported()) supportedInstructions.Add("EM64T");
+        if (Environment.Is64BitProcess) supportedInstructions.Add("x86-64");
+        if (IsVirtualizationEnabled())
         {
-            CpuInfo.Manufacturer = ApplicationCore.Enums.Manufacturer.Intel;
+            supportedInstructions.Add(
+                Cpu.Manufacturer == ApplicationCore.Enums.Manufacturer.Intel 
+                ? "VT-x" 
+                : "AMD-V");
+        }
+        if (Aes.IsSupported) supportedInstructions.Add("AES");
+        if (Avx.IsSupported) supportedInstructions.Add("AVX");
+        if (Avx2.IsSupported) supportedInstructions.Add("AVX2");
+        if (CheckAVX512Support()) supportedInstructions.Add("AVX512");
+        if (Fma.IsSupported) supportedInstructions.Add("FMA3");
+
+        Cpu.SupportedInstructions = new ReadOnlyCollection<string>(supportedInstructions);
+
+        try
+        {
+            AnalyzeRam();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred when analyzing ram information");
+        }
+
+        if (Cpu.Name.Contains("Intel"))
+        {
+            Cpu.Manufacturer = ApplicationCore.Enums.Manufacturer.Intel;
             _intelManagementService.DetermineCpu();
         }
         else
         {
-            switch (CpuInfo.RyzenGeneration)
+            switch (Cpu.RyzenGeneration)
             {
                 case RyzenGenerations.Zen1_2:
                 {
-                    CpuInfo.RyzenFamily = CpuInfo.Model switch
+                    Cpu.RyzenFamily = Cpu.Model switch
                     {
                         1 => RyzenFamily.SummitRidge,
                         8 => RyzenFamily.PinnacleRidge,
@@ -150,38 +198,38 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                         114 or 145 => RyzenFamily.VanGogh,
                         160 => RyzenFamily.Mendocino
                     };
-                    if (CpuInfo.Model == 32 &&
-                        (CpuInfo.Name.Contains("15e") || CpuInfo.Name.Contains("15Ce") || CpuInfo.Name.Contains("20e")))
+                    if (Cpu.Model == 32 &&
+                        (Cpu.Name.Contains("15e") || Cpu.Name.Contains("15Ce") || Cpu.Name.Contains("20e")))
                     {
-                        CpuInfo.RyzenFamily = RyzenFamily.Pollock;
+                        Cpu.RyzenFamily = RyzenFamily.Pollock;
                     }
 
                     break;
                 }
                 case RyzenGenerations.Zen3_4:
                 {
-                    CpuInfo.RyzenFamily = CpuInfo.Model switch
+                    Cpu.RyzenFamily = Cpu.Model switch
                     {
                         33 => RyzenFamily.Vermeer,
                         63 or 68 => RyzenFamily.Rembrandt,
-                        80 => CpuInfo.Name.Contains("25") || CpuInfo.Name.Contains("75") || CpuInfo.Name.Contains("30")
+                        80 => Cpu.Name.Contains("25") || Cpu.Name.Contains("75") || Cpu.Name.Contains("30")
                             ? RyzenFamily.Barcelo
                             : RyzenFamily.Cezanne,
                         116 => RyzenFamily.PhoenixPoint,
                         120 => RyzenFamily.PhoenixPoint2,
                         117 => RyzenFamily.HawkPoint
                     };
-                    if (CpuInfo.Model == 97)
+                    if (Cpu.Model == 97)
                     {
-                        CpuInfo.RyzenFamily =
-                            CpuInfo.Name.Contains("HX") ? RyzenFamily.DragonRange : RyzenFamily.Raphael;
+                        Cpu.RyzenFamily =
+                            Cpu.Name.Contains("HX") ? RyzenFamily.DragonRange : RyzenFamily.Raphael;
                     }
 
                     break;
                 }
                 case RyzenGenerations.Zen5_6:
                 {
-                    CpuInfo.RyzenFamily = CpuInfo.Model switch
+                    Cpu.RyzenFamily = Cpu.Model switch
                     {
                         32 or 36 => RyzenFamily.StrixPoint,
                         68 => RyzenFamily.GraniteRidge,
@@ -192,7 +240,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                 }
             }
 
-            CpuInfo.AmdProcessorType = CpuInfo.RyzenFamily is RyzenFamily.SummitRidge
+            Cpu.AmdProcessorType = Cpu.RyzenFamily is RyzenFamily.SummitRidge
                 or RyzenFamily.PinnacleRidge
                 or RyzenFamily.Matisse
                 or RyzenFamily.Vermeer
@@ -202,7 +250,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                 ? AmdProcessorType.Desktop
                 : AmdProcessorType.Apu;
 
-            Addresses.SetAddresses(CpuInfo);
+            Addresses.SetAddresses(Cpu);
         }
 
         var product = Product.ToLower();
@@ -218,7 +266,126 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                          || product.Contains("zenbook")
             };
         }
-}
+    }
+
+    private bool IsVirtualizationEnabled()
+    {
+        foreach (var queryObj in _processorInfoSearcher.Get())
+        {
+            // Check if virtualization is enabled
+            if (queryObj["VirtualizationFirmwareEnabled"] is bool)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool IsEM64TSupported()
+    {
+        using (var mo = new ManagementObject("Win32_Processor.DeviceID='CPU0'"))
+        {
+            var i = (ushort)mo["Architecture"];
+
+            return i == 9;
+        }
+    }
+
+    private bool CheckAVX512Support()
+    {
+        try
+        {
+            if (Cpu.Manufacturer != ApplicationCore.Enums.Manufacturer.Intel &&
+                Cpu.RyzenFamily < RyzenFamily.Raphael)
+            {
+                return false;
+            }
+            return NativeMethods.IsProcessorFeaturePresent(NativeMethods.PF_AVX512F_INSTRUCTIONS_AVAILABLE);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool IsMMXSupported()
+    {
+        if (Environment.Is64BitProcess)
+        {
+            // For 64-bit processes, MMX is always supported on Windows.
+            return true;
+        }
+        
+        // For 32-bit processes, check for MMX support on Windows.
+        return NativeMethods.IsProcessorFeaturePresent(NativeMethods.PF_MMX_INSTRUCTIONS_AVAILABLE);
+    }
+
+    private void AnalyzeRam()
+    {
+        int type = 0;
+        int width = 0;
+        List<RamModule> modules = [];
+        
+        foreach (var queryObj in _memoryInfoSearcher.Get())
+        {
+            var module = new RamModule()
+            {
+                Producer = queryObj["Manufacturer"].ToString()!,
+                Model = queryObj["PartNumber"].ToString()!,
+                Capacity = Convert.ToDouble(queryObj["Capacity"]),
+                Speed = Convert.ToInt32(queryObj["ConfiguredClockSpeed"])
+            };
+            
+            modules.Add(module);
+            type = Convert.ToInt32(queryObj["SMBIOSMemoryType"]);
+            width += Convert.ToInt32(queryObj["DataWidth"]);
+        }
+
+        if (width > 128 && Cpu.RyzenFamily != RyzenFamily.Unknown)
+        {
+            switch (Cpu.RyzenFamily)
+            {
+                case RyzenFamily.StrixHalo:
+                {
+                    if (width > 256)
+                    {
+                        width = 256;
+                    }
+                    break;
+                }
+                case RyzenFamily.Mendocino:
+                {
+                    width = 64;
+                    break;
+                }
+                default:
+                {
+                    if (Cpu.RyzenFamily < RyzenFamily.StrixPoint2)
+                    {
+                        width = 128;
+                    }
+                    break;
+                }
+            }
+        }
+
+        Ram.Modules = modules.ToArray();
+        Ram.Capacity = modules.Sum(module => module.Capacity);
+        Ram.Width = width;
+        
+        Ram.Type = type switch
+        {
+            20 => RamType.DDR,
+            21 => RamType.DDR2,
+            24 => RamType.DDR3,
+            26 => RamType.DDR4,
+            30 => RamType.LPDDR4,
+            34 => RamType.DDR5,
+            35 => RamType.LPDDR5,
+            _ => RamType.Unknown
+        };
+    }
 
     //todo try store gpu names in collection and subscribe to events on plug in or out video controller
     public bool IsGPUPresent(string gpuName)
@@ -301,6 +468,29 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         
         return 0;
     }
+    
+    public BatteryStatus GetBatteryStatus()
+    {
+        var batteryClass = new ManagementClass("Win32_Battery");
+        var batteries = batteryClass.GetInstances();
+        
+        foreach (var battery in batteries)
+        {
+            if (battery["BatteryStatus"] is ushort batteryStatus)
+            {
+                return batteryStatus switch
+                {
+                    1 => BatteryStatus.Discharging,
+                    3 => BatteryStatus.FullCharged,
+                    4 or 5 => BatteryStatus.Low,
+                    2 or 7 or 8 or 9 or 11 => BatteryStatus.Charging,
+                    _ => BatteryStatus.Unknown
+                };
+            }
+        }
+
+        return BatteryStatus.Unknown;
+    }
 
     public decimal ReadFullChargeCapacity()
     {
@@ -377,21 +567,21 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             .ToList();
     }
     
-    public string GetCodename()
+    private string GetCodename()
     {
-        if (CpuInfo.Manufacturer == ApplicationCore.Enums.Manufacturer.Intel)
+        if (Cpu.Manufacturer == ApplicationCore.Enums.Manufacturer.Intel)
         {
-            if (CpuInfo.Name.Contains("6th")) return "Skylake";
-            if (CpuInfo.Name.Contains("7th")) return "Kaby Lake";
-            if (CpuInfo.Name.Contains("8th") && CpuInfo.Name.Contains("G")) return "Kaby Lake";
-            else if (CpuInfo.Name.Contains("8121U") || CpuInfo.Name.Contains("8114Y")) return "Cannon Lake";
-            else if (CpuInfo.Name.Contains("8th")) return "Coffee Lake";
-            if (CpuInfo.Name.Contains("9th")) return "Coffee Lake";
-            if (CpuInfo.Name.Contains("10th") && CpuInfo.Name.Contains("G")) return "Ice Lake";
-            else if (CpuInfo.Name.Contains("10th")) return "Comet Lake";
-            if (CpuInfo.Name.Contains("11th"))
+            if (Cpu.Name.Contains("6th")) return "Skylake";
+            if (Cpu.Name.Contains("7th")) return "Kaby Lake";
+            if (Cpu.Name.Contains("8th") && Cpu.Name.Contains("G")) return "Kaby Lake";
+            else if (Cpu.Name.Contains("8121U") || Cpu.Name.Contains("8114Y")) return "Cannon Lake";
+            else if (Cpu.Name.Contains("8th")) return "Coffee Lake";
+            if (Cpu.Name.Contains("9th")) return "Coffee Lake";
+            if (Cpu.Name.Contains("10th") && Cpu.Name.Contains("G")) return "Ice Lake";
+            else if (Cpu.Name.Contains("10th")) return "Comet Lake";
+            if (Cpu.Name.Contains("11th"))
             {
-                if (CpuInfo.Name.Contains('G') || CpuInfo.Name.Contains('U') || CpuInfo.Name.Contains('H') || CpuInfo.Name.Contains("KB"))
+                if (Cpu.Name.Contains('G') || Cpu.Name.Contains('U') || Cpu.Name.Contains('H') || Cpu.Name.Contains("KB"))
                 {
                     return "Tiger Lake";
                 }
@@ -400,14 +590,14 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             {
                 return "Rocket Lake";
             }
-            if (CpuInfo.Name.Contains("12th")) return "Alder Lake";
-            if (CpuInfo.Name.Contains("13th") || CpuInfo.Name.Contains("14th") ||
-                CpuInfo.Name.Contains("Core") && CpuInfo.Name.Contains("100") && !CpuInfo.Name.Contains("th")) return "Raptor Lake";
-            if (CpuInfo.Name.Contains("Core") && CpuInfo.Name.Contains("Ultra") && CpuInfo.Name.Contains("100")) return "Meteor Lake";
+            if (Cpu.Name.Contains("12th")) return "Alder Lake";
+            if (Cpu.Name.Contains("13th") || Cpu.Name.Contains("14th") ||
+                Cpu.Name.Contains("Core") && Cpu.Name.Contains("100") && !Cpu.Name.Contains("th")) return "Raptor Lake";
+            if (Cpu.Name.Contains("Core") && Cpu.Name.Contains("Ultra") && Cpu.Name.Contains("100")) return "Meteor Lake";
         }
         else
         {
-            return CpuInfo.RyzenFamily switch
+            return Cpu.RyzenFamily switch
             {
                 RyzenFamily.SummitRidge => "Summit Ridge",
                 RyzenFamily.PinnacleRidge => "Pinnacle Ridge",
@@ -448,7 +638,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
     {
         int bigCores = 0;
         int smallCores = 0;
-        if (CpuInfo.Manufacturer == ApplicationCore.Enums.Manufacturer.Intel)
+        if (Cpu.Manufacturer == ApplicationCore.Enums.Manufacturer.Intel)
         {
             //if (CPUName.Contains("12th") || CPUName.Contains("13th") || CPUName.Contains("14th") || CPUName.Contains("Core") && CPUName.Contains("1000") && !CPUName.Contains("i"))
             //{
@@ -466,93 +656,15 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             //}
         }
 
-        if (CpuInfo.Name.Contains("7545U") && CpuInfo.RyzenFamily == RyzenFamily.PhoenixPoint2 ||
-            CpuInfo.Name.Contains("Z1") && CpuInfo.RyzenFamily == RyzenFamily.PhoenixPoint2 || CpuInfo.Name.Contains("7440U"))
+        if (Cpu.Name.Contains("7545U") && Cpu.RyzenFamily == RyzenFamily.PhoenixPoint2 ||
+            Cpu.Name.Contains("Z1") && Cpu.RyzenFamily == RyzenFamily.PhoenixPoint2 || Cpu.Name.Contains("7440U"))
         {
-            bigCores = CpuInfo.Name.Contains("7440U") ? 0 : 2;
+            bigCores = Cpu.Name.Contains("7440U") ? 0 : 2;
             smallCores = cores - bigCores;
             return $"{cores} ({bigCores} Prime Cores + {smallCores} Compact Cores)";
         }
             
         return cores.ToString();
-    }
-
-    public string GetInstructionSets()
-    {
-        List<string> supportedInstrictions = new();
-        if (IsMMXSupported()) supportedInstrictions.Add("MMX");
-        if (Sse.IsSupported) supportedInstrictions.Add("SSE");
-        if (Sse2.IsSupported) supportedInstrictions.Add("SSE2");
-        if (Sse3.IsSupported) supportedInstrictions.Add("SSE3");
-        if (Ssse3.IsSupported) supportedInstrictions.Add("SSSE3");
-        if (Sse41.IsSupported) supportedInstrictions.Add("SSE4.1");
-        if (Sse42.IsSupported) supportedInstrictions.Add("SSE4.2");
-        if (IsEM64TSupported()) supportedInstrictions.Add("EM64T");
-        if (Environment.Is64BitProcess) supportedInstrictions.Add("x86-64");
-        if (IsVirtualizationEnabled())
-        {
-            supportedInstrictions.Add(CpuInfo.Manufacturer == ApplicationCore.Enums.Manufacturer.Intel ? "VT-x" : "AMD-V");
-        }
-        if (Aes.IsSupported) supportedInstrictions.Add("AES");
-        if (Avx.IsSupported) supportedInstrictions.Add("AVX");
-        if (Avx2.IsSupported) supportedInstrictions.Add("AVX2");
-        if (CheckAVX512Support()) supportedInstrictions.Add("AVX512");
-        if (Fma.IsSupported) supportedInstrictions.Add("FMA3");
-        
-        return string.Join(", ", supportedInstrictions);
-    }
-
-    private bool IsVirtualizationEnabled()
-    {
-        foreach (var queryObj in _processorInfoSearcher.Get())
-        {
-            // Check if virtualization is enabled
-            if (queryObj["VirtualizationFirmwareEnabled"] is bool)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private bool IsEM64TSupported()
-    {
-        using (var mo = new ManagementObject("Win32_Processor.DeviceID='CPU0'"))
-        {
-            var i = (ushort)mo["Architecture"];
-
-            return i == 9;
-        }
-    }
-
-    private bool CheckAVX512Support()
-    {
-        try
-        {
-            if (CpuInfo.Manufacturer != ApplicationCore.Enums.Manufacturer.Intel &&
-                CpuInfo.RyzenFamily < RyzenFamily.Raphael)
-            {
-                return false;
-            }
-            return NativeMethods.IsProcessorFeaturePresent(NativeMethods.PF_AVX512F_INSTRUCTIONS_AVAILABLE);
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    private bool IsMMXSupported()
-    {
-        if (Environment.Is64BitProcess)
-        {
-            // For 64-bit processes, MMX is always supported on Windows.
-            return true;
-        }
-        
-        // For 32-bit processes, check for MMX support on Windows.
-        return NativeMethods.IsProcessorFeaturePresent(NativeMethods.PF_MMX_INSTRUCTIONS_AVAILABLE);
     }
     
     public void Dispose()

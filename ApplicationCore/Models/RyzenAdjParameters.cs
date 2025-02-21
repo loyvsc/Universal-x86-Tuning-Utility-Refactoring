@@ -1,4 +1,5 @@
 using System.Text;
+using ApplicationCore.Enums;
 
 namespace ApplicationCore.Models;
 
@@ -22,7 +23,7 @@ public class RyzenAdjParameters
     public int? PptLimit { get; set; }
     public int? EdcLimit { get; set; }
     public int? TdcLimit { get; set; }
-    public byte? WinPower { get; set; }
+    public PowerPlan? WinPower { get; set; }
 
     private RyzenAdjParameters()
     {
@@ -117,7 +118,7 @@ public class RyzenAdjParameters
             return this;
         }
 
-        public RyzenAdjParametersBuilder WithWinPower(byte winPower)
+        public RyzenAdjParametersBuilder WithWinPower(PowerPlan winPower)
         {
             _parameters.WinPower = winPower;
             
@@ -206,7 +207,7 @@ public class RyzenAdjParameters
 
             if (_parameters.WinPower != null)
             {
-                parametersList.Add($"--Win-Power={_parameters.WinPower}");
+                parametersList.Add($"--Power-Plan={_parameters.WinPower}");
             }
 
             if (_parameters.PptLimit != null)

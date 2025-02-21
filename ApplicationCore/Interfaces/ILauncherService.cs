@@ -6,6 +6,6 @@ public interface IGameLauncherService
 {
     public Lazy<List<GameLauncherItem>> InstalledGames { get; }
     public List<GameLauncherItem> ReSearchGames(bool isAdaptive = false);
-    public void LaunchGame(GameLauncherItem gameLauncherItem);
-    public void RunGame(string executableFilePath);
+    public Task LaunchGame(GameLauncherItem gameLauncherItem);
+    public Task RunGame(string executableFilePath);
 }

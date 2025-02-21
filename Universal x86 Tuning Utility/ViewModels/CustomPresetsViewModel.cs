@@ -10,7 +10,8 @@ using DesktopNotifications;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
-using Universal_x86_Tuning_Utility.Scripts;
+using Universal_x86_Tuning_Utility.Properties;
+using Universal_x86_Tuning_Utility.Services.PresetServices;
 using Universal_x86_Tuning_Utility.Services.RyzenAdj;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
@@ -70,6 +71,10 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         _notificationManager = notificationManager;
         _ryzenAdjService = ryzenAdjService;
 
+        _apuPresetService = PresetServiceFactory.GetPresetService(Settings.Default.Path + "apuPresets.json");
+        _amdDtCpuPresetService = PresetServiceFactory.GetPresetService(Settings.Default.Path + "amdDtCpuPresets.json");
+        _intelPresetService = PresetServiceFactory.GetPresetService(Settings.Default.Path + "intelPresets.json");
+
         DeletePresetCommand = ReactiveCommand.CreateFromTask(DeleteCurrentPreset);
     }
 
@@ -102,15 +107,15 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         try
         {
             if cbxPowerPreset.Text != "" && cbxPowerPreset.Text != null
-            switch (_systemInfoService.CpuInfo.Manufacturer)
+            switch (_systemInfoService.Cpu.Manufacturer)
             {
                 case Manufacturer.AMD:
                 {
-                    if (_systemInfoService.CpuInfo.AmdProcessorType == AmdProcessorType.Apu)
+                    if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
                     {
                         _apuPresetService.DeletePreset(deletePresetName);
                     }
-                    else if (_systemInfoService.CpuInfo.AmdProcessorType == AmdProcessorType.Desktop)
+                    else if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
                     {
                         _amdDtCpuPresetService.DeletePreset(deletePresetName);
                     }
@@ -320,7 +325,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 }
             }
 
-            if (_systemInfoService.CpuInfo.AmdProcessorType == AmdProcessorType.Desktop)
+            if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
             {
                 if (tbxPresetName.Text != "" && tbxPresetName.Text != null)
                 {
@@ -437,7 +442,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 }
             }
 
-            if (_systemInfoService.CpuInfo.Manufacturer == Manufacturer.Intel)
+            if (_systemInfoService.Cpu.Manufacturer == Manufacturer.Intel)
             {
                 if (tbxPresetName.Text != "" && tbxPresetName.Text != null)
                 {

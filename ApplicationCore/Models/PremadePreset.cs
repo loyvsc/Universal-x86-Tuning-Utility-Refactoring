@@ -15,6 +15,8 @@ public class PremadePreset : NotifyPropertyChangedBase
         get => _ryzenAdjParameters;
         set => SetValue(ref _ryzenAdjParameters, value);
     }
+    
+    public string Description { get; set; }
 
     private string _name;
     private string _ryzenAdjParameters;
