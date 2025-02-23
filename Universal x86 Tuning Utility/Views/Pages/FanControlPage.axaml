@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             x:DataType="viewModels:FanControlViewModel"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance viewModels:FanControlViewModel}"
              d:DesignHeight="450"
              d:DesignWidth="800">
 

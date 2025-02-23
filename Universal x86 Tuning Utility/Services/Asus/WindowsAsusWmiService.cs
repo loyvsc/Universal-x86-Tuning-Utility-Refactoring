@@ -13,10 +13,10 @@ using Microsoft.Extensions.Logging;
 namespace Universal_x86_Tuning_Utility.Services.Asus;
 
 // todo: remove references to implementation
-public class AsusWmiService : IASUSWmiService
+public class WindowsAsusWmiService : IASUSWmiService
 {
     // todo: log get set device
-    private readonly ILogger<AsusWmiService> _logger;
+    private readonly ILogger<WindowsAsusWmiService> _logger;
     //
     // This is a customised version of ASUSWmi.cs from https://github.com/seerge/g-helper
     // I do not take credit for the full functionality of the code.
@@ -89,10 +89,10 @@ public class AsusWmiService : IASUSWmiService
     // public const int PPT_APUC1 = 0x001200C1;
     // public const int PPT_APUC2 = 0x001200C2;
 
-    private const int TUF_KB_BRIGHTNESS = 0x00050021;
-    private const int TUF_KB = 0x00100056;
-    private const int TUF_KB2 = 0x0010005a;
-    private const int TUF_KB_STATE = 0x00100057;
+    private const uint TUF_KB_BRIGHTNESS = 0x00050021;
+    private const uint TUF_KB = 0x00100056;
+    private const uint TUF_KB2 = 0x0010005a;
+    private const uint TUF_KB_STATE = 0x00100057;
 
     // public const int CPU_VOLTAGE = 0x00120079;
     //
@@ -141,11 +141,11 @@ public class AsusWmiService : IASUSWmiService
 
     #endregion
 
-    private IntPtr _handle;
     private IntPtr _eventHandle;
+    private readonly IntPtr _handle;
     private readonly ManagementEventWatcher _eventWatcher;
     
-    public AsusWmiService(ILogger<AsusWmiService> logger)
+    public WindowsAsusWmiService(ILogger<WindowsAsusWmiService> logger)
     {
         _logger = logger;
         _handle = CreateFile(
@@ -222,22 +222,66 @@ public class AsusWmiService : IASUSWmiService
         return CallMethod(INIT, args);
     }
 
-    public int DeviceSet(uint deviceID, int status, string logName)
+    public int DeviceSet(AsusDevice device, int newValue)
+    {
+        var deviceId = device switch
+        {
+            AsusDevice.GpuMux => GPUMux,
+            AsusDevice.GpuMuxVivo => GPUMuxVivo,
+            AsusDevice.GpuEco => GPUEco,
+            AsusDevice.EGpu => eGPU,
+            AsusDevice.EGpuConnected => eGPUConnected,
+            AsusDevice.CpuFan => CPU_Fan,
+            AsusDevice.GpuFan => GPU_Fan,
+            AsusDevice.SystemFan => SYS_Fan,
+            AsusDevice.TufKeyboardState => TUF_KB_STATE,
+            AsusDevice.TufKeyboardBrightness => TUF_KB_BRIGHTNESS,
+            _ => throw new ArgumentOutOfRangeException(nameof(device), device, null)
+        };
+        
+        _logger.LogInformation($"Set value of {device.ToString()}", newValue);
+
+        return DeviceSet(deviceId: deviceId, newValue);
+    }
+
+    private int DeviceSet(uint deviceId, int status)
     {
         var args = new byte[8];
-        BitConverter.GetBytes(deviceID).CopyTo(args, 0);
+        BitConverter.GetBytes(deviceId).CopyTo(args, 0);
         BitConverter.GetBytes((uint)status).CopyTo(args, 4);
 
         var deviceStatus = CallMethod(DEVS, args);
         int result = BitConverter.ToInt32(deviceStatus, 0);
-            
+        
         return result;
     }
 
-    public int DeviceSet(uint deviceID, byte[] Params, string logName)
+    public int DeviceSet(AsusDevice device, byte[] values)
+    {
+        var deviceId = device switch
+        {
+            AsusDevice.GpuMux => GPUMux,
+            AsusDevice.GpuMuxVivo => GPUMuxVivo,
+            AsusDevice.GpuEco => GPUEco,
+            AsusDevice.EGpu => eGPU,
+            AsusDevice.EGpuConnected => eGPUConnected,
+            AsusDevice.CpuFan => CPU_Fan,
+            AsusDevice.GpuFan => GPU_Fan,
+            AsusDevice.SystemFan => SYS_Fan,
+            AsusDevice.TufKeyboardState => TUF_KB_STATE,
+            AsusDevice.TufKeyboardBrightness => TUF_KB_BRIGHTNESS,
+            _ => throw new ArgumentOutOfRangeException(nameof(device), device, null)
+        };
+        
+        _logger.LogInformation($"Set values of {device.ToString()}", values);
+
+        return DeviceSet(deviceId: deviceId, Params: values);
+    }
+
+    private int DeviceSet(uint deviceId, byte[] Params)
     {
         var args = new byte[4 + Params.Length];
-        BitConverter.GetBytes(deviceID).CopyTo(args, 0);
+        BitConverter.GetBytes(deviceId).CopyTo(args, 0);
         Params.CopyTo(args, 4);
 
         var status = CallMethod(DEVS, args);
@@ -245,23 +289,64 @@ public class AsusWmiService : IASUSWmiService
 
         return result;
     }
+
+    public int DeviceGet(AsusDevice device)
+    {
+        var deviceId = device switch
+        {
+            AsusDevice.GpuMux => GPUMux,
+            AsusDevice.GpuMuxVivo => GPUMuxVivo,
+            AsusDevice.GpuEco => GPUEco,
+            AsusDevice.EGpu => eGPU,
+            AsusDevice.EGpuConnected => eGPUConnected,
+            AsusDevice.CpuFan => CPU_Fan,
+            AsusDevice.GpuFan => GPU_Fan,
+            AsusDevice.SystemFan => SYS_Fan,
+            AsusDevice.TufKeyboardState => TUF_KB_STATE,
+            AsusDevice.TufKeyboardBrightness => TUF_KB_BRIGHTNESS,
+            _ => throw new ArgumentOutOfRangeException(nameof(device), device, null)
+        };
         
-    public int DeviceGet(uint deviceID)
+        _logger.LogInformation($"Getting status of {device.ToString()}", device);
+
+        return DeviceGet(deviceId: deviceId);
+    }
+        
+    private int DeviceGet(uint deviceId)
     {
         byte[] args = new byte[8];
-        BitConverter.GetBytes(deviceID).CopyTo(args, 0);
+        BitConverter.GetBytes(deviceId).CopyTo(args, 0);
         byte[] status = CallMethod(DSTS, args);
 
         return BitConverter.ToInt32(status, 0) - 65536;
     }
 
-    private byte[] DeviceGetBuffer(uint deviceID, uint status = 0)
+    private byte[] DeviceGetBuffer(uint deviceId, uint status = 0)
     {
         var args = new byte[8];
-        BitConverter.GetBytes(deviceID).CopyTo(args, 0);
+        BitConverter.GetBytes(deviceId).CopyTo(args, 0);
         BitConverter.GetBytes(status).CopyTo(args, 4);
 
         return CallMethod(DSTS, args);
+    }
+
+    public AsusMode GetPerformanceMode()
+    {
+        var gamingLaptopResult = DeviceGet(PerformanceMode);
+        if (gamingLaptopResult is >= 0 and < 3)
+        {
+            return (AsusMode)gamingLaptopResult;
+        }
+        else
+        {
+            var vivoLatopResult = DeviceGet(VivoBookMode);
+            if (vivoLatopResult is >= 0 and < 3)
+            {
+                return (AsusMode)vivoLatopResult;
+            }
+
+            throw new Exception("Unsupported asus laptop");
+        }
     }
 
     public void SetGPUEco(int eco)
@@ -271,7 +356,7 @@ public class AsusWmiService : IASUSWmiService
 
         if (ecoFlag != eco)
         {
-            DeviceSet(GPUEco, eco, "GPUEco");
+            DeviceSet(GPUEco, eco);
         }
     }
 
@@ -304,10 +389,10 @@ public class AsusWmiService : IASUSWmiService
         switch (device)
         {
             case AsusFan.GPU: 
-                DeviceSet(DevsGPUFan, range, "FanRangeGPU");
+                DeviceSet(DevsGPUFan, range);
                 break;
             default:
-                DeviceSet(DevsCPUFan, range, "FanRangeCPU");
+                DeviceSet(DevsCPUFan, range);
                 break;
         }
     }
@@ -327,13 +412,13 @@ public class AsusWmiService : IASUSWmiService
         switch (device)
         {
             case AsusFan.GPU:
-                DeviceSet(DevsGPUFanCurve, curve, "FanGPU");
+                DeviceSet(DevsGPUFanCurve, curve);
                 break;
             case AsusFan.Mid:
-                DeviceSet(DevsSYSFanCurve, curve, "FanMid");
+                DeviceSet(DevsSYSFanCurve, curve);
                 break;
             default:
-                DeviceSet(DevsCPUFanCurve, curve, "FanCPU");
+                DeviceSet(DevsCPUFanCurve, curve);
                 break;
         }
     }
@@ -417,8 +502,7 @@ public class AsusWmiService : IASUSWmiService
     {
         return DeviceGet(PPT_CPUB0) >= 0 && DeviceGet(GPUBoost) < 0;
     }
-
-    // todo: refact logFile path
+    
     public void ScanRange()
     {
         int value;
@@ -441,7 +525,7 @@ public class AsusWmiService : IASUSWmiService
     public void TUFKeyboardBrightness(int brightness)
     {
         int param = 0x80 | (brightness & 0x7F);
-        DeviceSet(TUF_KB_BRIGHTNESS, param, "TUF Brightness");
+        DeviceSet(TUF_KB_BRIGHTNESS, param);
     }
 
     public void TUFKeyboardRGB(int mode, Color color, int speed)
@@ -455,8 +539,8 @@ public class AsusWmiService : IASUSWmiService
         setting[4] = color.B;
         setting[5] = (byte)speed;
 
-        int result = DeviceSet(TUF_KB, setting, "TUF RGB");
-        if (result != 1) DeviceSet(TUF_KB2, setting, "TUF RGB");
+        int result = DeviceSet(TUF_KB, setting);
+        if (result != 1) DeviceSet(TUF_KB2, setting);
     }
 
     private const int ASUS_WMI_KEYBOARD_POWER_BOOT = 0x03 << 16;
@@ -475,7 +559,7 @@ public class AsusWmiService : IASUSWmiService
 
         state |= 0x01 << 8;
 
-        DeviceSet(TUF_KB_STATE, state, "TUF_KB");
+        DeviceSet(TUF_KB_STATE, state);
     }
 
     public void SubscribeToEvents(Action<object, EventArgs> eventHandler)

@@ -24,6 +24,11 @@ public class PresetService : IPresetService
         return _presets.Keys;
     }
 
+    public IEnumerable<Preset> GetPresets()
+    {
+        return _presets.Values;
+    }
+
     public Preset? GetPreset(string presetName)
     {
         return _presets.GetValueOrDefault(presetName);

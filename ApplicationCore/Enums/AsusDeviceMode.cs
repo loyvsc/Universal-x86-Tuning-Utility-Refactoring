@@ -1,7 +1,7 @@
 namespace ApplicationCore.Enums;
 
-public enum AsusDeviceMode : uint
+public enum AsusDeviceMode
 {
-    PerformanceMode = 0x00120075,
-    VivoBookMode = 0x00110019
+    PerformanceMode,
+    VivoBookMode
 }

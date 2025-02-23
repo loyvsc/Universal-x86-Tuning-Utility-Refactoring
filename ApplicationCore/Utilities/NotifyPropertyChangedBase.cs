@@ -12,11 +12,12 @@ public abstract class NotifyPropertyChangedBase : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    protected bool SetValue<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    protected bool SetValue<T>(ref T field, T value, Action? afterSetAction = null, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;
         field = value;
         OnPropertyChanged(propertyName);
+        afterSetAction?.Invoke();
         return true;
     }
 }

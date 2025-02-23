@@ -4,5 +4,6 @@ public enum AsusMode
 {
     Balanced,
     Turbo,
-    Silent
+    Silent,
+    AcControlled
 }

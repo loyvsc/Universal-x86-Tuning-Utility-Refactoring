@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using HidLibrary;
@@ -45,14 +46,7 @@ public class XgMobileConnectionService : IXgMobileConnectionService
             bool prevConnected = Connected;
                 
             Detected = IsEGPUDetected();
-            if (Detected)
-            {
-                Connected = IsEGPUConnected();
-            }
-            else
-            {
-                Connected = false;
-            }
+            Connected = Detected && IsEGPUConnected();
                 
             if (prevDetected != Detected || prevConnected != Connected)
             {
@@ -73,17 +67,17 @@ public class XgMobileConnectionService : IXgMobileConnectionService
 
     private bool IsEGPUDetected()
     {
-        return _wmiService.DeviceGet(AsusWmiService.eGPUConnected) == 1;
+        return _wmiService.DeviceGet(AsusDevice.EGpuConnected) == 1;
     }
 
     public bool IsEGPUConnected()
     {
-        int deviceStatus = _wmiService.DeviceGet(AsusWmiService.eGPU);
+        int deviceStatus = _wmiService.DeviceGet(AsusDevice.EGpuConnected);
         if (deviceStatus != 0 && deviceStatus != 1)
         {
             throw new InvalidOperationException($"Unknown device status: {deviceStatus}");
         }
-        return _wmiService.DeviceGet(AsusWmiService.eGPU) == 1;
+        return _wmiService.DeviceGet(AsusDevice.EGpu) == 1;
     }
 
     public void EnableXgMobileLight()

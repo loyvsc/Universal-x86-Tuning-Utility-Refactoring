@@ -12,31 +12,16 @@ namespace Universal_x86_Tuning_Utility.ViewModels;
 
 public partial class DashboardViewModel : NotifyPropertyChangedBase
 {
-    [ObservableProperty]
-    private int _counter = 0;
-
-
-    [RelayCommand]
-    private void OnCounterIncrement()
-    {
-        Counter++;
-    }
-
-    private readonly INavigationService _navigationService;
     private readonly ISystemInfoService _systemInfoService;
 
 
-    private ICommand _navigateCommand;
-
     private ICommand _openWindowCommand;
 
-    public ICommand NavigateCommand => _navigateCommand ??= new RelayCommand<string>(OnNavigate);
 
     public ICommand OpenWindowCommand => _openWindowCommand ??= new RelayCommand<string>(OnOpenWindow);
 
     public DispatcherTimer autoAdaptive = new DispatcherTimer();
-    public DashboardViewModel(INavigationService navigationService,
-        ISystemInfoService systemInfoService)
+    public DashboardViewModel(ISystemInfoService systemInfoService)
     {
         _navigationService = navigationService;
         _systemInfoService = systemInfoService;

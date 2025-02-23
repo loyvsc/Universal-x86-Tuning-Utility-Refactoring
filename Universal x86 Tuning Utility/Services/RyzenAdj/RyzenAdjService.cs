@@ -342,11 +342,11 @@ public class RyzenAdjService : IRyzenAdjService
                     {
                         if (_systemInfoService.Product.Contains("ROG") || _systemInfoService.Product.Contains("TUF"))
                         {
-                            id = AsusWmiService.GPUMux;
+                            id = WindowsAsusWmiService.GPUMux;
                         }
                         else
                         {
-                            id = AsusWmiService.GPUMuxVivo;
+                            id = WindowsAsusWmiService.GPUMuxVivo;
                         }
 
                         int mux = _asusWmiService.DeviceGet(id);
@@ -356,11 +356,11 @@ public class RyzenAdjService : IRyzenAdjService
                             if (_systemInfoService.Product.Contains("ROG") ||
                                 _systemInfoService.Product.Contains("TUF"))
                             {
-                                id = AsusWmiService.GPUMux;
+                                id = WindowsAsusWmiService.GPUMux;
                             }
                             else
                             {
-                                id = AsusWmiService.GPUMuxVivo;
+                                id = WindowsAsusWmiService.GPUMuxVivo;
                             }
                             _asusWmiService.DeviceSet(id, 0, "MUX");
                             
@@ -372,11 +372,11 @@ public class RyzenAdjService : IRyzenAdjService
                             if (_systemInfoService.Product.Contains("ROG") ||
                                 _systemInfoService.Product.Contains("TUF"))
                             {
-                                id = AsusWmiService.GPUMux;
+                                id = WindowsAsusWmiService.GPUMux;
                             }
                             else
                             {
-                                id = AsusWmiService.GPUMuxVivo;
+                                id = WindowsAsusWmiService.GPUMuxVivo;
                             }
                             _asusWmiService.DeviceSet(id, 1, "MUX");
                             

@@ -7,9 +7,10 @@ public interface IASUSWmiService : IDisposable
 {
     public void RunListener();
     public byte[] DeviceInit();
-    public int DeviceSet(uint deviceId, int status, string logName);
-    public int DeviceSet(uint deviceId, byte[] Params, string logName);
-    public int DeviceGet(uint deviceId);
+    public int DeviceSet(AsusDevice device, int newValue);
+    public int DeviceSet(AsusDevice device, byte[] values);
+    public int DeviceGet(AsusDevice deviceId);
+    public AsusMode GetPerformanceMode();
     public void SetGPUEco(int eco);
     public int GetFan(AsusFan device);
     public void SetFanRange(AsusFan device, byte[] curve);
