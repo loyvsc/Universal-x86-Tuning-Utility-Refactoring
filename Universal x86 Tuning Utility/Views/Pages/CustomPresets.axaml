@@ -32,6 +32,7 @@
                                Text="Saved Presets:" />
                     <ComboBox Width="225"
                               ItemsSource="{Binding AvailablePresets, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValue="{Binding SelectedPreset, UpdateSourceTrigger=PropertyChanged}"
                               Height="37" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal"
@@ -114,7 +115,7 @@
                 <StackPanel Margin="15,0,0,0">
                     <!-- Amd Apu Thermal settings !-->
                     <Expander Margin="0,0,15,0"
-                              IsVisible="{Binding is}">
+                              IsVisible="{Binding IsAmdApuSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <StackPanel Grid.Column="0"
                                         VerticalAlignment="Center">
@@ -229,17 +230,17 @@
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" Margin="0,8,0,0">
-                                    <CheckBox Name="cbCPUTemp" />
+                                    <CheckBox Name="cbCPUTemp"
+                                              IsChecked="{Binding SelectedPreset.IsDtCpuTemp, UpdateSourceTrigger=PropertyChanged}"/>
                                     <ui:NumberBox Name="nudCPUTemp"
                                                   Grid.Column="1"
-                                                  Text="{Binding ElementName=sdCPUTemp, Path=Value}"
-                                                  Value="{Binding ElementName=sdCPUTemp, Path=Value}"
+                                                  Value="{Binding SelectedPreset.DtCpuTemperature, UpdateSourceTrigger=PropertyChanged}"
                                                   Maximum="95"
                                                   Minimum="10"
                                                   SmallChange="1" />
                                     <Slider Name="sdCPUTemp"
                                             Grid.Column="2"
-                                            Value="{Binding ElementName=nudCPUTemp, Path=Value}"
+                                            Value="{Binding SelectedPreset.DtCpuTemperature, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="95"
                                             Minimum="10"
                                             Margin="12,0,0,0"
@@ -463,14 +464,14 @@
                                         <ColumnDefinition Width="150" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <CheckBox Name="cbPPT" />
-                                    <ui:NumberBox Name="nudPPT" Text="{Binding ElementName=sdPPT, Path=Value}"
-                                                  Value="{Binding ElementName=sdPPT, Path=Value}" Maximum="300"
+                                    <CheckBox Name="cbPPT" 
+                                              IsChecked="{Binding SelectedPreset.IsDtCpuPpt, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ui:NumberBox Name="nudPPT"
+                                                  Value="{Binding SelectedPreset.DtCpuPpt, UpdateSourceTrigger=PropertyChanged}" Maximum="300"
                                                   Minimum="8" Grid.Column="1" SmallChange="1"  />
-                                    <Slider Name="sdPPT" Value="{Binding ElementName=nudPPT, Path=Value}" Maximum="300"
+                                    <Slider Name="sdPPT" Value="{Binding SelectedPreset.DtCpuPpt, UpdateSourceTrigger=PropertyChanged}" Maximum="300"
                                             Minimum="8" Grid.Column="2" Margin="12,0,0,0" TickFrequency="1"
-                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                             />
+                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"/>
                                 </Grid>
                             </StackPanel>
                             <StackPanel Margin="0,8,0,0">
@@ -490,11 +491,12 @@
                                         <ColumnDefinition Width="150" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <CheckBox Name="cbEDC" />
-                                    <ui:NumberBox Name="nudEDC" Text="{Binding ElementName=sdEDC, Path=Value}"
-                                                  Value="{Binding ElementName=sdEDC, Path=Value}" Maximum="900"
+                                    <CheckBox Name="cbEDC"
+                                              IsChecked="{Binding SelectedPreset.IsDtCpuEdc, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ui:NumberBox Name="nudEDC"
+                                                  Value="{Binding SelectedPreset.DtCpuEdc, UpdateSourceTrigger=PropertyChanged}" Maximum="900"
                                                   Minimum="8" Grid.Column="1" SmallChange="25"  />
-                                    <Slider Name="sdEDC" Value="{Binding ElementName=nudEDC, Path=Value}" Maximum="900"
+                                    <Slider Name="sdEDC" Value="{Binding SelectedPreset.DtCpuEdc, UpdateSourceTrigger=PropertyChanged}" Maximum="900"
                                             Minimum="8" Grid.Column="2" Margin="12,0,0,0" TickFrequency="25"
                                             VerticalAlignment="Center" IsSnapToTickEnabled="True"
                                              />
@@ -517,11 +519,12 @@
                                         <ColumnDefinition Width="150" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <CheckBox Name="cbTDC" />
-                                    <ui:NumberBox Name="nudTDC" Text="{Binding ElementName=sdTDC, Path=Value}"
-                                                  Value="{Binding ElementName=sdTDC, Path=Value}" Maximum="900"
+                                    <CheckBox Name="cbTDC" 
+                                              IsChecked="{Binding SelectedPreset.IsDtCpuTdc, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ui:NumberBox Name="nudTDC"
+                                                  Value="{Binding SelectedPreset.DtCpuTdc, UpdateSourceTrigger=PropertyChanged}" Maximum="900"
                                                   Minimum="8" Grid.Column="1" SmallChange="25"  />
-                                    <Slider Name="sdTDC" Value="{Binding ElementName=nudTDC, Path=Value}" Maximum="900"
+                                    <Slider Name="sdTDC" Value="{Binding SelectedPreset.DtCpuTdc, UpdateSourceTrigger=PropertyChanged}" Maximum="900"
                                             Minimum="8" Grid.Column="2" Margin="12,0,0,0" TickFrequency="25"
                                             VerticalAlignment="Center" IsSnapToTickEnabled="True"
                                              />
@@ -565,12 +568,12 @@
                                         <ColumnDefinition Width="150" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <CheckBox Name="cbIntelPL1" />
+                                    <CheckBox Name="cbIntelPL1" 
+                                              IsChecked="{Binding SelectedPreset.IsIntelPl1, UpdateSourceTrigger=PropertyChanged}"/>
                                     <ui:NumberBox Name="nudIntelPL1"
-                                                  Text="{Binding ElementName=sdIntelPL1, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelPL1, Path=Value}" Maximum="400"
+                                                  Value="{Binding SelectedPreset.IntelPl1, UpdateSourceTrigger=PropertyChanged}" Maximum="400"
                                                   Minimum="8" Grid.Column="1" SmallChange="1"  />
-                                    <Slider Name="sdIntelPL1" Value="{Binding ElementName=nudIntelPL1, Path=Value}"
+                                    <Slider Name="sdIntelPL1" Value="{Binding SelectedPreset.IntelPl1, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="400" Minimum="8" Grid.Column="2" Margin="12,0,0,0"
                                             TickFrequency="1" VerticalAlignment="Center" IsSnapToTickEnabled="True"
                                              />
@@ -594,12 +597,13 @@
                                         <ColumnDefinition Width="150" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <CheckBox Name="cbIntelPL2" />
+                                    <CheckBox Name="cbIntelPL2" 
+                                              IsChecked="{Binding SelectedPreset.IsIntelPl2, UpdateSourceTrigger=PropertyChanged}"/>
                                     <ui:NumberBox Name="nudIntelPL2"
-                                                  Text="{Binding ElementName=sdIntelPL2, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelPL2, Path=Value}" Maximum="400"
+                                                  Value="{Binding SelectedPreset.IntelPl2, UpdateSourceTrigger=PropertyChanged}" Maximum="400"
                                                   Minimum="8" Grid.Column="1" SmallChange="25"  />
-                                    <Slider Name="sdIntelPL2" Value="{Binding ElementName=nudIntelPL2, Path=Value}"
+                                    <Slider Name="sdIntelPL2"
+                                            Value="{Binding SelectedPreset.IntelPl2, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="400" Minimum="8" Grid.Column="2" Margin="12,0,0,0"
                                             TickFrequency="25" VerticalAlignment="Center" IsSnapToTickEnabled="True"
                                              />
@@ -1702,7 +1706,9 @@
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                    <ToggleSwitch Name="tsIntelBal" Margin="0,0,9,0" />
+                                    <ToggleSwitch Name="tsIntelBal" 
+                                                  Margin="0,0,9,0" 
+                                                  IsChecked="{Binding SelectedPreset.IsIntelBal, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                             </Grid>
                         </Expander.Header>
@@ -1723,11 +1729,10 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <ui:NumberBox Name="nudIntelCpuBal"
-                                                  Text="{Binding ElementName=sdIntelCpuBal, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelCpuBal, Path=Value}" Maximum="31"
+                                                  Value="{Binding SelectedPreset.IntelBalCpu, UpdateSourceTrigger=PropertyChanged}" Maximum="31"
                                                   Minimum="0" Grid.Column="0" SmallChange="5"  />
                                     <Slider Name="sdIntelCpuBal"
-                                            Value="{Binding ElementName=nudIntelCpuBal, Path=Value}" Maximum="31"
+                                            Value="{Binding SelectedPreset.IntelBalCpu, UpdateSourceTrigger=PropertyChanged}" Maximum="31"
                                             Minimum="0" Grid.Column="1" Margin="12,0,0,0" TickFrequency="5"
                                             VerticalAlignment="Center" IsSnapToTickEnabled="True"
                                              />
@@ -1748,11 +1753,10 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <ui:NumberBox Name="nudIntelGpuBal"
-                                                  Text="{Binding ElementName=sdIntelGpuBal, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelGpuBal, Path=Value}" Maximum="31"
+                                                  Value="{Binding SelectedPreset.IntelBalGpu, UpdateSourceTrigger=PropertyChanged}" Maximum="31"
                                                   Minimum="0" Grid.Column="0" SmallChange="5"  />
                                     <Slider Name="sdIntelGpuBal"
-                                            Value="{Binding ElementName=nudIntelGpuBal, Path=Value}" Maximum="31"
+                                            Value="{Binding SelectedPreset.IntelBalGpu, UpdateSourceTrigger=PropertyChanged}" Maximum="31"
                                             Minimum="0" Grid.Column="1" Margin="12,0,0,0" TickFrequency="5"
                                             VerticalAlignment="Center" IsSnapToTickEnabled="True"
                                              />
@@ -1784,213 +1788,43 @@
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                    <ToggleSwitch Name="tsIntelRatioCore" Margin="0,0,9,0" />
+                                    <ToggleSwitch Name="tsIntelRatioCore"
+                                                  Margin="0,0,9,0" 
+                                                  IsChecked="{Binding SelectedPreset.IsIntelClockRatio, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <!--  CardExpander content  -->
-                        <StackPanel>
-                            <StackPanel Margin="0,-8,0,0">
+                        <ItemsControl ItemsSource="{Binding SelectedPreset.IntelClockRatios, UpdateSourceTrigger=PropertyChanged}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:IntelClockRatio}">
+                                    <StackPanel Margin="0,-8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13"
-                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}">
-                                        Core Group 1
-                                    </TextBlock>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" />-->
+                                    <TextBlock FontWeight="DemiBold" 
+                                               FontSize="13"
+                                               Text="{Binding CoreGroupIndex, StringFormat={}Core Group {0}}"/>
+                                    <!-- <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" /> -->
                                 </StackPanel>
 
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:NumberBox Name="nudIntelRatioC1"
-                                                  Text="{Binding ElementName=sdIntelRatioC1, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelRatioC1, Path=Value}" Maximum="83"
-                                                  Minimum="4" Grid.Column="0" SmallChange="1"  />
-                                    <Slider Name="sdIntelRatioC1"
-                                            Value="{Binding ElementName=nudIntelRatioC1, Path=Value}" Maximum="83"
-                                            Minimum="4" Grid.Column="1" Margin="12,0,0,0" TickFrequency="1"
-                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                             />
+                                <Grid ColumnDefinitions="150, *"
+                                      Margin="0,8,0,0">
+                                    <ui:NumberBox Grid.Column="0" 
+                                                  Value="{Binding Ratio, UpdateSourceTrigger=PropertyChanged}"
+                                                  Maximum="83"
+                                                  Minimum="4" SmallChange="1"  />
+                                    <Slider Grid.Column="1"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center" 
+                                            Value="{Binding Ratio, UpdateSourceTrigger=PropertyChanged}" 
+                                            Maximum="83"
+                                            Minimum="4" 
+                                            TickFrequency="1"
+                                            IsSnapToTickEnabled="True"/>
                                 </Grid>
                             </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13"
-                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}">
-                                        Core Group 2
-                                    </TextBlock>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                                </StackPanel>
-
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:NumberBox Name="nudIntelRatioC2"
-                                                  Text="{Binding ElementName=sdIntelRatioC2, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelRatioC2, Path=Value}" Maximum="83"
-                                                  Minimum="4" Grid.Column="0" SmallChange="1"  />
-                                    <Slider Name="sdIntelRatioC2"
-                                            Value="{Binding ElementName=nudIntelRatioC2, Path=Value}" Maximum="83"
-                                            Minimum="4" Grid.Column="1" Margin="12,0,0,0" TickFrequency="1"
-                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                             />
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13"
-                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}">
-                                        Core Group 3
-                                    </TextBlock>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                                </StackPanel>
-
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:NumberBox Name="nudIntelRatioC3"
-                                                  Text="{Binding ElementName=sdIntelRatioC3, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelRatioC3, Path=Value}" Maximum="83"
-                                                  Minimum="4" Grid.Column="0" SmallChange="1"  />
-                                    <Slider Name="sdIntelRatioC3"
-                                            Value="{Binding ElementName=nudIntelRatioC3, Path=Value}" Maximum="83"
-                                            Minimum="4" Grid.Column="1" Margin="12,0,0,0" TickFrequency="1"
-                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                             />
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13"
-                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}">
-                                        Core Group 4
-                                    </TextBlock>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                                </StackPanel>
-
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:NumberBox Name="nudIntelRatioC4"
-                                                  Text="{Binding ElementName=sdIntelRatioC4, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelRatioC4, Path=Value}" Maximum="83"
-                                                  Minimum="4" Grid.Column="0" SmallChange="1"  />
-                                    <Slider Name="sdIntelRatioC4"
-                                            Value="{Binding ElementName=nudIntelRatioC4, Path=Value}" Maximum="83"
-                                            Minimum="4" Grid.Column="1" Margin="12,0,0,0" TickFrequency="1"
-                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                             />
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13"
-                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}">
-                                        Core Group 5
-                                    </TextBlock>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                                </StackPanel>
-
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:NumberBox Name="nudIntelRatioC5"
-                                                  Text="{Binding ElementName=sdIntelRatioC5, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelRatioC5, Path=Value}" Maximum="83"
-                                                  Minimum="4" Grid.Column="0" SmallChange="1"  />
-                                    <Slider Name="sdIntelRatioC5"
-                                            Value="{Binding ElementName=nudIntelRatioC5, Path=Value}" Maximum="83"
-                                            Minimum="4" Grid.Column="1" Margin="12,0,0,0" TickFrequency="1"
-                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                             />
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13"
-                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}">
-                                        Core Group 6
-                                    </TextBlock>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                                </StackPanel>
-
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:NumberBox Name="nudIntelRatioC6"
-                                                  Text="{Binding ElementName=sdIntelRatioC6, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelRatioC6, Path=Value}" Maximum="83"
-                                                  Minimum="4" Grid.Column="0" SmallChange="1"  />
-                                    <Slider Name="sdIntelRatioC6"
-                                            Value="{Binding ElementName=nudIntelRatioC6, Path=Value}" Maximum="83"
-                                            Minimum="4" Grid.Column="1" Margin="12,0,0,0" TickFrequency="1"
-                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                             />
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13"
-                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}">
-                                        Core Group 7
-                                    </TextBlock>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                                </StackPanel>
-
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:NumberBox Name="nudIntelRatioC7"
-                                                  Text="{Binding ElementName=sdIntelRatioC7, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelRatioC7, Path=Value}" Maximum="83"
-                                                  Minimum="4" Grid.Column="0" SmallChange="1"  />
-                                    <Slider Name="sdIntelRatioC7"
-                                            Value="{Binding ElementName=nudIntelRatioC7, Path=Value}" Maximum="83"
-                                            Minimum="4" Grid.Column="1" Margin="12,0,0,0" TickFrequency="1"
-                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                             />
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13"
-                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}">
-                                        Core Group 8
-                                    </TextBlock>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                                </StackPanel>
-
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:NumberBox Name="nudIntelRatioC8"
-                                                  Text="{Binding ElementName=sdIntelRatioC8, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelRatioC8, Path=Value}" Maximum="83"
-                                                  Minimum="4" Grid.Column="0" SmallChange="1"  />
-                                    <Slider Name="sdIntelRatioC8"
-                                            Value="{Binding ElementName=nudIntelRatioC8, Path=Value}" Maximum="83"
-                                            Minimum="4" Grid.Column="1" Margin="12,0,0,0" TickFrequency="1"
-                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                             />
-                                </Grid>
-                            </StackPanel>
-                        </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Expander>
 
                     <!-- Intel FIVR Tuning !-->
@@ -2016,7 +1850,9 @@
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                    <ToggleSwitch Name="tsIntelUV" Margin="0,0,9,0" />
+                                    <ToggleSwitch Name="tsIntelUV"
+                                                  Margin="0,0,9,0" 
+                                                  IsChecked="{Binding SelectedPreset.IsIntelVoltages, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                             </Grid>
                         </Expander.Header>
@@ -2037,11 +1873,11 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <ui:NumberBox Name="nudIntelCoreUV"
-                                                  Text="{Binding ElementName=sdIntelCoreUV, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelCoreUV, Path=Value}" Maximum="250"
+                                                  Value="{Binding SelectedPreset.IntelVoltageCpu, UpdateSourceTrigger=PropertyChanged}" Maximum="250"
                                                   Minimum="-250" Grid.Column="0" SmallChange="5"  />
                                     <Slider Name="sdIntelCoreUV"
-                                            Value="{Binding ElementName=nudIntelCoreUV, Path=Value}" Maximum="250"
+                                            Value="{Binding SelectedPreset.IntelVoltageCpu, UpdateSourceTrigger=PropertyChanged}" 
+                                            Maximum="250"
                                             Minimum="-250" Grid.Column="1" Margin="12,0,0,0" TickFrequency="5"
                                             VerticalAlignment="Center" IsSnapToTickEnabled="True"
                                              />
@@ -2062,10 +1898,10 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <ui:NumberBox Name="nudIntelGfxUV"
-                                                  Text="{Binding ElementName=sdIntelGfxUV, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelGfxUV, Path=Value}" Maximum="250"
+                                                  Value="{Binding SelectedPreset.IntelVoltageGpu, UpdateSourceTrigger=PropertyChanged}" Maximum="250"
                                                   Minimum="-250" Grid.Column="0" SmallChange="5"  />
-                                    <Slider Name="sdIntelGfxUV" Value="{Binding ElementName=nudIntelGfxUV, Path=Value}"
+                                    <Slider Name="sdIntelGfxUV"
+                                            Value="{Binding SelectedPreset.IntelVoltageGpu, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="250" Minimum="-250" Grid.Column="1" Margin="12,0,0,0"
                                             TickFrequency="5" VerticalAlignment="Center" IsSnapToTickEnabled="True"
                                              />
@@ -2086,12 +1922,11 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <ui:NumberBox Name="nudIntelCacheUV"
-                                                  Text="{Binding ElementName=sdIntelCacheUV, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelCacheUV, Path=Value}"
+                                                  Value="{Binding SelectedPreset.IntelVoltageCache, UpdateSourceTrigger=PropertyChanged}"
                                                   Maximum="250" Minimum="-250" Grid.Column="0" SmallChange="5"
                                                    />
                                     <Slider Name="sdIntelCacheUV"
-                                            Value="{Binding ElementName=nudIntelCacheUV, Path=Value}" Maximum="250"
+                                            Value="{Binding SelectedPreset.IntelVoltageCache, UpdateSourceTrigger=PropertyChanged}" Maximum="250"
                                             Minimum="-250" Grid.Column="1" Margin="12,0,0,0" TickFrequency="5"
                                             VerticalAlignment="Center" IsSnapToTickEnabled="True"
                                              />
@@ -2112,10 +1947,10 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <ui:NumberBox Name="nudIntelSAUV"
-                                                  Text="{Binding ElementName=sdIntelSAUV, Path=Value}"
-                                                  Value="{Binding ElementName=sdIntelSAUV, Path=Value}" Maximum="250"
+                                                  Value="{Binding SelectedPreset.IntelVoltageSa, UpdateSourceTrigger=PropertyChanged}" Maximum="250"
                                                   Minimum="-250" Grid.Column="0" SmallChange="5"  />
-                                    <Slider Name="sdIntelSAUV" Value="{Binding ElementName=nudIntelSAUV, Path=Value}"
+                                    <Slider Name="sdIntelSAUV" 
+                                            Value="{Binding SelectedPreset.IntelVoltageSa, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="250" Minimum="-250" Grid.Column="1" Margin="12,0,0,0"
                                             TickFrequency="5" VerticalAlignment="Center" IsSnapToTickEnabled="True"
                                              />
@@ -2551,14 +2386,11 @@
                     <!-- Power mode settings !-->
                     <ui:CardControl Name="sdPowerMode"
                                     IsEnabled="True"
-                                    Icon="Power20" Margin="0,8,15,0">
+                                    Margin="0,8,15,0">
                         <ui:CardControl.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                            <Grid ColumnDefinitions="*, Auto">
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Power20Regular}"/>
                                     <TextBlock
                                         FontSize="14"
                                         FontWeight="Medium"
@@ -2645,7 +2477,7 @@
 
                                 <StackPanel Orientation="Horizontal" 
                                             Grid.Column="1">
-                                    <ToggleSwitch IsChecked="{Binding SelectedPreset.AsusGpuUlti, UpdateSourceTrigger=PropertyChanged}" 
+                                    <ToggleSwitch IsChecked="{Binding SelectedPreset.IsAsusGpuUlti, UpdateSourceTrigger=PropertyChanged}" 
                                                   Margin="0,0,9,0" />
                                 </StackPanel>
                             </Grid>

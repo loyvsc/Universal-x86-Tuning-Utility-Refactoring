@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Interop;
 using Avalonia.Controls;
 using Gma.System.MouseKeyHook;
+using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.Views.Windows;
 
@@ -19,6 +19,7 @@ namespace Universal_x86_Tuning_Utility.Services.SuperResolutionServices.Windows;
 
 public class WindowsSuperResolutionService
 {
+    private readonly IPlatformServiceAccessor _platformServiceAccessor;
     public MagWindow? MagWindow;
 
     private readonly ScaleModelManager _scaleModelManager = new();
@@ -27,6 +28,11 @@ public class WindowsSuperResolutionService
     private string _currentAppName = string.Empty;
     private bool _canReapply;
     
+    public WindowsSuperResolutionService(IPlatformServiceAccessor platformServiceAccessor)
+    {
+        _platformServiceAccessor = platformServiceAccessor;
+    }
+
     private IntPtr _handle;
     // private IntPtr _prevSrcWindow = IntPtr.Zero; 
     
@@ -115,7 +121,7 @@ public class WindowsSuperResolutionService
             {
                 if (GetWindowRect(foregroundWindow, out _))
                 {
-                    var primaryScreen = Screen.PrimaryScreen!;
+                    var primaryScreen = _platformServiceAccessor.PrimaryScreen!;
                     int screenWidth = primaryScreen.Bounds.Width;
                     int screenHeight = primaryScreen.Bounds.Height;
                     

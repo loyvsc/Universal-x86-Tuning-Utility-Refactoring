@@ -207,7 +207,7 @@ public class WindowsAsusWmiService : IASUSWmiService
         var acpiBuf = new byte[8 + args.Length];
         var outBuffer = new byte[16];
 
-        BitConverter.GetBytes((uint)MethodID).CopyTo(acpiBuf, 0);
+        BitConverter.GetBytes(MethodID).CopyTo(acpiBuf, 0);
         BitConverter.GetBytes((uint)args.Length).CopyTo(acpiBuf, 4);
         Array.Copy(args, 0, acpiBuf, 8, args.Length);
         
@@ -330,6 +330,26 @@ public class WindowsAsusWmiService : IASUSWmiService
         return CallMethod(DSTS, args);
     }
 
+    public void SetPerformanceMode(AsusMode newMode)
+    {
+        var gamingLaptopResult = DeviceGet(PerformanceMode);
+        uint id = 0;
+        if (gamingLaptopResult is >= 0 and < 3)
+        {
+            id = PerformanceMode;
+        }
+        else
+        {
+            var vivoLatopResult = DeviceGet(VivoBookMode);
+            if (vivoLatopResult is >= 0 and < 3)
+            {
+                id = VivoBookMode;
+            }
+        }
+
+        DeviceSet(id, (int)newMode);
+    }
+
     public AsusMode GetPerformanceMode()
     {
         var gamingLaptopResult = DeviceGet(PerformanceMode);
@@ -337,26 +357,25 @@ public class WindowsAsusWmiService : IASUSWmiService
         {
             return (AsusMode)gamingLaptopResult;
         }
-        else
-        {
-            var vivoLatopResult = DeviceGet(VivoBookMode);
-            if (vivoLatopResult is >= 0 and < 3)
-            {
-                return (AsusMode)vivoLatopResult;
-            }
 
-            throw new Exception("Unsupported asus laptop");
+        var vivoLatopResult = DeviceGet(VivoBookMode);
+        if (vivoLatopResult is >= 0 and < 3)
+        {
+            return (AsusMode)vivoLatopResult;
         }
+
+        throw new Exception("Unsupported asus laptop");
     }
 
-    public void SetGPUEco(int eco)
+    public void SetGPUEco(bool eco)
     {
         int ecoFlag = DeviceGet(GPUEco);
         if (ecoFlag < 0) return;
 
-        if (ecoFlag != eco)
+        var isEcoEnabled = ecoFlag == 1;
+        if (isEcoEnabled != eco)
         {
-            DeviceSet(GPUEco, eco);
+            DeviceSet(GPUEco, eco ? 1 : 0);
         }
     }
 

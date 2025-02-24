@@ -87,27 +87,24 @@ public class GamesViewModel : NotifyPropertyChangedBase, IDisposable
     {
         try
         {
-            if (!MainWindow.isMini && _systemInfoService.Cpu.Manufacturer == Manufacturer.Intel)
+            var presetNames = _gameDataService.GetPresetNames();
+            foreach (var name in presetNames)
             {
-                var presetNames = _gameDataService.GetPresetNames();
-                foreach (var name in presetNames)
+                var gameToUpdate = Games.FirstOrDefault(item => item.GameName == name);
+                if (gameToUpdate != null)
                 {
-                    var gameToUpdate = Games.FirstOrDefault(item => item.GameName == name);
-                    if (gameToUpdate != null)
-                    {
-                        var gameData = _gameDataService.GetPreset(name)!;
+                    var gameData = _gameDataService.GetPreset(name)!;
                         
-                        if (gameData.FpsData != "No Data")
-                        {
-                            gameToUpdate.FpsData = $"{gameData.FpsData} FPS";
-                        }
-                        if (gameData.MsData != "No Data")
-                        {
-                            gameToUpdate.MillisecondData = $"{gameData.MsData} ms";
-                        }
-
-                        _gameDataService.SavePreset(name, gameData);
+                    if (gameData.FpsData != "No Data")
+                    {
+                        gameToUpdate.FpsData = $"{gameData.FpsData} FPS";
                     }
+                    if (gameData.MsData != "No Data")
+                    {
+                        gameToUpdate.MillisecondData = $"{gameData.MsData} ms";
+                    }
+
+                    _gameDataService.SavePreset(name, gameData);
                 }
             }
         }

@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using Microsoft.Extensions.Logging;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.Services.Amd;
-using Universal_x86_Tuning_Utility.Services.Asus;
-using Universal_x86_Tuning_Utility.Services.PowerPlanServices;
 
 namespace Universal_x86_Tuning_Utility.Services.RyzenAdj;
 
 public class RyzenAdjService : IRyzenAdjService
 {
+    private bool _isUpdatingMux;
+    
     private readonly ILogger<RyzenAdjService> _logger;
     private readonly IDisplayInfoService _displayInfoService;
     private readonly IIntelManagementService _intelManagementService;
@@ -297,42 +296,29 @@ public class RyzenAdjService : IRyzenAdjService
     {
         try
         {
-            uint id = 0;
-            int mode = 0;
             switch (command)
             {
                 case "ASUS-Power":
                 {
-                    if (_systemInfoService.Product.Contains("ROG") || _systemInfoService.Product.Contains("TUF"))
+                    var mode = value switch
                     {
-                        id = (uint) AsusDeviceMode.PerformanceMode;
-                    }
-                    else
-                    {
-                        id = (uint) AsusDeviceMode.VivoBookMode;
-                    }
-
-                    mode = value switch
-                    {
-                        "1" => (int) AsusMode.Silent,
-                        "2" => (int) AsusMode.Balanced,
-                        "3" => (int) AsusMode.Turbo,
+                        "1" => AsusMode.Silent,
+                        "2" => AsusMode.Balanced,
+                        "3" => AsusMode.Turbo,
+                        _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
                     };
-                    if (_asusWmiService.DeviceGet(id) != mode)
+                    
+                    if (_asusWmiService.GetPerformanceMode() != mode)
                     {
-                        _asusWmiService.DeviceSet(id, mode, "PowerMode");
+                        _asusWmiService.SetPerformanceMode(mode);
                     }
                     break;
                 }
                 case "ASUS-Eco":
                 {
-                    if (value.ToLower() == "true")
+                    if (bool.TryParse(value, out var result))
                     {
-                        _asusWmiService.SetGPUEco(1);
-                    }
-                    else
-                    {
-                        _asusWmiService.SetGPUEco(0);
+                        _asusWmiService.SetGPUEco(result);
                     }
                     break;
                 }
@@ -340,45 +326,25 @@ public class RyzenAdjService : IRyzenAdjService
                 {
                     if (!_isUpdatingMux)
                     {
-                        if (_systemInfoService.Product.Contains("ROG") || _systemInfoService.Product.Contains("TUF"))
-                        {
-                            id = WindowsAsusWmiService.GPUMux;
-                        }
-                        else
-                        {
-                            id = WindowsAsusWmiService.GPUMuxVivo;
-                        }
+                        var isGaming = _systemInfoService.Product.Contains("ROG") ||
+                                       _systemInfoService.Product.Contains("TUF");
 
-                        int mux = _asusWmiService.DeviceGet(id);
+                        var device = isGaming ? AsusDevice.GpuMux : AsusDevice.GpuMuxVivo;
+
+                        int mux = _asusWmiService.DeviceGet(device);
                         if (mux > 0 && value.ToLower() == "true")
                         {
                             _isUpdatingMux = true;
-                            if (_systemInfoService.Product.Contains("ROG") ||
-                                _systemInfoService.Product.Contains("TUF"))
-                            {
-                                id = WindowsAsusWmiService.GPUMux;
-                            }
-                            else
-                            {
-                                id = WindowsAsusWmiService.GPUMuxVivo;
-                            }
-                            _asusWmiService.DeviceSet(id, 0, "MUX");
+                            _logger.LogInformation("Set Mux = 0");
+                            _asusWmiService.DeviceSet(device, 0);
                             
                             Process.Start("shutdown", "/r /t 1");
                         }
-                        else if (mux < 1 && mux > -1 && value.ToLower() == "false")
+                        else if (mux is < 1 and > -1 && value.ToLower() == "false")
                         {
                             _isUpdatingMux = true;
-                            if (_systemInfoService.Product.Contains("ROG") ||
-                                _systemInfoService.Product.Contains("TUF"))
-                            {
-                                id = WindowsAsusWmiService.GPUMux;
-                            }
-                            else
-                            {
-                                id = WindowsAsusWmiService.GPUMuxVivo;
-                            }
-                            _asusWmiService.DeviceSet(id, 1, "MUX");
+                            _logger.LogInformation("Set Mux = 1");
+                            _asusWmiService.DeviceSet(device, 1);
                             
                             Process.Start("shutdown", "/r /t 1");
 
@@ -397,6 +363,4 @@ public class RyzenAdjService : IRyzenAdjService
             _logger.LogError(ex, "Exception occurred when executing Asus Wmi command");
         }
     }
-
-    private bool _isUpdatingMux = false;
 }

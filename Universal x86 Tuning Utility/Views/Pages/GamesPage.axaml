@@ -127,13 +127,12 @@
                                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                                FontSize="12"/>
                                 </StackPanel>
-                                <Button Appearance="Primary"
-                                        Width="48" 
+                                <Button Width="48" 
                                         Height="40" 
                                         DockPanel.Dock="Right" 
                                         HorizontalAlignment="Right" 
                                         Tag="{Binding }"
-                                        Command="{Binding DataContext.RunGameCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}">
+                                        Command="{CompiledBinding #ItemParent.((viewModels:GamesViewModel)DataContext).RunGameCommand}">
                                     <controls:SymbolIcon Symbol="Play" 
                                                          FontSize="24" 
                                                          Margin="0,1,0,0"/>

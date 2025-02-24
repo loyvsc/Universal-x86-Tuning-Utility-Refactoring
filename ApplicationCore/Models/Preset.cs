@@ -45,14 +45,6 @@ public class Preset : NotifyPropertyChangedBase
 
     private bool _isIntelClockRatio;
 
-    private int _intelClockRatioC1 = 20;
-    private int _intelClockRatioC2 = 20;
-    private int _intelClockRatioC3 = 20;
-    private int _intelClockRatioC4 = 20;
-    private int _intelClockRatioC5 = 20;
-    private int _intelClockRatioC6 = 20;
-    private int _intelClockRatioC7 = 20;
-    private int _intelClockRatioC8 = 20;
     private int _rsr;
     private int _boost;
     private int _imageSharp;
@@ -163,7 +155,7 @@ public class Preset : NotifyPropertyChangedBase
     private bool _isSoftMaxSoCClk;
 
     private int _asusPowerProfile;
-    private bool _asusGpuUlti;
+    private bool _isAsusGpuUlti;
     private bool _asusIGpu;
 
     private int _displayHz;
@@ -177,6 +169,7 @@ public class Preset : NotifyPropertyChangedBase
     private int _resScaleIndex;
     
     private string _name;
+    private List<IntelClockRatio> _intelClockRatios;
 
     public string Name
     {
@@ -383,52 +376,10 @@ public class Preset : NotifyPropertyChangedBase
         set => SetValue(ref _isIntelClockRatio, value);
     }
 
-    public int IntelClockRatioC1
+    public List<IntelClockRatio> IntelClockRatios
     {
-        get => _intelClockRatioC1;
-        set => SetValue(ref _intelClockRatioC1, value);
-    }
-
-    public int IntelClockRatioC2
-    {
-        get => _intelClockRatioC2;
-        set => SetValue(ref _intelClockRatioC2, value);
-    }
-
-    public int IntelClockRatioC3
-    {
-        get => _intelClockRatioC3;
-        set => SetValue(ref _intelClockRatioC3, value);
-    }
-
-    public int IntelClockRatioC4
-    {
-        get => _intelClockRatioC4;
-        set => SetValue(ref _intelClockRatioC4, value);
-    }
-
-    public int IntelClockRatioC5
-    {
-        get => _intelClockRatioC5;
-        set => SetValue(ref _intelClockRatioC5, value);
-    }
-
-    public int IntelClockRatioC6
-    {
-        get => _intelClockRatioC6;
-        set => SetValue(ref _intelClockRatioC6, value);
-    }
-
-    public int IntelClockRatioC7
-    {
-        get => _intelClockRatioC7;
-        set => SetValue(ref _intelClockRatioC7, value);
-    }
-
-    public int IntelClockRatioC8
-    {
-        get => _intelClockRatioC8;
-        set => SetValue(ref _intelClockRatioC8, value);
+        get => _intelClockRatios;
+        set => SetValue(ref _intelClockRatios, value);
     }
 
     public int Rsr
@@ -860,10 +811,10 @@ public class Preset : NotifyPropertyChangedBase
         set => SetValue(ref _asusPowerProfile, value);
     }
 
-    public bool AsusGpuUlti
+    public bool IsAsusGpuUlti
     {
-        get => _asusGpuUlti;
-        set => SetValue(ref _asusGpuUlti, value);
+        get => _isAsusGpuUlti;
+        set => SetValue(ref _isAsusGpuUlti, value);
     }
 
     public bool AsusIGpu

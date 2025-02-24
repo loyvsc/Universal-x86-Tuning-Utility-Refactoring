@@ -1,20 +1,23 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
 using ApplicationCore.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.Services.PresetServices;
 
-public static class PresetServiceFactory
+public class PresetServiceFactory : IPresetServiceFactory
 {
-    private static readonly Dictionary<string, IPresetService> _presetServices = new();
+    private readonly Dictionary<string, IPresetService> _presetServices = new();
     
-    public static IPresetService GetPresetService(string presetsPath)
+    public IPresetService GetPresetService(string presetsPath)
     {
-        bool presetServiceAvailable = _presetServices.TryGetValue(presetsPath, out var presetService);
-        if (!presetServiceAvailable)
+        var presetService =
+            CollectionsMarshal.GetValueRefOrAddDefault(_presetServices, presetsPath, out bool exists);
+        if (!exists)
         {
             presetService = new PresetService(presetsPath);
-            _presetServices.Add(presetsPath, presetService);
         }
+
         return presetService;
     }
 }

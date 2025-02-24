@@ -11,7 +11,8 @@ public interface IASUSWmiService : IDisposable
     public int DeviceSet(AsusDevice device, byte[] values);
     public int DeviceGet(AsusDevice deviceId);
     public AsusMode GetPerformanceMode();
-    public void SetGPUEco(int eco);
+    public void SetPerformanceMode(AsusMode newMode);
+    public void SetGPUEco(bool eco);
     public int GetFan(AsusFan device);
     public void SetFanRange(AsusFan device, byte[] curve);
     public void SetFanCurve(AsusFan device, byte[] curve);

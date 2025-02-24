@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
@@ -186,7 +184,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     public Preset SelectedPreset
     {
         get => _selectedPreset;
-        set => _selectedPreset;
+        set => SetValue(ref _selectedPreset, value);
     }
 
     private Preset _selectedPreset;
@@ -234,7 +232,8 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         IRyzenAdjService ryzenAdjService,
         IDisplayInfoService displayInfoService,
         IIntelManagementService intelManagementService,
-        IASUSWmiService asusWmiService)
+        IASUSWmiService asusWmiService,
+        IPresetServiceFactory presetServiceFactory)
     {
         _logger = logger;
         _systemInfoService = systemInfoService;
@@ -244,10 +243,11 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         _intelManagementService = intelManagementService;
         _asusWmiService = asusWmiService;
 
-        _apuPresetService = PresetServiceFactory.GetPresetService(Settings.Default.Path + "apuPresets.json");
-        _amdDesktopPresetService = PresetServiceFactory.GetPresetService(Settings.Default.Path + "amdDtCpuPresets.json");
-        _intelPresetService = PresetServiceFactory.GetPresetService(Settings.Default.Path + "intelPresets.json");
+        _apuPresetService = presetServiceFactory.GetPresetService(Settings.Default.Path + "apuPresets.json");
+        _amdDesktopPresetService = presetServiceFactory.GetPresetService(Settings.Default.Path + "amdDtCpuPresets.json");
+        _intelPresetService = presetServiceFactory.GetPresetService(Settings.Default.Path + "intelPresets.json");
 
+        ApplyPresetCommand = ReactiveCommand.CreateFromTask(ApplyPreset);
         DeletePresetCommand = ReactiveCommand.CreateFromTask(DeleteCurrentPreset);
         UndoCommand = ReactiveCommand.CreateFromTask(Undo);
 
@@ -261,34 +261,33 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         {
             ApuSkinTemperature = 45,
             ApuTemperature = 95,
+            ApuStapmPower = 28,
+            ApuFastPower = 28,
+            ApuSlowPower = 28,
+            ApuSlowTime = 128,
+            ApuStapmTime = 64,
+            ApuCpuTdc = 64,
+            ApuCpuEdc = 64,
+            ApuGfxTdc = 64,
+            ApuGfxEdc = 64,
+            ApuSocTdc = 64,
+            ApuSocEdc = 64,
+            ApuGfxClock = 1000,
             
-        }
-        nudAPUSkinTemp.Value = 45;
-        nudAPUTemp.Value = 95;
-        nudSTAPMPow.Value = 28;
-        nudFastPow.Value = 28;
-        nudSlowPow.Value = 28;
-        nudSlowTime.Value = 128;
-        nudFastTime.Value = 64;
-        nudCpuVrmTdc.Value = 64;
-        nudCpuVrmEdc.Value = 64;
-        nudGfxVrmTdc.Value = 64;
-        nudGfxVrmEdc.Value = 64;
-        nudSocVrmTdc.Value = 64;
-        nudSocVrmEdc.Value = 64;
-        nudAPUiGPUClk.Value = 1000;
-        nudCPUTemp.Value = 85;
-        nudPPT.Value = 140;
-        nudEDC.Value = 160;
-        nudTDC.Value = 160;
-        nudIntelPL1.Value = 35;
-        nudIntelPL2.Value = 65;
-        nudAmdVID.Value = 1200;
-        nudAmdCpuClk.Value = 3200;
-        nudNVMaxCore.Value = 4000;
-
-        nudIntelCpuBal.Value = 9;
-        nudIntelGpuBal.Value = 13;
+            AmdClock = 3200,
+            AmdVid = 1200,
+            NvMaxCoreClk = 4000,
+            
+            DtCpuTemperature = 85,
+            DtCpuPpt = 140,
+            DtCpuEdc = 160,
+            DtCpuTdc = 160,
+            
+            IntelPl1 = 35,
+            IntelPl2 = 65,
+            IntelBalCpu = 9,
+            IntelBalGpu = 13,
+        };
 
         RadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
         NvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
@@ -311,28 +310,15 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             IsIntelSettingsAvailable = true;
 
             var clockRatio = _intelManagementService.ReadClockRatios().Result;
-
-            intelRatioControls = new NumberBox[]
+            SelectedPreset.IntelClockRatios = new List<IntelClockRatio>(clockRatio.Length+1);
+            
+            for (var i = 0; i < clockRatio.Length; i++)
             {
-                nudIntelRatioC1,
-                nudIntelRatioC2,
-                nudIntelRatioC3,
-                nudIntelRatioC4,
-                nudIntelRatioC5,
-                nudIntelRatioC6,
-                nudIntelRatioC7,
-                nudIntelRatioC8
-            };
-
-            if (clockRatio != null)
-            {
-                var core = 0;
-                foreach (var clock in clockRatio)
+                SelectedPreset.IntelClockRatios[i] = new IntelClockRatio()
                 {
-                    if (core < intelRatioControls.Length) intelRatioControls[core].Value = clock;
-
-                    core++;
-                }
+                    CoreGroupIndex = i,
+                    Ratio = clockRatio[i]
+                };
             }
 
             // Get the names of all the stored presets
@@ -345,12 +331,13 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
 
             if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
             {
-                IsAmdApuSettingsAvailable = _systemInfoService.Cpu.RyzenFamily == RyzenFamily.PhoenixPoint ||
-                                            (_systemInfoService.Cpu.RyzenFamily == RyzenFamily.PhoenixPoint2 &&
-                                             _systemInfoService.Cpu.RyzenFamily == RyzenFamily.Mendocino &&
-                                             _systemInfoService.Cpu.RyzenFamily == RyzenFamily.Rembrandt &&
-                                             _systemInfoService.Cpu.RyzenFamily == RyzenFamily.Lucienne &&
-                                             _systemInfoService.Cpu.RyzenFamily == RyzenFamily.Renoir);
+                IsAmdApuSettingsAvailable = _systemInfoService.Cpu.RyzenFamily is 
+                                            RyzenFamily.PhoenixPoint or
+                                            RyzenFamily.PhoenixPoint2 or
+                                            RyzenFamily.Mendocino or
+                                            RyzenFamily.Rembrandt or
+                                            RyzenFamily.Lucienne or
+                                            RyzenFamily.Renoir;
 
                 IsAmdPboSettingAvailable = !_systemInfoService.Cpu.Name.Contains('U') &&
                                            _systemInfoService.Cpu.RyzenFamily < RyzenFamily.Renoir;
@@ -405,10 +392,10 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             var mux = _asusWmiService.DeviceGet(device);
 
             if (mux > 0)
-                IsAsusMux = false;
+                SelectedPreset.IsAsusGpuUlti = false;
             else if (mux > -1)
-                IsAsusMux = true;
-            else IsAsusMux = false;
+                SelectedPreset.IsAsusGpuUlti = true;
+            else SelectedPreset.IsAsusGpuUlti = false;
 
             device = AsusDevice.GpuEco;
             var eco = _asusWmiService.DeviceGet(device);
@@ -481,27 +468,25 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     {
         try
         {
-            if cbxPowerPreset.Text != "" && cbxPowerPreset.Text != null
             switch (_systemInfoService.Cpu.Manufacturer)
             {
                 case Manufacturer.AMD:
                 {
                     if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
-                        _apuPresetService.DeletePreset(deletePresetName);
+                        _apuPresetService.DeletePreset(SelectedPreset.Name);
                     else if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
-                        _amdDesktopPresetService.DeletePreset(deletePresetName);
-
+                        _amdDesktopPresetService.DeletePreset(SelectedPreset.Name);
                     break;
                 }
                 case Manufacturer.Intel:
                 {
-                    _intelPresetService.DeletePreset(deletePresetName);
+                    _intelPresetService.DeletePreset(SelectedPreset.Name);
                     break;
                 }
             }
 
             await _notificationManager.ShowTextNotification("Preset Deleted",
-                $"Your preset {deletePresetName} has been deleted successfully!");
+                $"Your preset {SelectedPreset.Name} has been deleted successfully!");
         }
         catch (Exception ex)
         {
@@ -511,16 +496,11 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         }
     }
 
-    private Task ReloadPreset()
-    {
-        if (cbxPowerPreset.Text != null && cbxPowerPreset.Text != "")
-            updateValues(cbxPowerPreset.SelectedItem.ToString());
-    }
-
     private async Task SavePreset()
     {
         if (!SelectedPreset.Name.Contains("PM -"))
         {
+            SelectedPreset.CommandValue = GetCommandValues();
             switch (_systemInfoService.Cpu.Manufacturer)
             {
                 case Manufacturer.AMD:
@@ -528,145 +508,22 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                     if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
                     {
                         // Save a preset
-                        var preset = new Preset
-                        {
-                            CommandValue = GetCommandValues(),
-                        
-                            AsusPowerProfile = (int)SelectedAsusPowerProfile.PowerProfileMode, 
-                        };
+                        SelectedPreset.AsusPowerProfile = (int)SelectedAsusPowerProfile.PowerProfileMode;
 
-                        _apuPresetService.SavePreset(SelectedPreset.Name, preset);
+                        _apuPresetService.SavePreset(SelectedPreset.Name, SelectedPreset);
 
                         RadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
                         NvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
                     }
-                    if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop) 
-                    { 
-                        var preset = new Preset 
-                        {
-                        dtCpuTemp = (int)nudCPUTemp.Value,
-                        dtCpuPPT = (int)nudPPT.Value,
-                        dtCpuTDC = (int)nudTDC.Value,
-                        dtCpuEDC = (int)nudEDC.Value,
-                        pboScalar = (int)nudPBOScaler.Value,
-                        coAllCore = (int)nudAllCO.Value,
-
-                        boostProfile = (int)cbxBoost.SelectedIndex,
-
-                        Rsr = (int)nudRSR.Value,
-                        Boost = (int)nudBoost.Value,
-                        ImageSharp = (int)nudImageSharp.Value,
-                        IsRadeonGraphics = (bool)tsRadeonGraph.IsChecked,
-                        IsRsr = (bool)cbRSR.IsChecked,
-                        IsBoost = (bool)cbBoost.IsChecked,
-                        IsAntiLag = (bool)cbAntiLag.IsChecked,
-                        IsImageSharp = (bool)cbImageSharp.IsChecked,
-                        IsSync = (bool)cbSync.IsChecked,
-
-                        CommandValue = GetCommandValues(),
-
-
-                        IsDtCpuTemp = (bool)cbCPUTemp.IsChecked,
-                        IsDtCpuPpt = (bool)cbPPT.IsChecked,
-                        IsDtCpuTdc = (bool)cbTDC.IsChecked,
-                        IsDtCpuEdc = (bool)cbEDC.IsChecked,
-                        IsPboScalar = (bool)cbPBOScaler.IsChecked,
-                        IsCoAllCore = (bool)cbAllCO.IsChecked,
-
-                        CoGfx = (int)nudGfxCO.Value,
-                        IsCoGfx = (bool)cbGfxCO.IsChecked,
-
-                        IsNvidia = (bool)tsNV.IsChecked,
-                        NvMaxCoreClk = (int)nudNVMaxCore.Value,
-                        NvCoreClk = (int)nudNVCore.Value,
-                        NvMemClk = (int)nudNVMem.Value,
-
-                        IsAmdOc = (bool)IsAmdOc,
-                        AmdClock = (int)nudAmdCpuClk.Value,
-                        AmdVid = (int)nudAmdVID.Value,
-
-                        AsusGpuUlti = (bool)tsASUSUlti.IsChecked,
-                        AsusIGpu = (bool)tsASUSEco.IsChecked,
-                        AsusPowerProfile = (int)cbxAsusPower.SelectedIndex,
-
-                        DisplayHz = (int)cbxRefreshRate.SelectedIndex,
-
-                        IsMag = (bool)tsUXTUSR.IsChecked,
-                        IsVsync = (bool)cbVSync.IsChecked,
-                        IsRecap = (bool)cbAutoCap.IsChecked,
-                        Sharpness = (int)nudSharp.Value,
-                        ResScaleIndex = (int)cbxResScale.SelectedIndex,
-
-                        PowerMode = (int)cbxPowerMode.SelectedIndex
-                    }; 
-                        _amdDesktopPresetService.SavePreset(_selectedPreset.Name, preset); 
+                    else if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
+                    {
+                        _amdDesktopPresetService.SavePreset(SelectedPreset.Name, SelectedPreset); 
                     }
                     break;
                 }
                 case Manufacturer.Intel:
                 {
-                    var preset = new Preset
-                    {
-                        IntelPl1 = (int)nudIntelPL1.Value,
-                        IntelPl2 = (int)nudIntelPL2.Value,
-                        IntelVoltCPU = (int)nudIntelCoreUV.Value,
-                        IntelVoltGPU = (int)nudIntelGfxUV.Value,
-                        IntelVoltCache = (int)nudIntelCacheUV.Value,
-                        IntelVoltSA = (int)nudIntelSAUV.Value,
-                        IntelBalCpu = (int)nudIntelCpuBal.Value,
-                        IntelBalGpu = (int)nudIntelGpuBal.Value,
-
-                        IsApuGfxClk = (bool)cbAPUiGPUClk.IsChecked,
-                        apuGfxClk = (int)nudAPUiGPUClk.Value,
-
-                        Rsr = (int)nudRSR.Value,
-                        Boost = (int)nudBoost.Value,
-                        ImageSharp = (int)nudImageSharp.Value,
-                        IsRadeonGraphics = (bool)tsRadeonGraph.IsChecked,
-                        IsRsr = (bool)cbRSR.IsChecked,
-                        IsBoost = (bool)cbBoost.IsChecked,
-                        IsAntiLag = (bool)cbAntiLag.IsChecked,
-                        IsImageSharp = (bool)cbImageSharp.IsChecked,
-                        IsSync = (bool)cbSync.IsChecked,
-
-                        CommandValue = GetCommandValues(),
-
-                        IsIntelPl1 = (bool)cbIntelPL1.IsChecked,
-                        IsIntelPl2 = (bool)cbIntelPL2.IsChecked,
-                        IsIntelVolt = (bool)tsIntelUV.IsChecked,
-                        IsIntelBal = (bool)tsIntelBal.IsChecked,
-
-                        IsNvidia = (bool)tsNV.IsChecked,
-                        NvMaxCoreClk = (int)nudNVMaxCore.Value,
-                        NvCoreClk = (int)nudNVCore.Value,
-                        NvMemClk = (int)nudNVMem.Value,
-
-                        AsusGpuUlti = (bool)tsASUSUlti.IsChecked,
-                        AsusiGpu = (bool)tsASUSEco.IsChecked,
-                        AsusPowerProfile = (int)SelectedAsusPowerProfile.PowerProfileMode,
-
-                        DisplayHz = (int)cbxRefreshRate.SelectedIndex,
-
-                        IsMag = (bool)tsUXTUSR.IsChecked,
-                        IsVsync = (bool)cbVSync.IsChecked,
-                        IsRecap = (bool)cbAutoCap.IsChecked,
-                        Sharpness = (int)nudSharp.Value,
-                        ResScaleIndex = (int)cbxResScale.SelectedIndex,
-
-                        PowerMode = (int)cbxPowerMode.SelectedIndex,
-
-                        IsIntelClockRatio = (bool)tsIntelRatioCore.IsChecked,
-                        IntelClockRatioC1 = (int)nudIntelRatioC1.Value,
-                        IntelClockRatioC2 = (int)nudIntelRatioC2.Value,
-                        IntelClockRatioC3 = (int)nudIntelRatioC3.Value,
-                        IntelClockRatioC4 = (int)nudIntelRatioC4.Value,
-                        IntelClockRatioC5 = (int)nudIntelRatioC5.Value,
-                        IntelClockRatioC6 = (int)nudIntelRatioC6.Value,
-                        IntelClockRatioC7 = (int)nudIntelRatioC7.Value,
-                        IntelClockRatioC8 = (int)nudIntelRatioC8.Value
-                    };
-                    
-                    _intelPresetService.SavePreset(_selectedPreset.Name, preset);
+                    _intelPresetService.SavePreset(_selectedPreset.Name, _selectedPreset);
                     break;
                 }
             }
@@ -678,362 +535,318 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
 
     private string GetCommandValues()
     {
-        string commandValues = commandValues +
-                               $"--UXTUSR={tsUXTUSR.IsChecked}-{cbVSync.IsChecked}-{nudSharp.Value / 100}-{cbxResScale.SelectedIndex}-{cbAutoCap.IsChecked} ";
+        var commands = new List<string>(64);
+
+        commands.Add(
+            $"--UXTUSR={SelectedPreset.IsMag}-{SelectedPreset.IsVsync}-{SelectedPreset.Sharpness / 100}" +
+            $"-{SelectedPreset.ResScaleIndex}-{SelectedPreset.IsRecap}");
 
         if (_systemInfoService.LaptopInfo?.IsAsus == true)
         {
             if (SelectedAsusPowerProfile.PowerProfileMode != AsusMode.AcControlled)
-                commandValues = commandValues + $"--ASUS-Power={(int) SelectedAsusPowerProfile.PowerProfileMode} ";
+                commands.Add($"--ASUS-Power={(int)SelectedAsusPowerProfile.PowerProfileMode}");
             if (IsAsusEcoMode)
-                commandValues = commandValues + $"--ASUS-Eco={IsAsusEcoMode} ";
+                commands.Add($"--ASUS-Eco={IsAsusEcoMode}");
             if (IsAsusGpuUltimateSettingsAvailable)
-                commandValues = commandValues + $"--ASUS-MUX={IsAsusGpuUltimateSettingsAvailable} ";
+                commands.Add($"--ASUS-MUX={IsAsusGpuUltimateSettingsAvailable}");
         }
 
-        if (sdRefreshRate.Visibility == Visibility.Visible && cbxRefreshRate.SelectedIndex > 0)
+        //todo: remove using of indexes
+        if (IsChangeRefreshRateAvailable && SelectedPreset.DisplayHz > 0)
         {
-            commandValues = commandValues +
-                            $"--Refresh-Rate={WindowsDisplayInfoService.uniqueRefreshRates[cbxRefreshRate.SelectedIndex - 1]} ";
+            commands.Add($"--Refresh-Rate={RefreshRates[SelectedPreset.DisplayHz - 1]}");
         }
 
-        if (sdPowerMode.Visibility == Visibility.Visible && cbxPowerMode.SelectedIndex > 0)
-            commandValues = commandValues + $"--Win-Power={cbxPowerMode.SelectedIndex - 1} ";
+        if (SelectedPreset.PowerMode > 0)
+            commands.Add($"--Win-Power={SelectedPreset.PowerMode - 1}");
 
-        if (Family.TYPE == Family.ProcessorType.Amd_Apu)
+        if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu) // todo: why this is amd processor type??? why only amd?
         {
-            if (cbAPUTemp.IsChecked == true)
-                commandValues = commandValues + $"--tctl-temp={nudAPUTemp.Value} --cHTC-temp={nudAPUTemp.Value} ";
-            if (cbAPUSkinTemp.IsChecked == true)
-                commandValues = commandValues + $"--apu-skin-temp={nudAPUSkinTemp.Value} ";
-            if (cbSTAPMPow.IsChecked == true)
-                commandValues = commandValues + $"--stapm-limit={nudSTAPMPow.Value * 1000}  ";
-            if (cbFastPow.IsChecked == true) commandValues = commandValues + $"--fast-limit={nudFastPow.Value * 1000} ";
-            if (cbFastTime.IsChecked == true) commandValues = commandValues + $"--stapm-time={nudFastTime.Value} ";
-            if (cbSlowPow.IsChecked == true) commandValues = commandValues + $"--slow-limit={nudSlowPow.Value * 1000} ";
-            if (cbSlowTime.IsChecked == true) commandValues = commandValues + $"--slow-time={nudSlowTime.Value} ";
-            if (cbCpuVrmTdc.IsChecked == true)
-                commandValues = commandValues + $"--vrm-current={nudCpuVrmTdc.Value * 1000} ";
-            if (cbCpuVrmEdc.IsChecked == true)
-                commandValues = commandValues + $"--vrmmax-current={nudCpuVrmEdc.Value * 1000} ";
-            if (cbSocVrmTdc.IsChecked == true)
-                commandValues = commandValues + $"--vrmsoc-current={nudSocVrmTdc.Value * 1000} ";
-            if (cbSocVrmEdc.IsChecked == true)
-                commandValues = commandValues + $"--vrmsocmax-current={nudSocVrmEdc.Value * 1000} ";
-            if (cbGfxVrmTdc.IsChecked == true)
-                commandValues = commandValues + $"--vrmgfx-current={nudGfxVrmTdc.Value * 1000} ";
-            if (cbGfxVrmEdc.IsChecked == true)
-                commandValues = commandValues + $"--vrmgfxmax-current={nudGfxVrmEdc.Value * 1000} ";
-            if (cbAPUiGPUClk.IsChecked == true) commandValues = commandValues + $"--gfx-clk={nudAPUiGPUClk.Value} ";
-            if (cbPBOScaler.IsChecked == true)
-                commandValues = commandValues + $"--pbo-scalar={nudPBOScaler.Value * 100} ";
+            if (SelectedPreset.IsApuTemp)
+                commands.Add(
+                    $"--tctl-temp={SelectedPreset.ApuTemperature} --cHTC-temp={SelectedPreset.ApuTemperature}");
+            if (SelectedPreset.IsApuSkinTemp)
+                commands.Add($"--apu-skin-temp={SelectedPreset.ApuSkinTemperature}");
+            if (SelectedPreset.IsApuStapmPow)
+                commands.Add($"--stapm-limit={SelectedPreset.ApuStapmPower * 1000}");
+            if (SelectedPreset.IsApuFastPow)
+                commands.Add($"--fast-limit={SelectedPreset.ApuFastPower * 1000}");
+            if (SelectedPreset.IsApuStapmTime)
+                commands.Add($"--stapm-time={SelectedPreset.ApuStapmPower} ");
+            if (SelectedPreset.IsApuSlowPow)
+                commands.Add($"--slow-limit={SelectedPreset.ApuSlowPower * 1000}");
+            if (SelectedPreset.IsApuSlowTime)
+                commands.Add($"--slow-time={SelectedPreset.ApuSlowTime}");
+            if (SelectedPreset.IsApuCpuTdc)
+                commands.Add($"--vrm-current={SelectedPreset.ApuCpuTdc * 1000}");
+            if (SelectedPreset.IsApuCpuEdc)
+                commands.Add($"--vrmmax-current={SelectedPreset.ApuCpuEdc * 1000}");
+            if (SelectedPreset.IsApuSocTdc)
+                commands.Add($"--vrmsoc-current={SelectedPreset.ApuSocTdc * 1000}");
+            if (SelectedPreset.IsApuSocEdc)
+                commands.Add($"--vrmsocmax-current={SelectedPreset.ApuSocEdc * 1000}");
+            if (SelectedPreset.IsApuGfxClk)
+                commands.Add($"--vrmgfx-current={SelectedPreset.ApuGfxClock * 1000}");
+            if (SelectedPreset.IsApuGfxEdc)
+                commands.Add($"--vrmgfxmax-current={SelectedPreset.ApuGfxEdc * 1000}");
+            if (SelectedPreset.IsApuGfxClk)
+                commands.Add($"--gfx-clk={SelectedPreset.ApuGfxClock}");
+            if (SelectedPreset.IsPboScalar)
+                commands.Add($"--pbo-scalar={SelectedPreset.PboScalar * 100}");
 
-            if (cbAllCO.IsChecked == true)
+            if (SelectedPreset.IsCoAllCore)
             {
-                if (nudAllCO.Value >= 0) commandValues = commandValues + $"--set-coall={nudAllCO.Value} ";
-                if (nudAllCO.Value < 0)
-                    commandValues = commandValues +
-                                    $"--set-coall={Convert.ToUInt32(0x100000 - (uint)(-1 * (int)nudAllCO.Value))} ";
+                if (SelectedPreset.CoAllCore >= 0)
+                {
+                    commands.Add($"--set-coall={SelectedPreset.CoAllCore}");
+                }
+                else if (SelectedPreset.CoAllCore < 0)
+                {
+                    commands.Add(
+                        $"--set-coall={Convert.ToUInt32(0x100000 - (uint)(-1 * (int)SelectedPreset.CoAllCore))} ");
+                }
             }
 
-            if (cbGfxCO.IsChecked == true)
+            if (SelectedPreset.IsCoGfx)
             {
-                if (nudGfxCO.Value >= 0) commandValues = commandValues + $"--set-cogfx={nudGfxCO.Value} ";
-                if (nudGfxCO.Value < 0)
-                    commandValues = commandValues +
-                                    $"--set-cogfx={Convert.ToUInt32(0x100000 - (uint)(-1 * (int)nudGfxCO.Value))} ";
+                if (SelectedPreset.CoGfx >= 0)
+                {
+                    commands.Add($"--set-cogfx={SelectedPreset.CoGfx}");
+                }
+                else if (SelectedPreset.CoGfx < 0)
+                {
+                    commands.Add($"--set-cogfx={Convert.ToUInt32(0x100000 - (uint)(-1 * SelectedPreset.CoGfx))}");
+                }
             }
 
-            if (cbSoftMiniGPUClk.IsChecked == true)
-                commandValues = commandValues + $"--min-gfxclk={nudSoftMiniGPUClk.Value} ";
-            if (cbSoftMaxiGPUClk.IsChecked == true)
-                commandValues = commandValues + $"--max-gfxclk={nudSoftMaxiGPUClk.Value} ";
+            if (SelectedPreset.IsSoftMiniGpuClk)
+                commands.Add($"--min-gfxclk={SelectedPreset.SoftMiniGpuClk}");
+            if (SelectedPreset.IsSoftMaxiGpuClk)
+                commands.Add($"--max-gfxclk={SelectedPreset.SoftMaxiGpuClk}");
 
-            if (cbSoftMinCPUClk.IsChecked == true)
-                commandValues = commandValues + $"--min-cpuclk={nudSoftMinCPUClk.Value} ";
-            if (cbSoftMaxCPUClk.IsChecked == true)
-                commandValues = commandValues + $"--max-cpuclk={nudSoftMaxCPUClk.Value} ";
+            if (SelectedPreset.IsSoftMinCpuClk)
+                commands.Add($"--min-cpuclk={SelectedPreset.SoftMinCpuClk}");
+            if (SelectedPreset.IsSoftMaxCpuClk)
+                commands.Add($"--max-cpuclk={SelectedPreset.SoftMaxCpuClk}");
 
-            if (cbSoftMinDataClk.IsChecked == true)
-                commandValues = commandValues + $"--min-lclk={nudSoftMinDataClk.Value} ";
-            if (cbSoftMaxDataClk.IsChecked == true)
-                commandValues = commandValues + $"--max-lclk={nudSoftMaxDataClk.Value} ";
+            if (SelectedPreset.IsSoftMinDataClk)
+                commands.Add($"--min-lclk={SelectedPreset.SoftMinDataClk}");
+            if (SelectedPreset.IsSoftMaxDataClk)
+                commands.Add($"--max-lclk={SelectedPreset.SoftMaxDataClk}");
 
-            if (cbSoftMinVCNClk.IsChecked == true)
-                commandValues = commandValues + $"--min-vcn={nudSoftMinVCNClk.Value} ";
-            if (cbSoftMaxVCNClk.IsChecked == true)
-                commandValues = commandValues + $"--max-vcn={nudSoftMaxVCNClk.Value} ";
+            if (SelectedPreset.IsSoftMinVcnClk)
+                commands.Add($"--min-vcn={SelectedPreset.SoftMinVcnClk}");
+            if (SelectedPreset.IsSoftMaxVcnClk)
+                commands.Add($"--max-vcn={SelectedPreset.SoftMaxVcnClk}");
 
-            if (cbSoftMinFabClk.IsChecked == true)
-                commandValues = commandValues + $"--min-fclk-frequency={nudSoftMinFabClk.Value} ";
-            if (cbSoftMaxFabClk.IsChecked == true)
-                commandValues = commandValues + $"--max-fclk-frequency={nudSoftMaxFabClk.Value} ";
+            if (SelectedPreset.IsSoftMinFabClk)
+                commands.Add($"--min-fclk-frequency={SelectedPreset.SoftMinFabClk}");
+            if (SelectedPreset.IsSoftMaxFabClk)
+                commands.Add($"--max-fclk-frequency={SelectedPreset.SoftMaxFabClk}");
 
-            if (cbSoftMinSoCClk.IsChecked == true)
-                commandValues = commandValues + $"--min-socclk-frequency={nudSoftMinSoCClk.Value} ";
-            if (cbSoftMaxSoCClk.IsChecked == true)
-                commandValues = commandValues + $"--max-socclk-frequency={nudSoftMaxSoCClk.Value} ";
+            if (SelectedPreset.IsSoftMinSoCClk)
+                commands.Add($"--min-socclk-frequency={SelectedPreset.SoftMinSoCClk}");
+            if (SelectedPreset.IsSoftMaxSoCClk)
+                commands.Add($"--max-socclk-frequency={SelectedPreset.SoftMaxSoCClk}");
 
-            if (cbxBoost.SelectedIndex > 0)
+            switch (SelectedPreset.BoostProfile)
             {
-                if (cbxBoost.SelectedIndex == 1) commandValues = commandValues + $"--power-saving ";
-                if (cbxBoost.SelectedIndex == 2) commandValues = commandValues + $"--max-performance ";
+                case 1:
+                {
+                    commands.Add("--power-saving");
+                    break;
+                }
+                case 2:
+                {
+                    commands.Add("--max-performance");
+                    break;
+                }
             }
 
+            int coresCount = SelectedPreset.Ccd1States.Count;
             if (_systemInfoService.Cpu.RyzenFamily == RyzenFamily.DragonRange)
             {
-                if (cbCCD1Core1.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((0 % 8) & 15)) << 20) | ((int)nudCCD1Core1.Value & 0xFFFF)} ";
-                if (cbCCD1Core2.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((1 % 8) & 15)) << 20) | ((int)nudCCD1Core2.Value & 0xFFFF)} ";
-                if (cbCCD1Core3.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((2 % 8) & 15)) << 20) | ((int)nudCCD1Core3.Value & 0xFFFF)} ";
-                if (cbCCD1Core4.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((3 % 8) & 15)) << 20) | ((int)nudCCD1Core4.Value & 0xFFFF)} ";
-                if (cbCCD1Core5.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((4 % 8) & 15)) << 20) | ((int)nudCCD1Core5.Value & 0xFFFF)} ";
-                if (cbCCD1Core6.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((5 % 8) & 15)) << 20) | ((int)nudCCD1Core6.Value & 0xFFFF)} ";
-                if (cbCCD1Core7.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((6 % 8) & 15)) << 20) | ((int)nudCCD1Core7.Value & 0xFFFF)} ";
-                if (cbCCD1Core8.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((7 % 8) & 15)) << 20) | ((int)nudCCD1Core8.Value & 0xFFFF)} ";
+                foreach (var state in SelectedPreset.Ccd1States)
+                {
+                    if (state.IsEnabled)
+                    {
+                        commands.Add(
+                            $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((state.CoreIndex % coresCount) & 15)) << 20) | ((int)state.Value & 0xFFFF)}");
+                    }
+                }
 
-                if (cbCCD2Core1.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((0 % 8) & 15)) << 20) | ((int)nudCCD2Core1.Value & 0xFFFF)} ";
-                if (cbCCD2Core2.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((1 % 8) & 15)) << 20) | ((int)nudCCD2Core2.Value & 0xFFFF)} ";
-                if (cbCCD2Core3.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((2 % 8) & 15)) << 20) | ((int)nudCCD2Core3.Value & 0xFFFF)} ";
-                if (cbCCD2Core4.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((3 % 8) & 15)) << 20) | ((int)nudCCD2Core4.Value & 0xFFFF)} ";
-                if (cbCCD2Core5.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((4 % 8) & 15)) << 20) | ((int)nudCCD2Core5.Value & 0xFFFF)} ";
-                if (cbCCD2Core6.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((5 % 8) & 15)) << 20) | ((int)nudCCD2Core6.Value & 0xFFFF)} ";
-                if (cbCCD2Core7.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((6 % 8) & 15)) << 20) | ((int)nudCCD2Core7.Value & 0xFFFF)} ";
-                if (cbCCD2Core8.IsChecked == true)
-                    commandValues = commandValues +
-                                    $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((7 % 8) & 15)) << 20) | ((int)nudCCD2Core8.Value & 0xFFFF)} ";
+                foreach (var state in SelectedPreset.Ccd2States)
+                {
+                    if (state.IsEnabled)
+                    {
+                        commands.Add(
+                            $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((state.CoreIndex % 8) & 15)) << 20) | ((int)state.Value & 0xFFFF)}");
+                    }
+                }
+
             }
             else
             {
-                if (cbCCD1Core1.IsChecked == true)
-                    commandValues = commandValues + $"--set-coper={(0 << 20) | ((int)nudCCD1Core1.Value & 0xFFFF)} ";
-                if (cbCCD1Core2.IsChecked == true)
-                    commandValues = commandValues + $"--set-coper={(1 << 20) | ((int)nudCCD1Core2.Value & 0xFFFF)} ";
-                if (cbCCD1Core3.IsChecked == true)
-                    commandValues = commandValues + $"--set-coper={(2 << 20) | ((int)nudCCD1Core3.Value & 0xFFFF)} ";
-                if (cbCCD1Core4.IsChecked == true)
-                    commandValues = commandValues + $"--set-coper={(3 << 20) | ((int)nudCCD1Core4.Value & 0xFFFF)} ";
-                if (cbCCD1Core5.IsChecked == true)
-                    commandValues = commandValues + $"--set-coper={(4 << 20) | ((int)nudCCD1Core5.Value & 0xFFFF)} ";
-                if (cbCCD1Core6.IsChecked == true)
-                    commandValues = commandValues + $"--set-coper={(5 << 20) | ((int)nudCCD1Core6.Value & 0xFFFF)} ";
-                if (cbCCD1Core7.IsChecked == true)
-                    commandValues = commandValues + $"--set-coper={(6 << 20) | ((int)nudCCD1Core7.Value & 0xFFFF)} ";
-                if (cbCCD1Core8.IsChecked == true)
-                    commandValues = commandValues + $"--set-coper={(7 << 20) | ((int)nudCCD1Core8.Value & 0xFFFF)} ";
-            }
-
-            if (IsAmdOc == true)
-            {
-                double vid = 0;
-
-                vid = ((double)nudAmdVID.Value - 1125) / 5 + 1200;
-                commandValues = commandValues +
-                                $"--oc-clk={(int)nudAmdCpuClk.Value} --oc-clk={(int)nudAmdCpuClk.Value} ";
-
-                if (_systemInfoService.Cpu.RyzenFamily >= RyzenFamily.Rembrandt)
+                foreach (var state in SelectedPreset.Ccd1States)
                 {
-                    vid = ((double)nudAmdVID.Value - 1125) / 5 + 1200;
-                    commandValues = commandValues + $"--oc-volt={vid} --oc-volt={vid} ";
-                }
-                else
-                {
-                    vid = Math.Round((double)nudAmdVID.Value / 1000, 2);
-                    commandValues = commandValues +
-                                    $"--oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)} --oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)} ";
-                }
-
-                commandValues = commandValues + $"--enable-oc --enable-oc ";
-            }
-        }
-
-        if (Family.TYPE == Family.ProcessorType.Amd_Desktop_Cpu)
-        {
-            if (cbCPUTemp.IsChecked == true) commandValues = commandValues + $"--tctl-limit={nudCPUTemp.Value * 1000} ";
-            if (cbPPT.IsChecked == true) commandValues = commandValues + $"--ppt-limit={nudPPT.Value * 1000} ";
-            if (cbTDC.IsChecked == true) commandValues = commandValues + $"--tdc-limit={nudTDC.Value * 1000} ";
-            if (cbEDC.IsChecked == true) commandValues = commandValues + $"--edc-limit={nudEDC.Value * 1000} ";
-            if (cbPBOScaler.IsChecked == true)
-                commandValues = commandValues + $"--pbo-scalar={nudPBOScaler.Value * 100} ";
-
-            if (cbAllCO.IsChecked == true)
-            {
-                if (nudAllCO.Value >= 0) commandValues = commandValues + $"--set-coall={nudAllCO.Value} ";
-                if (nudAllCO.Value < 0)
-                    commandValues = commandValues +
-                                    $"--set-coall={Convert.ToUInt32(0x100000 - (uint)(-1 * (int)nudAllCO.Value))} ";
-            }
-
-            if (cbGfxCO.IsChecked == true)
-            {
-                if (nudGfxCO.Value >= 0) commandValues = commandValues + $"--set-cogfx={nudGfxCO.Value} ";
-                if (nudGfxCO.Value < 0)
-                    commandValues = commandValues +
-                                    $"--set-cogfx={Convert.ToUInt32(0x100000 - (uint)(-1 * (int)nudGfxCO.Value))} ";
-            }
-
-            if (cbCCD1Core1.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((0 % 8) & 15)) << 20) | ((int)nudCCD1Core1.Value & 0xFFFF)} ";
-            if (cbCCD1Core2.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((1 % 8) & 15)) << 20) | ((int)nudCCD1Core2.Value & 0xFFFF)} ";
-            if (cbCCD1Core3.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((2 % 8) & 15)) << 20) | ((int)nudCCD1Core3.Value & 0xFFFF)} ";
-            if (cbCCD1Core4.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((3 % 8) & 15)) << 20) | ((int)nudCCD1Core4.Value & 0xFFFF)} ";
-            if (cbCCD1Core5.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((4 % 8) & 15)) << 20) | ((int)nudCCD1Core5.Value & 0xFFFF)} ";
-            if (cbCCD1Core6.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((5 % 8) & 15)) << 20) | ((int)nudCCD1Core6.Value & 0xFFFF)} ";
-            if (cbCCD1Core7.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((6 % 8) & 15)) << 20) | ((int)nudCCD1Core7.Value & 0xFFFF)} ";
-            if (cbCCD1Core8.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((7 % 8) & 15)) << 20) | ((int)nudCCD1Core8.Value & 0xFFFF)} ";
-
-            if (cbCCD2Core1.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((0 % 8) & 15)) << 20) | ((int)nudCCD2Core1.Value & 0xFFFF)} ";
-            if (cbCCD2Core2.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((1 % 8) & 15)) << 20) | ((int)nudCCD2Core2.Value & 0xFFFF)} ";
-            if (cbCCD2Core3.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((2 % 8) & 15)) << 20) | ((int)nudCCD2Core3.Value & 0xFFFF)} ";
-            if (cbCCD2Core4.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((3 % 8) & 15)) << 20) | ((int)nudCCD2Core4.Value & 0xFFFF)} ";
-            if (cbCCD2Core5.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((4 % 8) & 15)) << 20) | ((int)nudCCD2Core5.Value & 0xFFFF)} ";
-            if (cbCCD2Core6.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((5 % 8) & 15)) << 20) | ((int)nudCCD2Core6.Value & 0xFFFF)} ";
-            if (cbCCD2Core7.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((6 % 8) & 15)) << 20) | ((int)nudCCD2Core7.Value & 0xFFFF)} ";
-            if (cbCCD2Core8.IsChecked == true)
-                commandValues = commandValues +
-                                $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((7 % 8) & 15)) << 20) | ((int)nudCCD2Core8.Value & 0xFFFF)} ";
-
-            if (IsAmdOc == true)
-            {
-                double vid = 0;
-
-                vid = ((double)nudAmdVID.Value - 1125) / 5 + 1200;
-                commandValues = commandValues +
-                                $"--oc-clk={(int)nudAmdCpuClk.Value} --oc-clk={(int)nudAmdCpuClk.Value} ";
-
-                if (_systemInfoService.Cpu.RyzenFamily >= RyzenFamily.Rembrandt)
-                {
-                    vid = ((double)nudAmdVID.Value - 1125) / 5 + 1200;
-                    commandValues = commandValues + $"--oc-volt={vid} --oc-volt={vid} ";
-                }
-                else
-                {
-                    vid = Math.Round((double)nudAmdVID.Value / 1000, 2);
-                    commandValues = commandValues +
-                                    $"--oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)} --oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)} ";
-                }
-
-                commandValues = commandValues + $"--enable-oc --enable-oc ";
-            }
-        }
-
-        if (Family.TYPE == Family.ProcessorType.Intel)
-        {
-            if (tsIntelRatioCore.IsChecked == true)
-            {
-                commandValues = commandValues + $"--intel-ratio=";
-                var core = 0;
-                foreach (int clock in clockRatio)
-                {
-                    if (core < intelRatioControls.Length)
+                    if (state.IsEnabled)
                     {
-                        if (core == clockRatio.Length - 1)
-                            commandValues = commandValues + $"{intelRatioControls[core].Value} ";
-                        else commandValues = commandValues + $"{intelRatioControls[core].Value}-";
+                        commands.Add($"--set-coper={(state.CoreIndex << 20) | ((int)state.Value & 0xFFFF)} ");
+                    }
+                }
+            }
+
+            if (IsAmdOc)
+            {
+                commands.Add($"--oc-clk={SelectedPreset.AmdClock} --oc-clk={SelectedPreset.AmdClock}");
+
+                double vid;
+                if (_systemInfoService.Cpu.RyzenFamily >= RyzenFamily.Rembrandt)
+                {
+                    vid = ((double)SelectedPreset.AmdVid - 1125) / 5 + 1200;
+                    commands.Add($"--oc-volt={vid} --oc-volt={vid}");
+                }
+                else
+                {
+                    vid = Math.Round((double)SelectedPreset.AmdVid / 1000, 2);
+                    commands.Add(
+                        $"--oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)} --oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)}");
+                }
+
+                commands.Add("--enable-oc --enable-oc"); // todo: why it is doubled?
+            }
+        }
+
+        if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
+        {
+            if (SelectedPreset.IsDtCpuTemp)
+                commands.Add($"--tctl-limit={SelectedPreset.DtCpuTemperature * 1000}");
+            if (SelectedPreset.IsDtCpuPpt)
+                commands.Add($"--ppt-limit={SelectedPreset.DtCpuPpt * 1000}");
+            if (SelectedPreset.IsDtCpuTdc)
+                commands.Add($"--tdc-limit={SelectedPreset.DtCpuTdc * 1000}");
+            if (SelectedPreset.IsDtCpuEdc)
+                commands.Add($"--edc-limit={SelectedPreset.DtCpuEdc * 1000}");
+            if (SelectedPreset.IsPboScalar)
+                commands.Add($"--pbo-scalar={SelectedPreset.PboScalar * 100} ");
+
+            if (SelectedPreset.IsCoAllCore)
+            {
+                if (SelectedPreset.CoAllCore >= 0)
+                {
+                    commands.Add($"--set-coall={SelectedPreset.CoAllCore}");
+                }
+                else if (SelectedPreset.CoAllCore < 0)
+                {
+                    commands.Add(
+                        $"--set-coall={Convert.ToUInt32(0x100000 - (uint)(-1 * (int)SelectedPreset.CoAllCore))}");
+                }
+
+                if (SelectedPreset.IsCoGfx)
+                {
+                    if (SelectedPreset.CoGfx >= 0)
+                    {
+                        commands.Add($"--set-cogfx={SelectedPreset.CoGfx}");
+                    }
+                    else if (SelectedPreset.CoGfx < 0)
+                    {
+                        commands.Add(
+                            $"--set-cogfx={Convert.ToUInt32(0x100000 - (uint)(-1 * (int)SelectedPreset.CoGfx))}");
+                    }
+                }
+
+                int coresCount = SelectedPreset.Ccd1States.Count;
+                foreach (var state in SelectedPreset.Ccd1States)
+                {
+                    if (state.IsEnabled)
+                    {
+                        commands.Add(
+                            $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((state.CoreIndex % coresCount) & 15)) << 20) | (state.Value & 0xFFFF)}");
+                    }
+                }
+
+                foreach (var state in SelectedPreset.Ccd2States)
+                {
+                    if (state.IsEnabled)
+                    {
+                        commands.Add(
+                            $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((state.CoreIndex % coresCount) & 15)) << 20) | (state.Value & 0xFFFF)} ");
+                    }
+                }
+
+                if (IsAmdOc)
+                {
+                    commands.Add($"--oc-clk={SelectedPreset.AmdClock} --oc-clk={SelectedPreset.AmdClock}");
+
+                    double vid;
+                    if (_systemInfoService.Cpu.RyzenFamily >= RyzenFamily.Rembrandt)
+                    {
+                        vid = ((double)SelectedPreset.AmdVid - 1125) / 5 + 1200;
+                        commands.Add($"--oc-volt={vid} --oc-volt={vid}");
+                    }
+                    else
+                    {
+                        vid = Math.Round((double)SelectedPreset.AmdVid / 1000, 2);
+                        commands.Add(
+                            $"--oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)} --oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)}");
                     }
 
-                    core++;
+                    commands.Add("--enable-oc --enable-oc"); // todo: why it is doubled?
                 }
             }
 
-            if (cbIntelPL1.IsChecked == true) commandValues = commandValues + $"--intel-pl={nudIntelPL1.Value} ";
-            if (tsIntelUV.IsChecked == true)
-                commandValues = commandValues +
-                                $"--intel-volt-cpu={nudIntelCoreUV.Value} --intel-volt-gpu={nudIntelGfxUV.Value} --intel-volt-cache={nudIntelCacheUV.Value} --intel-volt-cpu={nudIntelSAUV.Value} ";
-            if (tsIntelBal.IsChecked == true)
-                commandValues = commandValues +
-                                $"--intel-bal-cpu={nudIntelCpuBal.Value} --intel-bal-gpu={nudIntelGpuBal.Value} ";
-            if (cbAPUiGPUClk.IsChecked == true) commandValues = commandValues + $"--intel-gpu={nudAPUiGPUClk.Value} ";
+            if (_systemInfoService.Cpu.Manufacturer == Manufacturer.Intel)
+            {
+                if (SelectedPreset.IsIntelClockRatio)
+                {
+                    var clockRatioValue = string.Join('-', SelectedPreset.IntelClockRatios.Select(x => x.Ratio));
+                    commands.Add($"--intel-ratio={clockRatioValue}");
+                }
+
+                if (SelectedPreset.IsIntelPl1)
+                    commands.Add($"--intel-pl={SelectedPreset.IntelPl1}");
+                if (SelectedPreset.IsIntelVoltages)
+                    commands.Add(
+                        $"--intel-volt-cpu={SelectedPreset.IntelVoltageCpu} --intel-volt-gpu={SelectedPreset.IntelVoltageGpu} --intel-volt-cache={SelectedPreset.IntelVoltageCache} --intel-volt-cpu={SelectedPreset.IntelVoltageSa}");
+                if (SelectedPreset.IsIntelBal)
+                    commands.Add(
+                        $"--intel-bal-cpu={SelectedPreset.IntelBalCpu} --intel-bal-gpu={SelectedPreset.IntelBalGpu}");
+                if (SelectedPreset.IsApuGfxClk)
+                    commands.Add($"--intel-gpu={SelectedPreset.ApuGfxClock}");
+            }
+
+            if (SelectedPreset.IsRadeonGraphics)
+            {
+                commands.Add(SelectedPreset.IsAntiLag
+                    ? "--ADLX-Lag=0-true --ADLX-Lag=1-true"
+                    : "--ADLX-Lag=0-false --ADLX-Lag=1-false");
+
+                commands.Add(SelectedPreset.IsRsr
+                    ? $"--ADLX-RSR=true-{SelectedPreset.Rsr}"
+                    : $"--ADLX-RSR=false-{SelectedPreset.Rsr}");
+
+                commands.Add(
+                    SelectedPreset.IsBoost
+                        ? $"--ADLX-Boost=0-true-{SelectedPreset.Boost} --ADLX-Boost=1-true-{SelectedPreset.Boost}"
+                        : $"--ADLX-Boost=0-false-{SelectedPreset.Boost} --ADLX-Boost=1-false-{SelectedPreset.Boost}");
+
+                commands.Add(
+                    SelectedPreset.IsImageSharp
+                        ? $"--ADLX-ImageSharp=0-true-{SelectedPreset.ImageSharp} --ADLX-ImageSharp=1-true-{SelectedPreset.ImageSharp}"
+                        : $"--ADLX-ImageSharp=0-false-{SelectedPreset.ImageSharp} --ADLX-ImageSharp=1-false-{SelectedPreset.ImageSharp}");
+
+                commands.Add(SelectedPreset.IsSync
+                    ? "--ADLX-Sync=0-true --ADLX-Sync=1-true"
+                    : "--ADLX-Sync=0-false --ADLX-Sync=1-false");
+            }
+
+            if (SelectedPreset.IsNvidia)
+            {
+                commands.Add(
+                    $"--NVIDIA-Clocks={SelectedPreset.NvMaxCoreClk}-{SelectedPreset.NvCoreClk}-{SelectedPreset.NvMemClk} ");
+            }
         }
-
-        if (tsRadeonGraph.IsChecked == true)
-        {
-            if (cbAntiLag.IsChecked == true) commandValues = commandValues + $"--ADLX-Lag=0-true --ADLX-Lag=1-true ";
-            else commandValues = commandValues + $"--ADLX-Lag=0-false --ADLX-Lag=1-false ";
-
-            if (cbRSR.IsChecked == true) commandValues = commandValues + $"--ADLX-RSR=true-{(int)nudRSR.Value} ";
-            else commandValues = commandValues + $"--ADLX-RSR=false-{(int)nudRSR.Value} ";
-
-            if (cbBoost.IsChecked == true)
-                commandValues = commandValues +
-                                $"--ADLX-Boost=0-true-{(int)nudBoost.Value} --ADLX-Boost=1-true-{(int)nudBoost.Value} ";
-            else
-                commandValues = commandValues +
-                                $"--ADLX-Boost=0-false-{(int)nudBoost.Value} --ADLX-Boost=1-false-{(int)nudBoost.Value} ";
-
-            if (cbImageSharp.IsChecked == true)
-                commandValues = commandValues +
-                                $"--ADLX-ImageSharp=0-true-{(int)nudImageSharp.Value} --ADLX-ImageSharp=1-true-{(int)nudImageSharp.Value} ";
-            else
-                commandValues = commandValues +
-                                $"--ADLX-ImageSharp=0-false-{(int)nudImageSharp.Value} --ADLX-ImageSharp=1-false-{(int)nudImageSharp.Value} ";
-
-            if (cbSync.IsChecked == true) commandValues = commandValues + $"--ADLX-Sync=0-true --ADLX-Sync=1-true ";
-            else commandValues = commandValues + $"--ADLX-Sync=0-false --ADLX-Sync=1-false ";
-        }
-
-        if (tsNV.IsChecked == true)
-            commandValues = commandValues + $"--NVIDIA-Clocks={nudNVMaxCore.Value}-{nudNVCore.Value}-{nudNVMem.Value} ";
-
-
-        return commandValues;
+        
+        return string.Join(' ', commands);
     }
 }
