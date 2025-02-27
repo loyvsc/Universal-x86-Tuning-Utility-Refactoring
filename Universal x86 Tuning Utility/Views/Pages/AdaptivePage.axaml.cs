@@ -53,6 +53,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
         System.Windows.Threading.DispatcherTimer adaptiveMode = new System.Windows.Threading.DispatcherTimer();
         System.Windows.Threading.DispatcherTimer sensors = new System.Windows.Threading.DispatcherTimer();
         private static int coreCount = 0;
+
         public AdaptivePage()
         {
             InitializeComponent();
@@ -74,7 +75,10 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
 
             if (!Settings.Default.isASUS) sdAsusPower.Visibility = Visibility.Collapsed;
         }
-        private static AdaptivePresetService _adaptivePresetService = new AdaptivePresetService(Settings.Default.Path + "adaptivePresets.json");
+
+        private static AdaptivePresetService _adaptivePresetService =
+            new AdaptivePresetService(Settings.Default.Path + "adaptivePresets.json");
+
         private async void setUp()
         {
             try
@@ -87,7 +91,8 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
 
                 if (GetNVIDIAGPUCount() < 1) sdNVIDIA.Visibility = Visibility.Collapsed;
 
-                if (Family.TYPE == Family.ProcessorType.Amd_Desktop_Cpu || Family.FAM == Family.RyzenFamily.DragonRange) nudPowerLimit.Value = 86;
+                if (Family.TYPE == Family.ProcessorType.Amd_Desktop_Cpu || Family.FAM == Family.RyzenFamily.DragonRange)
+                    nudPowerLimit.Value = 86;
                 else nudPowerLimit.Value = 28;
                 nudMaxGfxClk.Value = 1900;
                 nudMinGfxClk.Value = 400;
@@ -96,10 +101,12 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                 nudNVMaxCore.Value = 4000;
                 tsAutoSwitch.IsChecked = true;
 
-                await Task.Run(() => WindowsGameLauncherService.InstalledGames = WindowsGameLauncherService.ReSearchGames(true));
+                await Task.Run(() =>
+                    WindowsGameLauncherService.InstalledGames = WindowsGameLauncherService.ReSearchGames(true));
 
                 cbxPowerPreset.Items.Add("Default");
-                foreach (GameLauncherItem item in WindowsGameLauncherService.InstalledGames) cbxPowerPreset.Items.Add(item.gameName);
+                foreach (GameLauncherItem item in WindowsGameLauncherService.InstalledGames)
+                    cbxPowerPreset.Items.Add(item.gameName);
 
                 cbxPowerPreset.SelectedIndex = 0;
 
@@ -155,17 +162,20 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                         spCO.Visibility = Visibility.Collapsed;
                         sdTBOiGPU.Visibility = Visibility.Collapsed;
                     }
-
                 }
 
-                foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_Processor").Get()) coreCount += int.Parse(item["NumberOfCores"].ToString());
+                foreach (var item in
+                         new System.Management.ManagementObjectSearcher("Select * from Win32_Processor").Get())
+                    coreCount += int.Parse(item["NumberOfCores"].ToString());
 
                 btnStart.IsEnabled = true;
                 btnSave.IsEnabled = true;
 
                 if (Settings.Default.isStartAdpative) ToggleAdaptiveMode();
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+            }
         }
 
         [DllImport("user32.dll")]
@@ -183,7 +193,9 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
             // Mark event as handled
             e.Handled = true;
         }
+
         bool start = false;
+
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
             ToggleAdaptiveMode();
@@ -201,7 +213,6 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     WindowsSensorsService.Stop();
                     Settings.Default.isAdaptiveModeRunning = false;
                     Settings.Default.Save();
-
                 }
                 else
                 {
@@ -213,7 +224,9 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     Settings.Default.Save();
                 }
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         public static int CPUTemp, CPULoad, CPUClock, CPUPower, GPULoad, GPUClock, GPUMemClock;
@@ -223,6 +236,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
             if (IsScrollBarVisible(mainScroll)) mainCon.Margin = new Thickness(0, 0, -12, 0);
             else mainCon.Margin = new Thickness(0, 0, 0, 0);
         }
+
         int i = 0;
 
         private async void adaptive_Tick(object sender, EventArgs e)
@@ -231,6 +245,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
             {
                 update();
             }
+
             if (Settings.Default.polling != nudPolling.Value)
             {
                 Settings.Default.polling = (double)nudPolling.Value;
@@ -243,6 +258,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                 adaptiveMode.Interval = TimeSpan.FromSeconds((double)nudPolling.Value);
                 adaptiveMode.Start();
             }
+
             if (sensors.Interval != TimeSpan.FromSeconds((double)nudPolling.Value))
             {
                 sensors.Stop();
@@ -302,7 +318,9 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     cbxResScale.SelectedIndex = myPreset.ResScaleIndex;
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+            }
         }
 
         private void savePreset(string presetName)
@@ -342,7 +360,9 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                 };
                 _adaptivePresetService.SavePreset(presetName, preset);
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+            }
         }
 
         private static LASTINPUTINFO lastInput = new LASTINPUTINFO();
@@ -354,13 +374,17 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
             try
             {
                 cbxPowerPreset.ItemsSource = new List<string>();
-                await Task.Run(() => WindowsGameLauncherService.InstalledGames = WindowsGameLauncherService.ReSearchGames(true));
+                await Task.Run(() =>
+                    WindowsGameLauncherService.InstalledGames = WindowsGameLauncherService.ReSearchGames(true));
                 cbxPowerPreset.Items.Clear();
                 cbxPowerPreset.Items.Add("Default");
-                foreach (GameLauncherItem item in WindowsGameLauncherService.InstalledGames) cbxPowerPreset.Items.Add(item.gameName);
+                foreach (GameLauncherItem item in WindowsGameLauncherService.InstalledGames)
+                    cbxPowerPreset.Items.Add(item.gameName);
                 cbxPowerPreset.SelectedIndex = 0;
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+            }
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -369,6 +393,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
         }
 
         private static int newMinCPUClock = 1440;
+
         private async void sensors_Tick(object sender, EventArgs e)
         {
             try
@@ -377,17 +402,19 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                 {
                     await Task.Run(() =>
                     {
-                        if (Family.TYPE == Family.ProcessorType.Intel) CPUTemp = (int)WindowsSensorsService.GetCPUInfo(SensorType.Temperature, "Package");
+                        if (Family.TYPE == Family.ProcessorType.Intel)
+                            CPUTemp = (int)WindowsSensorsService.GetCPUInfo(SensorType.Temperature, "Package");
                         else CPUTemp = (int)WindowsSensorsService.GetCPUInfo(SensorType.Temperature, "Core");
                         CPULoad = (int)WindowsSensorsService.GetCPUInfo(SensorType.Load, "Total");
 
                         int i = 1;
                         do
                         {
-                            if (i <= i) CPUClock = CPUClock + (int)WindowsSensorsService.GetCPUInfo(SensorType.Clock, $"Core #{i}");
+                            if (i <= i)
+                                CPUClock = CPUClock +
+                                           (int)WindowsSensorsService.GetCPUInfo(SensorType.Clock, $"Core #{i}");
                             i++;
-                        }
-                        while (i <= coreCount);
+                        } while (i <= coreCount);
 
                         CPUClock = (int)(CPUClock / i);
 
@@ -414,29 +441,25 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     {
                         string selectedGameName = string.Empty;
 
-                        Dispatcher.Invoke(() =>
-                        {
-                            selectedGameName = cbxPowerPreset.SelectedItem.ToString();
-                        });
+                        Dispatcher.Invoke(() => { selectedGameName = cbxPowerPreset.SelectedItem.ToString(); });
 
                         if (selectedGameName != runningGameName)
                         {
-                            Dispatcher.Invoke(() =>
-                            {
-                                getRunningGame(runningGameName);
-                            });
+                            Dispatcher.Invoke(() => { getRunningGame(runningGameName); });
                         }
                     }
-
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+            }
         }
 
         public static int GetRadeonGPUCount()
         {
             int count = 0;
-            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_VideoController"))
+            using (ManagementObjectSearcher searcher =
+                   new ManagementObjectSearcher("SELECT * FROM Win32_VideoController"))
             {
                 foreach (ManagementObject obj in searcher.Get())
                 {
@@ -447,13 +470,15 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     }
                 }
             }
+
             return count;
         }
 
         public static int GetNVIDIAGPUCount()
         {
             int count = 0;
-            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_VideoController"))
+            using (ManagementObjectSearcher searcher =
+                   new ManagementObjectSearcher("SELECT * FROM Win32_VideoController"))
             {
                 foreach (ManagementObject obj in searcher.Get())
                 {
@@ -464,11 +489,14 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     }
                 }
             }
+
             return count;
         }
+
         string lastCPU = "";
         string lastCO = "";
         string lastiGPU = "";
+
         private async void update()
         {
             try
@@ -477,26 +505,36 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                 {
                     if (i < 2)
                     {
-                        WindowsCpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, (int)nudPowerLimit.Value, (int)nudPowerLimit.Value - 5, (int)nudTemp.Value);
-                        WindowsCpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, (int)nudPowerLimit.Value, (int)nudPowerLimit.Value - 5, (int)nudTemp.Value);
-                        WindowsCpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, (int)nudPowerLimit.Value, (int)nudPowerLimit.Value - 5, (int)nudTemp.Value);
+                        WindowsCpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, (int)nudPowerLimit.Value,
+                            (int)nudPowerLimit.Value - 5, (int)nudTemp.Value);
+                        WindowsCpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, (int)nudPowerLimit.Value,
+                            (int)nudPowerLimit.Value - 5, (int)nudTemp.Value);
+                        WindowsCpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, (int)nudPowerLimit.Value,
+                            (int)nudPowerLimit.Value - 5, (int)nudTemp.Value);
                         i++;
                     }
                     else
                     {
-                        WindowsCpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, (int)nudPowerLimit.Value, 8, (int)nudTemp.Value);
+                        WindowsCpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, (int)nudPowerLimit.Value, 8,
+                            (int)nudTemp.Value);
 
-                        if (cbCurve.IsChecked == true) WindowsCpuControlService.CurveOptimiserLimit(CPULoad, (int)nudCurve.Value);
+                        if (cbCurve.IsChecked == true)
+                            WindowsCpuControlService.CurveOptimiserLimit(CPULoad, (int)nudCurve.Value);
 
-                        if (tsTBOiGPU.IsChecked == true) AmdApuControlService.UpdateiGPUClock((int)nudMaxGfxClk.Value, (int)nudMinGfxClk.Value, (int)nudTemp.Value, CPUPower, CPUTemp, GPUClock, GPULoad, GPUMemClock, CPUClock, minCPUClock);
+                        if (tsTBOiGPU.IsChecked == true)
+                            AmdApuControlService.UpdateiGPUClock((int)nudMaxGfxClk.Value, (int)nudMinGfxClk.Value,
+                                (int)nudTemp.Value, CPUPower, CPUTemp, GPUClock, GPULoad, GPUMemClock, CPUClock,
+                                minCPUClock);
 
                         string commandString = "";
 
-                        commandString = commandString + $"--UXTUSR={tsUXTUSR.IsChecked}-{cbVSync.IsChecked}-{nudSharp.Value / 100}-{cbxResScale.SelectedIndex}-{cbAutoCap.IsChecked} ";
+                        commandString = commandString +
+                                        $"--UXTUSR={tsUXTUSR.IsChecked}-{cbVSync.IsChecked}-{nudSharp.Value / 100}-{cbxResScale.SelectedIndex}-{cbAutoCap.IsChecked} ";
 
                         if (Settings.Default.isASUS)
                         {
-                            if (cbxAsusPower.SelectedIndex > 0) commandString = commandString + $"--ASUS-Power={cbxAsusPower.SelectedIndex} ";
+                            if (cbxAsusPower.SelectedIndex > 0)
+                                commandString = commandString + $"--ASUS-Power={cbxAsusPower.SelectedIndex} ";
                         }
 
                         if (WindowsCpuControlService.CpuCommand != lastCPU)
@@ -505,13 +543,15 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                             lastCPU = WindowsCpuControlService.CpuCommand;
                         }
 
-                        if (WindowsCpuControlService.CoCommand != null && WindowsCpuControlService.CoCommand != "" && cbCurve.IsChecked == true && WindowsCpuControlService.CoCommand != lastCO)
+                        if (WindowsCpuControlService.CoCommand != null && WindowsCpuControlService.CoCommand != "" &&
+                            cbCurve.IsChecked == true && WindowsCpuControlService.CoCommand != lastCO)
                         {
                             commandString = commandString + WindowsCpuControlService.CoCommand;
                             lastCO = WindowsCpuControlService.CoCommand;
                         }
 
-                        if (AmdApuControlService.Commmand != null && AmdApuControlService.Commmand != "" && tsTBOiGPU.IsChecked == true && AmdApuControlService.Commmand != lastiGPU)
+                        if (AmdApuControlService.Commmand != null && AmdApuControlService.Commmand != "" &&
+                            tsTBOiGPU.IsChecked == true && AmdApuControlService.Commmand != lastiGPU)
                         {
                             commandString = commandString + AmdApuControlService.Commmand;
                             lastiGPU = AmdApuControlService.Commmand;
@@ -519,32 +559,46 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
 
                         if (tsRadeonGraph.IsChecked == true)
                         {
-                            if (cbAntiLag.IsChecked == true) commandString = commandString + $"--ADLX-Lag=0-true --ADLX-Lag=1-true ";
+                            if (cbAntiLag.IsChecked == true)
+                                commandString = commandString + $"--ADLX-Lag=0-true --ADLX-Lag=1-true ";
                             else commandString = commandString + $"--ADLX-Lag=0-false --ADLX-Lag=1-false ";
 
-                            if (cbRSR.IsChecked == true) commandString = commandString + $"--ADLX-RSR=true-{(int)nudRSR.Value} ";
+                            if (cbRSR.IsChecked == true)
+                                commandString = commandString + $"--ADLX-RSR=true-{(int)nudRSR.Value} ";
                             else commandString = commandString + $"--ADLX-RSR=false-{(int)nudRSR.Value} ";
 
-                            if (cbBoost.IsChecked == true) commandString = commandString + $"--ADLX-Boost=0-true-{(int)nudBoost.Value} --ADLX-Boost=1-true-{(int)nudBoost.Value} ";
-                            else commandString = commandString + $"--ADLX-Boost=0-false-{(int)nudBoost.Value} --ADLX-Boost=1-false-{(int)nudBoost.Value} ";
+                            if (cbBoost.IsChecked == true)
+                                commandString = commandString +
+                                                $"--ADLX-Boost=0-true-{(int)nudBoost.Value} --ADLX-Boost=1-true-{(int)nudBoost.Value} ";
+                            else
+                                commandString = commandString +
+                                                $"--ADLX-Boost=0-false-{(int)nudBoost.Value} --ADLX-Boost=1-false-{(int)nudBoost.Value} ";
 
-                            if (cbImageSharp.IsChecked == true) commandString = commandString + $"--ADLX-ImageSharp=0-true-{(int)nudImageSharp.Value} --ADLX-ImageSharp=1-true-{(int)nudImageSharp.Value} ";
-                            else commandString = commandString + $"--ADLX-ImageSharp=0-false-{(int)nudImageSharp.Value} --ADLX-ImageSharp=1-false-{(int)nudImageSharp.Value} ";
+                            if (cbImageSharp.IsChecked == true)
+                                commandString = commandString +
+                                                $"--ADLX-ImageSharp=0-true-{(int)nudImageSharp.Value} --ADLX-ImageSharp=1-true-{(int)nudImageSharp.Value} ";
+                            else
+                                commandString = commandString +
+                                                $"--ADLX-ImageSharp=0-false-{(int)nudImageSharp.Value} --ADLX-ImageSharp=1-false-{(int)nudImageSharp.Value} ";
 
-                            if (cbSync.IsChecked == true) commandString = commandString + $"--ADLX-Sync=0-true --ADLX-Sync=1-true ";
+                            if (cbSync.IsChecked == true)
+                                commandString = commandString + $"--ADLX-Sync=0-true --ADLX-Sync=1-true ";
                             else commandString = commandString + $"--ADLX-Sync=0-false --ADLX-Sync=1-false ";
                         }
 
                         if (tsNV.IsChecked == true)
                         {
-                            commandString = commandString + $"--NVIDIA-Clocks={nudNVMaxCore.Value}-{nudNVCore.Value}-{nudNVMem.Value} ";
+                            commandString = commandString +
+                                            $"--NVIDIA-Clocks={nudNVMaxCore.Value}-{nudNVCore.Value}-{nudNVMem.Value} ";
                         }
 
-                        if (commandString != null && commandString != "") await Task.Run(() => RyzenAdjService.Translate(commandString));
+                        if (commandString != null && commandString != "")
+                            await Task.Run(() => RyzenAdjService.Translate(commandString));
                     }
 
-                    if (WindowsRtssService.IsRTSSRunning() && tsRTSS.IsChecked == true) WindowsRtssService.SetFpsLimit((int)nudRTSS.Value);
-                    
+                    if (WindowsRtssService.IsRTSSRunning() && tsRTSS.IsChecked == true)
+                        WindowsRtssService.SetFpsLimit((int)nudRTSS.Value);
+
 
                     //if (RTSS.RTSSRunning())
                     //{
@@ -564,7 +618,9 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     //}
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+            }
         }
 
         public bool IsScrollBarVisible(ScrollViewer scrollViewer)
@@ -580,7 +636,8 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
             Settings.Default.Save();
         }
 
-        private static LauncherManager launcherManager = new LauncherManager(new LauncherOptions() { QueryOnlineData = true });
+        private static LauncherManager launcherManager =
+            new LauncherManager(new LauncherOptions() { QueryOnlineData = true });
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -589,6 +646,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
 
 
         string runningGameName = "Default";
+
         private void isGameRunning()
         {
             foreach (GameLauncherItem item in installedGames)
@@ -616,6 +674,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                                 {
                                     autoSwitch = preset.isAutoSwitch;
                                 }
+
                                 if (!autoSwitch)
                                 {
                                     continue;
@@ -627,12 +686,13 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                         }
                         catch (Exception ex)
                         {
-
                         }
                     }
+
                     i++;
                 } while (i < 2);
             }
+
             runningGameName = "Default";
         }
 

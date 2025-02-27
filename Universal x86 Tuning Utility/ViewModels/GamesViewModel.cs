@@ -17,7 +17,6 @@ using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
-using Universal_x86_Tuning_Utility.Views.Windows;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
@@ -47,7 +46,6 @@ public class GamesViewModel : NotifyPropertyChangedBase, IDisposable
 
     private readonly ILogger<GamesViewModel> _logger;
     private readonly IGameDataService _gameDataService;
-    private readonly ISystemInfoService _systemInfoService;
     private readonly IDialogService _dialogService;
     private readonly INotificationManager _toastNotificationsService;
     private readonly IImageService _imageService;
@@ -59,7 +57,6 @@ public class GamesViewModel : NotifyPropertyChangedBase, IDisposable
 
     public GamesViewModel(ILogger<GamesViewModel> logger, 
                           IGameDataService gameDataService,
-                          ISystemInfoService systemInfoService,
                           IDialogService dialogService,
                           INotificationManager toastNotificationsService,
                           IImageService imageService,
@@ -67,13 +64,14 @@ public class GamesViewModel : NotifyPropertyChangedBase, IDisposable
     {
         _logger = logger;
         _gameDataService = gameDataService;
-        _systemInfoService = systemInfoService;
         _dialogService = dialogService;
         _toastNotificationsService = toastNotificationsService;
         _imageService = imageService;
         _gameLauncherService = gameLauncherService;
 
         RunGameCommand = ReactiveCommand.CreateFromTask((GameLauncherItem gameToRun) => RunGame(gameToRun));
+        AddGameCommand = ReactiveCommand.CreateFromTask(AddCustomGame);
+        ReloadGamesListCommand = ReactiveCommand.CreateFromTask(ReloadGamesList);
         
         _updateFps = new DispatcherTimer
         {

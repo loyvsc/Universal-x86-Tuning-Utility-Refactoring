@@ -27,9 +27,13 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
     public partial class AutomationsPage : Page
     {
         private PresetService _apuPresetService = new PresetService(Settings.Default.Path + "apuPresets.json");
-        private PresetService _amdDtCpuPresetService = new PresetService(Settings.Default.Path + "amdDtCpuPresets.json"); 
+
+        private PresetService _amdDtCpuPresetService =
+            new PresetService(Settings.Default.Path + "amdDtCpuPresets.json");
+
         private PresetService _intelPresetService = new PresetService(Settings.Default.Path + "intelPresets.json");
         bool setup = false;
+
         public AutomationsPage()
         {
             InitializeComponent();
@@ -64,6 +68,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     cbxResume.Items.Add(presetName);
                 }
             }
+
             if (Family.TYPE == Family.ProcessorType.Amd_Desktop_Cpu)
             {
                 // Get the names of all the stored presets
@@ -93,6 +98,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     cbxResume.Items.Add(presetName);
                 }
             }
+
             if (Family.TYPE == Family.ProcessorType.Intel)
             {
                 // Get the names of all the stored presets
@@ -384,13 +390,15 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     cbxResume.Items.Add(presetName);
                 }
             }
+
             getResumePreset(oldPreset);
             setup = true;
         }
 
         private void cbxCharge_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            try {
+            try
+            {
                 if (setup == true)
                 {
                     string presetName = (sender as ComboBox).SelectedItem as string;
@@ -399,7 +407,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     {
                         if ((sender as ComboBox).SelectedItem != (sender as ComboBox).Items[0])
                         {
-                            if(presetName.Contains("PM - Eco"))
+                            if (presetName.Contains("PM - Eco"))
                             {
                                 Settings.Default.acPreset = presetName;
                                 PremadePresets.InitializePremadePresets();
@@ -437,6 +445,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                             Settings.Default.acCommandString = "";
                         }
                     }
+
                     if (Family.TYPE == Family.ProcessorType.Amd_Desktop_Cpu)
                     {
                         _amdDtCpuPresetService = new PresetService(Settings.Default.Path + "amdDtCpuPresets.json");
@@ -497,8 +506,12 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     }
 
                     Settings.Default.Save();
-                }        
-            } catch (Exception ex) { toastNotiifcation.Show(ex.ToString()) }
+                }
+            }
+            catch (Exception ex)
+            {
+                toastNotiifcation.Show(ex.ToString())
+            }
         }
 
         private void cbxDischarge_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -549,6 +562,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                         Settings.Default.dcCommandString = "";
                     }
                 }
+
                 if (Family.TYPE == Family.ProcessorType.Amd_Desktop_Cpu)
                 {
                     _amdDtCpuPresetService = new PresetService(Settings.Default.Path + "amdDtCpuPresets.json");
@@ -591,6 +605,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                         Settings.Default.dcCommandString = "";
                     }
                 }
+
                 if (Family.TYPE == Family.ProcessorType.Intel)
                 {
                     _intelPresetService = new PresetService(Settings.Default.Path + "intelPresets.json");
@@ -657,6 +672,7 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                             Settings.Default.resumeCommandString = "";
                         }
                     }
+
                     if (Family.TYPE == Family.ProcessorType.Amd_Desktop_Cpu)
                     {
                         _amdDtCpuPresetService = new PresetService(Settings.Default.Path + "amdDtCpuPresets.json");
@@ -715,12 +731,14 @@ namespace Universal_x86_Tuning_Utility.Views.Pages
                     Settings.Default.Save();
                 }
             }
-            catch (Exception ex) { toastNotiifcation.Show(ex.ToString()) }
+            catch (Exception ex)
+            {
+                toastNotiifcation.Show(ex.ToString())
+            }
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-
         }
     }
 }

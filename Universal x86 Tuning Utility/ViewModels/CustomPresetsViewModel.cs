@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Properties;
-using Universal_x86_Tuning_Utility.Services.PresetServices;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
@@ -23,18 +22,19 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     public ICommand DeletePresetCommand { get; }
     public ICommand UndoCommand { get; }
     public ICommand ReloadPresetValuesCommand { get; }
-    
 
-    public bool NvidiaGpuSettingsAvailable
+    #region Properties
+
+    public bool IsNvidiaGpuSettingsAvailable
     {
-        get => _nvidiaGpuSettingsAvailable;
-        set => SetValue(ref _nvidiaGpuSettingsAvailable, value);
+        get => _isNvidiaGpuSettingsAvailable;
+        set => SetValue(ref _isNvidiaGpuSettingsAvailable, value);
     }
 
-    public bool RadeonGpuSettingsAvailable
+    public bool IsRadeonGpuSettingsAvailable
     {
-        get => _radeonGpuSettingsAvailable;
-        set => SetValue(ref _radeonGpuSettingsAvailable, value);
+        get => _isIsRadeonGpuSettingsAvailable;
+        set => SetValue(ref _isIsRadeonGpuSettingsAvailable, value);
     }
 
     public List<Preset> AvailablePresets
@@ -79,6 +79,12 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         set => SetValue(ref _isAmdApuSettingsAvailable, value);
     }
 
+    public bool IsAmdCpuSettingsAvailable
+    {
+        get => _isAmdCpuSettingsAvailable;
+        set => SetValue(ref _isAmdCpuSettingsAvailable, value);
+    }
+
     public bool IsAmdPboSettingAvailable
     {
         get => _isAmdPboSettingAvailable;
@@ -97,10 +103,10 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         set => SetValue(ref _isAmdSoftClockSettingAvailable, value);
     }
 
-    public bool IsAmdC0SettingAvailable
+    public bool IsAmdCOSettingAvailable
     {
-        get => _isAmdC0SettingAvailable;
-        set => SetValue(ref _isAmdC0SettingAvailable, value);
+        get => _isAmdCoSettingAvailable;
+        set => SetValue(ref _isAmdCoSettingAvailable, value);
     }
 
     public bool IsAmdPowerProfileSettingsAvailable
@@ -127,13 +133,13 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         set => SetValue(ref _isAmdApuIGpuClockSettingAvailable, value);
     }
 
-    public bool IsUndoActionAvailable
+    public bool IsAmdApuVrmSettingAvailable
     {
-        get => _isUndoActionAvailable;
-        set => SetValue(ref _isUndoActionAvailable, value);
+        get => _isAmdApuVrmSettingAvailable;
+        set => SetValue(ref _isAmdApuVrmSettingAvailable, value);
     }
 
-    public bool IsAmdOc
+    public bool IsUndoActionAvailable
     {
         get => _isUndoActionAvailable;
         set => SetValue(ref _isUndoActionAvailable, value);
@@ -169,6 +175,12 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         set => SetValue(ref _isAsusGpuEcoModeSettingsAvailable, value);
     }
 
+    public bool IsAmdCpuThermalSettingsAvailable
+    {
+        get => _isAsusGpuEcoModeSettingsAvailable;
+        set => SetValue(ref _isAsusGpuEcoModeSettingsAvailable, value);
+    }
+
     public List<AsusPowerProfile> AsusPowerProfiles
     {
         get => _asusPowerProfiles;
@@ -187,6 +199,10 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         set => SetValue(ref _selectedPreset, value);
     }
 
+    #endregion
+
+    #region Backing fields
+
     private Preset _selectedPreset;
     private bool _isAsusMux;
     private bool _isAsusEcoMode;
@@ -203,7 +219,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     private bool _isIntelSettingsAvailable;
     private bool _isAmdCpuTuneSettingAvailable;
     private bool _isAmdSoftClockSettingAvailable;
-    private bool _isAmdC0SettingAvailable;
+    private bool _isAmdCoSettingAvailable;
     private bool _isAmdPowerProfileSettingsAvailable;
     private bool _isAmdCCD1COSettingAvailable;
     private bool _isAmdCCD2COSettingAvailable;
@@ -211,9 +227,15 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     private bool _isAmdPboSettingAvailable;
     private bool _isAmdApuSettingsAvailable;
     private bool _isChangeRefreshRateAvailable;
-    private bool _nvidiaGpuSettingsAvailable;
-    private bool _radeonGpuSettingsAvailable;
+    private bool _isNvidiaGpuSettingsAvailable;
+    private bool _isIsRadeonGpuSettingsAvailable;
     private bool _undoActionAvailable;
+    private bool _isAmdCpuSettingsAvailable;
+    private bool _isAmdApuVrmSettingAvailable;
+
+    #endregion
+
+    #region Services
 
     private readonly IPresetService _apuPresetService;
     private readonly IPresetService _amdDesktopPresetService;
@@ -225,6 +247,8 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     private readonly IDisplayInfoService _displayInfoService;
     private readonly IIntelManagementService _intelManagementService;
     private readonly IASUSWmiService _asusWmiService;
+
+    #endregion
 
     public CustomPresetsViewModel(ILogger<CustomPresetsViewModel> logger,
         ISystemInfoService systemInfoService,
@@ -248,8 +272,10 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         _intelPresetService = presetServiceFactory.GetPresetService(Settings.Default.Path + "intelPresets.json");
 
         ApplyPresetCommand = ReactiveCommand.CreateFromTask(ApplyPreset);
+        ReloadPresetValuesCommand = ReactiveCommand.CreateFromTask(RestorePresetValues);
         DeletePresetCommand = ReactiveCommand.CreateFromTask(DeleteCurrentPreset);
         UndoCommand = ReactiveCommand.CreateFromTask(Undo);
+        SavePresetCommand = ReactiveCommand.CreateFromTask(SavePreset);
 
         Initialize();
     }
@@ -289,8 +315,8 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             IntelBalGpu = 13,
         };
 
-        RadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
-        NvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
+        IsRadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
+        IsNvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
 
         if (_displayInfoService.UniqueTargetRefreshRates.Count > 1)
         {
@@ -327,7 +353,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         }
         else if (_systemInfoService.Cpu.Manufacturer == Manufacturer.AMD)
         {
-            IsIntelSettingsAvailable = false;
+            IsAmdCpuSettingsAvailable = true;
 
             if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
             {
@@ -339,17 +365,18 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                                             RyzenFamily.Lucienne or
                                             RyzenFamily.Renoir;
 
+                IsAmdApuVrmSettingAvailable = true;
                 IsAmdPboSettingAvailable = !_systemInfoService.Cpu.Name.Contains('U') &&
                                            _systemInfoService.Cpu.RyzenFamily < RyzenFamily.Renoir;
                 IsAmdCpuTuneSettingAvailable = _systemInfoService.GetBatteryStatus() == BatteryStatus.NoSystemBattery;
                 IsAmdSoftClockSettingAvailable = _systemInfoService.Cpu.RyzenFamily < RyzenFamily.Renoir;
-                IsAmdC0SettingAvailable = _systemInfoService.Cpu.RyzenFamily > RyzenFamily.Renoir &&
+                IsAmdCOSettingAvailable = _systemInfoService.Cpu.RyzenFamily > RyzenFamily.Renoir &&
                                           _systemInfoService.Cpu.RyzenFamily != RyzenFamily.Mendocino;
 
                 if (_systemInfoService.Cpu.RyzenFamily < RyzenFamily.Renoir)
                 {
                     IsAmdPowerProfileSettingsAvailable = false;
-                    IsAmdC0SettingAvailable = false;
+                    IsAmdCOSettingAvailable = false;
                 }
 
                 IsAmdApuIGpuClockSettingAvailable = _systemInfoService.Cpu.RyzenFamily is
@@ -369,8 +396,9 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             }
             else if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
             {
-                IsAmdC0SettingAvailable = _systemInfoService.Cpu.RyzenFamily >= RyzenFamily.Vermeer;
-                IsAmdCCD1COSettingAvailable = IsAmdC0SettingAvailable;
+                IsAmdCpuThermalSettingsAvailable = true;
+                IsAmdCOSettingAvailable = _systemInfoService.Cpu.RyzenFamily >= RyzenFamily.Vermeer;
+                IsAmdCCD1COSettingAvailable = IsAmdCOSettingAvailable;
                 IsAmdCCD2COSettingAvailable = _systemInfoService.Cpu.Name.Contains("Ryzen 9");
 
                 var desktopPresets = _amdDesktopPresetService.GetPresets();
@@ -426,10 +454,25 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             IsAsusGpuEcoModeSettingsAvailable = false;
         }
     }
+    
+    private async Task RestorePresetValues()
+    {
+        var presetService = _systemInfoService.Cpu.Manufacturer switch
+        {
+            Manufacturer.AMD => _systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu
+                ? _apuPresetService
+                : _amdDesktopPresetService,
+            Manufacturer.Intel => _intelPresetService
+        };
+        if (presetService.GetPresetNames().Contains(SelectedPreset.Name))
+        {
+            SelectedPreset = presetService.GetPreset(SelectedPreset.Name)!;
+        }
+    }
 
     private async Task Undo()
     {
-        IsAmdOc = false;
+        SelectedPreset.IsAmdOc = false;
         await _ryzenAdjService.Translate("--disable-oc ");
         await _ryzenAdjService.Translate(GetCommandValues());
         Settings.Default.CommandString = GetCommandValues();
@@ -451,8 +494,8 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                     "Your custom preset settings have been applied!");
             }
 
-            RadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
-            NvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
+            IsRadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
+            IsNvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
         }
         catch (Exception ex)
         {
@@ -512,8 +555,8 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
 
                         _apuPresetService.SavePreset(SelectedPreset.Name, SelectedPreset);
 
-                        RadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
-                        NvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
+                        IsRadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
+                        IsNvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
                     }
                     else if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
                     {
@@ -696,7 +739,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 }
             }
 
-            if (IsAmdOc)
+            if (SelectedPreset.IsAmdOc)
             {
                 commands.Add($"--oc-clk={SelectedPreset.AmdClock} --oc-clk={SelectedPreset.AmdClock}");
 
@@ -774,7 +817,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                     }
                 }
 
-                if (IsAmdOc)
+                if (SelectedPreset.IsAmdOc)
                 {
                     commands.Add($"--oc-clk={SelectedPreset.AmdClock} --oc-clk={SelectedPreset.AmdClock}");
 

@@ -34,15 +34,14 @@
                             <DataTemplate DataType="models:PremadePreset">
                                 <ToggleButton Width="155"
                                               Margin="4.5,0"
-                                              Command="{Binding DataContext.ApplyPresetCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">
+                                              Command="{Binding DataContext.ApplyPresetCommand, ElementName=Root}">
                                     <StackPanel Orientation="Horizontal">
                                         <controls:SymbolIcon Symbol="{ic:FluentIcon LeafTwo20Regular}"
                                                              Margin="0,0,9,0"
                                                              FontSize="24" />
                                         <Label Height="23"
                                                FontSize="16"
-                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                               Content="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                               Content="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                                     </StackPanel>
                                 </ToggleButton>
                             </DataTemplate>
@@ -51,10 +50,11 @@
                 </UniformGrid>
             </NotificationCard>
             <UniformGrid Columns="2">
-                <Image Source="pack://application:,,,/Assets/config.png"
-                       MaxWidth="500"
-                       MaxHeight="500"
-                       Stretch="Uniform" />
+                <!-- todo: refact this.  !-->
+                <!-- <Image Source="pack://application:,,,/Assets/config.png" -->
+                <!--        MaxWidth="500" -->
+                <!--        MaxHeight="500" -->
+                <!--        Stretch="Uniform" /> -->
                 <NotificationCard Margin="0,0,18,0"
                                   MaxWidth="475"
                                   MaxHeight="475">
@@ -65,11 +65,11 @@
                                        FontSize="20"
                                        Margin="0,-6,0,0"
                                        Text="{Binding CurrentPreset.Name, UpdateSourceTrigger=PropertyChanged}" />
-                            <controls:InfoBadge Appearance="Success"
-                                                Margin="0,9,0,0"
+                            <controls:InfoBadge Margin="0,9,0,0"
                                                 Width="150"
                                                 HorizontalAlignment="Left"
-                                                Text="Device Certified Preset"/>
+                                                Value="Device Certified Preset" />
+                            <!-- todo: infobadge not displays text !-->
                             <TextBlock FontSize="14.5"
                                        Margin="0,9,0,0"
                                        TextWrapping="Wrap"

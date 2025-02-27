@@ -24,7 +24,7 @@
                             VerticalAlignment="Stretch"
                             Background="{Binding Color, Mode=OneWay}"
                             FontSize="25">
-                        <controls:SymbolIcon Symbol="{ic:FluentIcon Fluent20Regular}"/>
+                        <controls:SymbolIcon Symbol="{ic:FluentIcon Fluent20Regular}" />
                     </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

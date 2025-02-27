@@ -34,41 +34,41 @@
             IsChecked="{Binding ViewModel.CurrentTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}" />-->
         <CheckBox Content="Start on System Boot"
                   IsChecked="{Binding IsAutoStartEnabled, UpdateSourceTrigger=PropertyChanged}"
-                  Command="{Binding StartOnSystemBootCommand}"/>
+                  Command="{Binding StartOnSystemBootCommand}" />
         <CheckBox Content="Start Minimized"
-                  IsChecked="{Binding IsStartMinimizedEnabled, UpdateSourceTrigger=PropertyChanged }"/>
+                  IsChecked="{Binding IsStartMinimizedEnabled, UpdateSourceTrigger=PropertyChanged }" />
         <CheckBox Content="Minimize on close"
-                  IsChecked="{Binding IsMinimizeOnClose, UpdateSourceTrigger=PropertyChanged }"/>
+                  IsChecked="{Binding IsMinimizeOnClose, UpdateSourceTrigger=PropertyChanged }" />
         <CheckBox Content="Reapply On Start"
-                  IsChecked="{Binding IsReapplyOnStart, UpdateSourceTrigger=PropertyChanged }"/>
+                  IsChecked="{Binding IsReapplyOnStart, UpdateSourceTrigger=PropertyChanged }" />
         <StackPanel>
             <CheckBox Content="Auto Reapply (s)"
-                      IsChecked="{Binding IsAutoReapply, UpdateSourceTrigger=PropertyChanged }"/>
+                      IsChecked="{Binding IsAutoReapply, UpdateSourceTrigger=PropertyChanged }" />
             <controls:NumberBox Margin="9,0,0,0"
                                 Minimum="1"
                                 Maximum="90"
                                 Value="{Binding ReapplySecond, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
         <CheckBox Content="Auto Update Check"
-                  IsChecked="{Binding IsAutoCheckUpdates, UpdateSourceTrigger=PropertyChanged}"/>
+                  IsChecked="{Binding IsAutoCheckUpdates, UpdateSourceTrigger=PropertyChanged}" />
         <CheckBox Content="Auto Start Adaptive Mode"
-                  IsChecked="{Binding IsAutoStartAdaptiveMode, UpdateSourceTrigger=PropertyChanged}"/>
+                  IsChecked="{Binding IsAutoStartAdaptiveMode, UpdateSourceTrigger=PropertyChanged}" />
         <CheckBox Content="Track Games"
-                  IsChecked="{Binding IsAutoTrackGames, UpdateSourceTrigger=PropertyChanged}"/>
+                  IsChecked="{Binding IsAutoTrackGames, UpdateSourceTrigger=PropertyChanged}" />
         <Button Width="178"
                 Margin="0,9,0,0"
                 Command="{Binding StartStressTestCommand}">
             <StackPanel Orientation="Horizontal">
-                <controls:SymbolIcon Symbol="{ic:FluentIcon Fire20Regular}" 
+                <controls:SymbolIcon Symbol="{ic:FluentIcon Fire20Regular}"
                                      FontSize="24"
-                                     Margin="0,0,9,0"/>
+                                     Margin="0,0,9,0" />
                 <TextBlock VerticalAlignment="Center"
-                           Text="Start Stress Test"/>
+                           Text="Start Stress Test" />
             </StackPanel>
         </Button>
 
-        <TextBlock Foreground="DarkRed" 
-                   Margin="0,4.5,0,0" 
+        <TextBlock Foreground="DarkRed"
+                   Margin="0,4.5,0,0"
                    Text="WARNING: This will put extreme stress on your CPU. Use at your own risk!" />
 
         <TextBlock
@@ -76,38 +76,38 @@
             FontSize="20"
             FontWeight="Medium"
             Text="About Universal x86 Tuning Utility" />
-        <TextBlock Margin="0,12,0,9" 
+        <TextBlock Margin="0,12,0,9"
                    Text="{Binding ApplicationVersion, Mode=OneWay}" />
 
         <StackPanel>
             <Button Width="178"
                     Command="{Binding CheckUpdateCommand}">
                 <StackPanel>
-                    <controls:SymbolIcon Symbol="Sync" 
+                    <controls:SymbolIcon Symbol="Sync"
                                          FontSize="24"
-                                         Margin="0,0,9,0"/>
+                                         Margin="0,0,9,0" />
                     <TextBlock VerticalAlignment="Center"
-                               Text="Check for Updates"/>
+                               Text="Check for Updates" />
                 </StackPanel>
             </Button>
 
             <Button Margin="9,0,0,0"
-                    Width="178" 
+                    Width="178"
                     IsVisible="{Binding IsUpdateAvailable, UpdateSourceTrigger=PropertyChanged}"
                     Command="{Binding DownloadUpdateCommand}">
                 <StackPanel>
-                    <controls:SymbolIcon Symbol="Download" 
+                    <controls:SymbolIcon Symbol="Download"
                                          FontSize="24"
-                                         Margin="0,0,9,0"/>
+                                         Margin="0,0,9,0" />
                     <TextBlock VerticalAlignment="Center"
-                               Text="Download Update"/>
+                               Text="Download Update" />
                 </StackPanel>
             </Button>
         </StackPanel>
 
-        <TextBlock HorizontalAlignment="Left" 
-                   Margin="0,9,0,0" 
+        <TextBlock HorizontalAlignment="Left"
+                   Margin="0,9,0,0"
                    TextWrapping="Wrap"
-                   Width="351"/>
+                   Width="351" />
     </StackPanel>
 </UserControl>
