@@ -2,7 +2,7 @@ using ApplicationCore.Utilities;
 
 namespace ApplicationCore.Models;
 
-public class PremadePreset : NotifyPropertyChangedBase
+public class PremadePreset : Preset
 {
     public string Name
     {

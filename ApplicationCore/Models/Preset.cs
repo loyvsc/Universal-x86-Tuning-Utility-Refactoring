@@ -5,6 +5,11 @@ namespace ApplicationCore.Models;
 
 public class Preset : NotifyPropertyChangedBase
 {
+    public static readonly Preset Empty = new Preset()
+    {
+        Name = "None"
+    };
+    
     private int _apuTemperature;
     private int _apuSkinTemperature;
     private int _apuStapmPower;

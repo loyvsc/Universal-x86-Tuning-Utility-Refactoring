@@ -3,600 +3,658 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:Universal_x86_Tuning_Utility.Views.Pages"
-             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-             d:DataContext="{d:DesignInstance local:CustomPresetsPage, IsDesignTimeCreatable=False}"
-             d:Background="{DynamicResource ApplicationBackgroundBrush}"
-             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+             xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:icons="clr-namespace:FluentAvalonia.FluentIcons;assembly=FluentAvalonia.FluentIcons"
+             xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
+             x:DataType="viewModels:AdaptiveViewModel"
              mc:Ignorable="d"
-             d:DesignHeight="1000" d:DesignWidth="800"
-             Title="Adaptive Mode" Loaded="Page_Loaded">
+             d:DesignHeight="1000"
+             d:DesignWidth="800">
 
     <Grid>
-        <DockPanel LastChildFill="True" Margin="15,0,0,0">
-            <TextBlock
-                FontSize="26"
-                FontWeight="Medium"
-                Text="Adaptive Mode" DockPanel.Dock="Top" Margin="3,10,0,0" />
+        <DockPanel LastChildFill="True"
+                   Margin="15,0,0,0">
+            <TextBlock FontSize="26"
+                       FontWeight="Medium"
+                       Text="Adaptive Mode"
+                       DockPanel.Dock="Top" 
+                       Margin="3,10,0,0" />
 
-            <DockPanel DockPanel.Dock="Top" Margin="0
-                       ,9,18,0">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" HorizontalAlignment="Left">
-                    <TextBlock FontSize="17" FontWeight="Medium" Margin="0,0,12,0" VerticalAlignment="Center">Games/Apps:</TextBlock>
-                    <ComboBox Width="225" Name="cbxPowerPreset" SelectionChanged="cbxPowerPreset_SelectionChanged"
+            <DockPanel DockPanel.Dock="Top" 
+                       Margin="0,9,18,0">
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Left"
+                            DockPanel.Dock="Left" >
+                    <TextBlock FontSize="17" 
+                               FontWeight="Medium" 
+                               Margin="0,0,12,0"
+                               VerticalAlignment="Center"
+                               Text="Games/Apps:"/>
+                    <ComboBox Width="225"
+                              Name="cbxPowerPreset" 
+                              SelectionChanged="cbxPowerPreset_SelectionChanged"
                               Height="37">
                     </ComboBox>
-                    <ui:Button HorizontalAlignment="Right" VerticalAlignment="Center" Height="37"
-                               DockPanel.Dock="Bottom" Width="50" Name="btnReloadApps"
-                               ToolTip.Tip="Updates dropdown list with games/apps" Click="btnReloadApps_Click"
-                               Margin="9,0,0,0">
-                        <ui:SymbolIcon Symbol="ArrowSync20" FontSize="24" />
-                    </ui:Button>
+                    <Button HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Height="37"
+                            Width="50" 
+                            DockPanel.Dock="Bottom" 
+                            Name="btnReloadApps"
+                            ToolTip.Tip="Updates dropdown list with games/apps" 
+                            Click="btnReloadApps_Click"
+                            Margin="9,0,0,0">
+                        <ui:SymbolIcon Symbol="{icons:FluentIcon ArrowSync20Regular}"
+                                       FontSize="24" />
+                    </Button>
                 </StackPanel>
             </DockPanel>
 
-            <TextBlock DockPanel.Dock="Top" Margin="0,8,0,0" Foreground="LightGray">Notes: Wait for profiles to load before starting mode!</TextBlock>
+            <TextBlock DockPanel.Dock="Top"
+                       Margin="0,8,0,0"
+                       Foreground="LightGray"
+                       Text="Notes: Wait for profiles to load before starting mode!"/>
 
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,9,9,6">
-                <TextBlock FontSize="14" Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                           VerticalAlignment="Center" Margin="0,0,9,9">
-                    Polling Rate
-                </TextBlock>
-                <ui:NumberBox Margin="0,0,9,9" x:Name="nudPolling" Minimum="1" Maximum="8" Value="2" SmallChange="0.05"
-                              MaxDecimalPlaces="2">
-                </ui:NumberBox>
-                <CheckBox Name="cbAutoSwitch" Content="Auto switch app profile" Margin="0,0,9,9"
-                          VerticalAlignment="Center" Click="cbAutoSwitch_Click" />
-                <ui:Button HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,9,9" Height="40"
-                           DockPanel.Dock="Bottom" Width="50" Name="btnSave" ToolTip.Tip="Save current settings"
-                           Click="btnSave_Click" IsEnabled="False">
-                    <ui:SymbolIcon Symbol="Save20" FontSize="24" />
-                </ui:Button>
-                <ui:Button HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,9,9" Height="40"
-                           DockPanel.Dock="Bottom" Width="185" Name="btnStart" Click="btnStart_Click" IsEnabled="False">
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Right" 
+                        DockPanel.Dock="Bottom" 
+                        Margin="0,9,9,6">
+                <TextBlock FontSize="14" 
+                           VerticalAlignment="Center" 
+                           Margin="0,0,9,9"
+                           Text="Polling Rate"/>
+                <ui:NumberBox Margin="0,0,9,9" 
+                              x:Name="nudPolling" 
+                              Minimum="1"
+                              Maximum="8"
+                              Value="2" 
+                              SmallChange="0.05"/>
+                <CheckBox Name="cbAutoSwitch"
+                          Content="Auto switch app profile" 
+                          Margin="0,0,9,9"
+                          VerticalAlignment="Center"
+                          Click="cbAutoSwitch_Click" />
+                <Button HorizontalAlignment="Right" 
+                        VerticalAlignment="Center" 
+                        Margin="0,0,9,9" 
+                        Width="50" 
+                        Height="40"
+                        DockPanel.Dock="Bottom"
+                        Name="btnSave"
+                        ToolTip.Tip="Save current settings"
+                        Click="btnSave_Click">
+                    <ui:SymbolIcon Symbol="{icons:FluentIcon Save20Regular}" 
+                                   FontSize="24" />
+                </Button>
+                <Button HorizontalAlignment="Right" 
+                        VerticalAlignment="Center" 
+                        Margin="0,0,9,9"
+                        Height="40"
+                        Width="185"
+                        DockPanel.Dock="Bottom"
+                        Name="btnStart"
+                        Click="btnStart_Click">
                     <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Name="siStartIcon" Symbol="Play20" FontSize="24" />
-                        <TextBlock Name="tbxStartText" VerticalAlignment="Center" Margin="9,0,0,0">Start Adaptive Mode</TextBlock>
+                        <ui:SymbolIcon Name="siStartIcon"
+                                       Symbol="{icons:FluentIcon Play20Regular}"
+                                       FontSize="24" />
+                        <TextBlock Name="tbxStartText" 
+                                   VerticalAlignment="Center"
+                                   Margin="9,0,0,0"
+                                   Text="Start Adaptive Mode"/>
                     </StackPanel>
-                </ui:Button>
+                </Button>
             </StackPanel>
 
-            <ScrollViewer Name="mainScroll" Margin="0,9,0,0" HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto" CanContentScroll="False" PanningMode="VerticalFirst"
-                          Stylus.IsFlicksEnabled="False" Stylus.IsTouchFeedbackEnabled="True"
-                          IsDeferredScrollingEnabled="False" DockPanel.Dock="Top"
+            <ScrollViewer Name="mainScroll"
+                          Margin="0,9,0,0" 
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto" 
+                          IsDeferredScrollingEnabled="False"
+                          DockPanel.Dock="Top"
                           ScrollChanged="mainScroll_ScrollChanged">
                 <StackPanel Name="mainCon">
-                    <ui:CardControl Name="sdEnabled"
-                                    IsEnabled="True"
-                                    Icon="PresenceAvailable10"
-                                    VerticalAlignment="Top"
-                                    Margin="0,0,15,0">
-
-                        <ui:CardControl.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                    <controls:CardControl Name="sdEnabled"
+                                          VerticalAlignment="Top"
+                                          Margin="0,0,15,0">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" 
+                                        VerticalAlignment="Center">
+                                <ui:SymbolIcon Symbol="{icons:FluentIcon PresenceAvailable10Regular}"/>
+                                <TextBlock FontSize="14"
+                                           FontWeight="Medium"
+                                           Text="Auto Switch" />
+                                <TextBlock FontSize="12"
+                                           Text="Enable this preset for automatic switching. Can be used to exclude games/apps from auto switch." />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal" >
+                                <ToggleSwitch Name="tsAutoSwitch" 
+                                              Margin="0,0,9,0" />
+                            </StackPanel>
+                        </Grid>
+                    </controls:CardControl>
+                    
+                    <Expander Name="sdBasic"
+                              VerticalAlignment="Top" 
+                              Margin="0,8,15,0">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*, Auto">
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="14"
-                                        FontWeight="Medium"
-                                        Text="Auto Switch" />
-                                    <TextBlock
-                                        FontSize="12"
-                                        Text="Enable this preset for automatic switching. Can be used to exclude games/apps from auto switch." />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                    <ui:ToggleSwitch Name="tsAutoSwitch" Margin="0,0,9,0" />
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Book20Regular}"/>
+                                    <TextBlock FontSize="14"
+                                               FontWeight="Medium"
+                                               Text="Basic Adaptive Mode Settings" />
+                                    <TextBlock FontSize="12"
+                                               Text="Provides the ability to toggle/set adaptive mode targets." />
                                 </StackPanel>
                             </Grid>
-                        </ui:CardControl.Header>
-                    </ui:CardControl>
-                    <ui:CardExpander Name="sdBasic"
-                                     IsEnabled="True"
-                                     IsExpanded="False"
-                                     Icon="Book20" VerticalAlignment="Top" Margin="0,8,15,0">
-                        <ui:CardExpander.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="14"
-                                        FontWeight="Medium"
-                                        Text="Basic Adaptive Mode Settings" />
-                                    <TextBlock
-                                        FontSize="12"
-                                        Text="Provides the ability to toggle/set adaptive mode targets." />
-                                </StackPanel>
-                            </Grid>
-                        </ui:CardExpander.Header>
+                        </Expander.Header>
                         <!--  CardExpander content  -->
                         <StackPanel>
                             <StackPanel Margin="0,-8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Max Temperature Limit (°C)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold" FontSize="13"
+                                               Text="Max Temperature Limit (°C)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the max temperature limit adaptive mode is allowed to set"
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0" />
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
+                                <Grid ColumnDefinitions="0,150,*"
+                                      Margin="0,8,0,0">
                                     <!--<CheckBox Name="cbTemp"/>-->
-                                    <ui:NumberBox Name="nudTemp" Text="{Binding ElementName=sdTemp, Path=Value}"
-                                                  Value="{Binding ElementName=sdTemp, Path=Value}" Maximum="105"
-                                                  Minimum="10" Grid.Column="1" SmallChange="1" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdTemp" Value="{Binding ElementName=nudTemp, Path=Value}"
-                                            Maximum="105" Minimum="10" Grid.Column="2" Margin="12,0,0,0"
-                                            TickFrequency="1" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                    <ui:NumberBox Grid.Column="1"
+                                                  Name="nudTemp"
+                                                  Text="{Binding ElementName=sdTemp, Path=Value}"
+                                                  Value="{Binding ElementName=sdTemp, Path=Value}" 
+                                                  Maximum="105"
+                                                  Minimum="10" 
+                                                  SmallChange="1" />
+                                    <Slider Name="sdTemp" 
+                                            Grid.Column="2"
+                                            Value="{Binding ElementName=nudTemp, Path=Value}"
+                                            Maximum="105" 
+                                            Minimum="10" 
+                                            Margin="12,0,0,0"
+                                            TickFrequency="1" 
+                                            VerticalAlignment="Center"
+                                            IsSnapToTickEnabled="True" />
                                 </Grid>
                             </StackPanel>
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Max Power Limit (W)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold" 
+                                               FontSize="13"
+                                               Text="Max Power Limit (W)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the max power limit adpative mode is allowed to set"
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0" />
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <!--<CheckBox Name="cbPowerLimit"/>-->
+                                <Grid ColumnDefinitions="0,150,*"
+                                      Margin="0,8,0,0">
                                     <ui:NumberBox Name="nudPowerLimit"
+                                                  Grid.Column="1"
                                                   Text="{Binding ElementName=sdPowerLimit, Path=Value}"
-                                                  Value="{Binding ElementName=sdPowerLimit, Path=Value}" Maximum="300"
-                                                  Minimum="8" Grid.Column="1" SmallChange="1" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdPowerLimit" Value="{Binding ElementName=nudPowerLimit, Path=Value}"
-                                            Maximum="300" Minimum="8" Grid.Column="2" Margin="12,0,0,0"
-                                            TickFrequency="1" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                                  Value="{Binding ElementName=sdPowerLimit, Path=Value}"
+                                                  Maximum="300"
+                                                  Minimum="8" 
+                                                  SmallChange="1" />
+                                    <Slider Name="sdPowerLimit" 
+                                            Grid.Column="2" 
+                                            Value="{Binding ElementName=nudPowerLimit, Path=Value}"
+                                            Maximum="300" 
+                                            Minimum="8" 
+                                            Margin="12,0,0,0"
+                                            TickFrequency="1" 
+                                            VerticalAlignment="Center"
+                                            IsSnapToTickEnabled="True"/>
                                 </Grid>
                             </StackPanel>
-                            <StackPanel Margin="0,8,0,0" Name="spCO">
+                            <StackPanel Margin="0,8,0,0" 
+                                        Name="spCO">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Max Curve Optimiser Limit (-)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold" 
+                                               FontSize="13"
+                                               Text="Max Curve Optimiser Limit (-)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the max negative curve optimiser limit adpative mode is allowed to set"
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="33" />
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <CheckBox Name="cbCurve" />
-                                    <ui:NumberBox Name="nudCurve" Text="{Binding ElementName=sdCurve, Path=Value}"
-                                                  Value="{Binding ElementName=sdCurve, Path=Value}" Maximum="50"
-                                                  Minimum="0" Grid.Column="1" SmallChange="1" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdCurve" Value="{Binding ElementName=nudCurve, Path=Value}"
-                                            Maximum="50" Minimum="0" Grid.Column="2" Margin="12,0,0,0"
-                                            TickFrequency="1" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                <Grid ColumnDefinitions="33,150,*"
+                                      Margin="0,8,0,0">
+                                    <CheckBox Grid.Column="0" Name="cbCurve" />
+                                    <ui:NumberBox Grid.Column="1" Name="nudCurve"
+                                                  Text="{Binding ElementName=sdCurve, Path=Value}"
+                                                  Value="{Binding ElementName=sdCurve, Path=Value}" 
+                                                  Maximum="50"
+                                                  Minimum="0"
+                                                  SmallChange="1" />
+                                    <Slider Name="sdCurve"
+                                            Grid.Column="2"
+                                            Margin="12,0,0,0"
+                                            Value="{Binding ElementName=nudCurve, Path=Value}"
+                                            Maximum="50"
+                                            Minimum="0" 
+                                            TickFrequency="1" 
+                                            VerticalAlignment="Center"
+                                            IsSnapToTickEnabled="True"/>
                                 </Grid>
                             </StackPanel>
                         </StackPanel>
-                    </ui:CardExpander>
+                    </Expander>
 
-                    <ui:CardExpander Name="sdTBOiGPU"
-                                     IsEnabled="True"
-                                     IsExpanded="False"
-                                     Icon="Pulse20" VerticalAlignment="Top" Margin="0,8,15,0">
-                        <ui:CardExpander.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="14"
-                                        FontWeight="Medium"
-                                        Text="Turbo Boost Overdrive iGPU Settings" />
-                                    <TextBlock
-                                        FontSize="12"
-                                        Text="Provides the ability to toggle/set Turbo Boost Overdrive iGPU targets." />
+                    <Expander Name="sdTBOiGPU"
+                              VerticalAlignment="Top" 
+                              Margin="0,8,15,0">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*, Auto">
+                                <StackPanel Grid.Column="0"
+                                            VerticalAlignment="Center">
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Pulse20Regular}"/>
+                                    <TextBlock FontSize="14"
+                                               FontWeight="Medium"
+                                               Text="Turbo Boost Overdrive iGPU Settings" />
+                                    <TextBlock FontSize="12"
+                                               Text="Provides the ability to toggle/set Turbo Boost Overdrive iGPU targets." />
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                    <ui:ToggleSwitch Name="tsTBOiGPU" Margin="0,0,9,0" />
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal">
+                                    <ToggleSwitch Name="tsTBOiGPU" 
+                                                  Margin="0,0,9,0" />
                                 </StackPanel>
                             </Grid>
-                        </ui:CardExpander.Header>
+                        </Expander.Header>
                         <!--  CardExpander content  -->
                         <StackPanel>
                             <StackPanel Margin="0,-8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Maximum iGPU Clock Limit (MHz)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold"
+                                               FontSize="13"
+                                               Text="Maximum iGPU Clock Limit (MHz)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the maximum iGPU clock speed adaptive mode is allowed to set"
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0" />
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
+                                <Grid Margin="0,8,0,0" ColumnDefinitions="0,150,*">
                                     <!--<CheckBox Name="cbMaxGfxClk"/>-->
                                     <ui:NumberBox Name="nudMaxGfxClk"
+                                                  Grid.Column="1"
                                                   Text="{Binding ElementName=sdMaxGfxClk, Path=Value}"
-                                                  Value="{Binding ElementName=sdMaxGfxClk, Path=Value}" Maximum="3300"
-                                                  Minimum="200" Grid.Column="1" SmallChange="25" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdMaxGfxClk" Value="{Binding ElementName=nudMaxGfxClk, Path=Value}"
-                                            Maximum="3400" Minimum="200" Grid.Column="2" Margin="12,0,0,0"
-                                            TickFrequency="25" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                                  Value="{Binding ElementName=sdMaxGfxClk, Path=Value}"
+                                                  Maximum="3300"
+                                                  Minimum="200" 
+                                                  SmallChange="25" />
+                                    <Slider Name="sdMaxGfxClk"
+                                            Grid.Column="2" 
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Value="{Binding ElementName=nudMaxGfxClk, Path=Value}"
+                                            Maximum="3400" 
+                                            Minimum="200" 
+                                            TickFrequency="25" 
+                                            IsSnapToTickEnabled="True" />
                                 </Grid>
                             </StackPanel>
 
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Minimum iGPU Clock Limit (MHz)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold" 
+                                               FontSize="13"
+                                               Text="Minimum iGPU Clock Limit (MHz)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the minimum iGPU clock speed adaptive mode is allowed to set"
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0" />
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <!--<CheckBox Name="cbMinGfxClk"/>-->
+                                <Grid ColumnDefinitions="0,150,*"
+                                      Margin="0,8,0,0">
                                     <ui:NumberBox Name="nudMinGfxClk"
+                                                  Grid.Column="1"
                                                   Text="{Binding ElementName=sdMinGfxClk, Path=Value}"
-                                                  Value="{Binding ElementName=sdMinGfxClk, Path=Value}" Maximum="3300"
-                                                  Minimum="200" Grid.Column="1" SmallChange="25" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdMinGfxClk" Value="{Binding ElementName=nudMinGfxClk, Path=Value}"
-                                            Maximum="3400" Minimum="200" Grid.Column="2" Margin="12,0,0,0"
-                                            TickFrequency="25" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                                  Value="{Binding ElementName=sdMinGfxClk, Path=Value}"
+                                                  Maximum="3300"
+                                                  Minimum="200" 
+                                                  SmallChange="25" />
+                                    <Slider Name="sdMinGfxClk" 
+                                            Grid.Column="2" 
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Value="{Binding ElementName=nudMinGfxClk, Path=Value}"
+                                            Maximum="3400" 
+                                            Minimum="200" 
+                                            TickFrequency="25" 
+                                            IsSnapToTickEnabled="True"/>
                                 </Grid>
                             </StackPanel>
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Minimum CPU Clock Limit (MHz)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold"
+                                               FontSize="13"
+                                               Text="Minimum CPU Clock Limit (MHz)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the minimum CPU clock speed at which adaptive mode will start throttling iGPU clocks"
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0" />
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <!--<CheckBox Name="cbMinGfxClk"/>-->
+                                <Grid ColumnDefinitions="0,150,*"
+                                      Margin="0,8,0,0">
                                     <ui:NumberBox Name="nudMinCpuClk"
+                                                  Grid.Column="1" 
                                                   Text="{Binding ElementName=sdMinCpuClk, Path=Value}"
-                                                  Value="{Binding ElementName=sdMinCpuClk, Path=Value}" Maximum="4000"
-                                                  Minimum="1000" Grid.Column="1" SmallChange="25" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdMinCpuClk" Value="{Binding ElementName=nudMinCpuClk, Path=Value}"
-                                            Maximum="4000" Minimum="1000" Grid.Column="2" Margin="12,0,0,0"
-                                            TickFrequency="25" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                                  Value="{Binding ElementName=sdMinCpuClk, Path=Value}"
+                                                  Maximum="4000"
+                                                  Minimum="1000" 
+                                                  SmallChange="25" />
+                                    <Slider Name="sdMinCpuClk" 
+                                            Grid.Column="2"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center" 
+                                            Value="{Binding ElementName=nudMinCpuClk, Path=Value}"
+                                            Maximum="4000" 
+                                            Minimum="1000" 
+                                            TickFrequency="25" 
+                                            IsSnapToTickEnabled="True" />
                                 </Grid>
                             </StackPanel>
-                            <TextBlock Margin="0,8,0,0" Foreground="LightGray">Notes: Ensure you balance CPU and iGPU clocks out for the best performance!</TextBlock>
+                            <TextBlock Margin="0,8,0,0" 
+                                       Foreground="LightGray"
+                                       Text="Notes: Ensure you balance CPU and iGPU clocks out for the best performance!"/>
                         </StackPanel>
-                    </ui:CardExpander>
-                    <ui:CardExpander Name="sdUXTUSR"
-                                     IsEnabled="True"
-                                     IsExpanded="False"
-                                     Icon="Image24" Margin="0,8,15,0">
-                        <ui:CardExpander.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="14"
-                                        FontWeight="Medium"
-                                        Text="UXTU Super Resolution" />
-                                    <TextBlock
-                                        FontSize="12"
-                                        Text="Powered by a customised version of Magpie. Use Alt+F to toggle." />
+                    </Expander>
+                    <Expander Name="sdUXTUSR"
+                              Margin="0,8,15,0">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" 
+                                            VerticalAlignment="Center">
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Image24Regular}"/>
+                                    <TextBlock FontSize="14"
+                                               FontWeight="Medium"
+                                               Text="UXTU Super Resolution" />
+                                    <TextBlock FontSize="12"
+                                               Text="Powered by a customised version of Magpie. Use Alt+F to toggle." />
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                    <ui:ToggleSwitch Name="tsUXTUSR" Margin="0,0,9,0" />
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal">
+                                    <ToggleSwitch Name="tsUXTUSR"
+                                                  Margin="0,0,9,0" />
                                 </StackPanel>
                             </Grid>
-                        </ui:CardExpander.Header>
+                        </Expander.Header>
                         <!--  CardExpander content  -->
                         <StackPanel>
-                            <StackPanel Margin="0,-8,0,0">
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox Name="cbVSync" Checked="cb_Checked" FontSize="13"
-                                                  FontWeight="DemiBold" Content="Enable VSync"
-                                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                        <ui:SymbolIcon Symbol="Info20"
-                                                                    Margin="6,0,0,-4"
-                                                       ToolTip.Tip="Synchronises capture frame rate to display refresh rate."
-                                                       VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Name="cbVSync" 
+                                          Checked="cb_Checked"
+                                          FontSize="13"
+                                          FontWeight="DemiBold"
+                                          Content="Enable VSync"/>
+                                <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
+                                               Margin="6,0,0,-4"
+                                               ToolTip.Tip="Synchronises capture frame rate to display refresh rate."
+                                               VerticalAlignment="Center" />
                             </StackPanel>
-                            <StackPanel Margin="0,-8,0,0">
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox Width="130" Name="cbAutoCap" Checked="cb_Checked" FontSize="13"
-                                                  FontWeight="DemiBold" Content="Auto Recapture"
-                                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                        <ui:SymbolIcon Symbol="Info20"
-                                                                    Margin="6,0,0,-4"
-                                                       ToolTip.Tip="Auto recaptures the previous capture window after focus was lost and restored."
-                                                       VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Width="130"
+                                          Name="cbAutoCap" 
+                                          Checked="cb_Checked" 
+                                          FontSize="13"
+                                          FontWeight="DemiBold"
+                                          Content="Auto Recapture"/>
+                                <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
+                                               Margin="6,0,0,-4"
+                                               ToolTip.Tip="Auto recaptures the previous capture window after focus was lost and restored."
+                                               VerticalAlignment="Center" />
                             </StackPanel>
 
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Capture Sharpness (%)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold"
+                                               FontSize="13"
+                                               Text="Capture Sharpness (%)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls UXTU Super Resolution capture image sharpness."
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudSharp" Text="{Binding ElementName=sdSharp, Path=Value}"
-                                                  Value="{Binding ElementName=sdSharp, Path=Value}" Maximum="100"
-                                                  Minimum="5" Grid.Column="0" SmallChange="1" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdSharp" Value="{Binding ElementName=nudSharp, Path=Value}"
-                                            Maximum="100" Minimum="5" Grid.Column="1" Margin="12,0,0,0"
-                                            TickFrequency="1" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                    <ui:NumberBox Name="nudSharp"
+                                                  Grid.Column="0"
+                                                  Text="{Binding ElementName=sdSharp, Path=Value}"
+                                                  Value="{Binding ElementName=sdSharp, Path=Value}" 
+                                                  Maximum="100"
+                                                  Minimum="5" 
+                                                  SmallChange="1" />
+                                    <Slider Name="sdSharp"
+                                            Grid.Column="1" 
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center" 
+                                            Value="{Binding ElementName=nudSharp, Path=Value}"
+                                            Maximum="100" 
+                                            Minimum="5" 
+                                            TickFrequency="1" 
+                                            IsSnapToTickEnabled="True"/>
                                 </Grid>
                             </StackPanel>
 
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Resolution Scale
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold" 
+                                               FontSize="13"
+                                               Text="Resolution Scale"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the resolution of the window being captured. Use application controlled if you do not want UXTU to override the window resolution. Not all applications will be compatible with this mode!"
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="208" />
-                                    </Grid.ColumnDefinitions>
-                                    <ComboBox
-                                        Grid.Column="1"
-                                        VerticalAlignment="Center" SelectedIndex="0" MinWidth="138" Name="cbxResScale"
-                                        Height="37">
-                                        <ComboBoxItem>Application Controlled</ComboBoxItem>
-                                        <ComboBoxItem>Ultra Quality (77%)</ComboBoxItem>
-                                        <ComboBoxItem>Quality (67%)</ComboBoxItem>
-                                        <ComboBoxItem>Balanced (59%)</ComboBoxItem>
-                                        <ComboBoxItem>Performance (50%)</ComboBoxItem>
-                                        <ComboBoxItem>Ultra Performance (33%)</ComboBoxItem>
-                                    </ComboBox>
-                                </Grid>
+                                <ComboBox Margin="0,8,0,0"
+                                          VerticalAlignment="Center" 
+                                          SelectedIndex="0" 
+                                          Width="208" 
+                                          Name="cbxResScale"
+                                          Height="37">
+                                    <!-- todo: refact this !-->
+                                    <ComboBoxItem>Application Controlled</ComboBoxItem>
+                                    <ComboBoxItem>Ultra Quality (77%)</ComboBoxItem>
+                                    <ComboBoxItem>Quality (67%)</ComboBoxItem>
+                                    <ComboBoxItem>Balanced (59%)</ComboBoxItem>
+                                    <ComboBoxItem>Performance (50%)</ComboBoxItem>
+                                    <ComboBoxItem>Ultra Performance (33%)</ComboBoxItem>
+                                </ComboBox>
                             </StackPanel>
                         </StackPanel>
-                    </ui:CardExpander>
-                    <ui:CardExpander Name="sdADLX"
-                                     IsEnabled="True"
-                                     IsExpanded="False"
-                                     Icon="Image24" Margin="0,8,15,0">
-                        <ui:CardExpander.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="14"
-                                        FontWeight="Medium"
-                                        Text="Radeon™ Graphics Options" />
-                                    <TextBlock
-                                        FontSize="12"
-                                        Text="Provides the ability to customise driver graphics options" />
+                    </Expander>
+                    <Expander Name="sdADLX"
+                              Margin="0,8,15,0">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" 
+                                            VerticalAlignment="Center">
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Image24Regular}"/>
+                                    <TextBlock FontSize="14"
+                                               FontWeight="Medium"
+                                               Text="Radeon™ Graphics Options" />
+                                    <TextBlock FontSize="12"
+                                               Text="Provides the ability to customise driver graphics options" />
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                    <ui:ToggleSwitch Name="tsRadeonGraph" Margin="0,0,9,0" />
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal">
+                                    <ToggleSwitch Name="tsRadeonGraph" 
+                                                  Margin="0,0,9,0" />
                                 </StackPanel>
                             </Grid>
-                        </ui:CardExpander.Header>
+                        </Expander.Header>
                         <!--  CardExpander content  -->
                         <StackPanel>
-                            <StackPanel Margin="0,-8,0,0">
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox Name="cbAntiLag" Checked="cb_Checked" FontSize="13"
-                                                  FontWeight="DemiBold" Content="Radeon™ Anti-Lag"
-                                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                        <ui:SymbolIcon Symbol="Info20"
-                                                                    Margin="6,0,0,-4"
-                                                       ToolTip.Tip="Enables AMD Radeon™ Anti-Lag within drivers on supported hardware."
-                                                       VerticalAlignment="Center" />
-                                    </StackPanel>
-
-                                </Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Name="cbAntiLag" 
+                                          Checked="cb_Checked" 
+                                          FontSize="13"
+                                          FontWeight="DemiBold"
+                                          Content="Radeon™ Anti-Lag"/>
+                                <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
+                                               Margin="6,0,0,-4"
+                                               ToolTip.Tip="Enables AMD Radeon™ Anti-Lag within drivers on supported hardware."
+                                               VerticalAlignment="Center" />
                             </StackPanel>
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Radeon™ Super Resolution (%)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold" 
+                                               FontSize="13"
+                                               Text="Radeon™ Super Resolution (%)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Enables AMD Radeon™ Super Resolution within drivers on supported hardware. Also allows you to set a custom sharpness effect."
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="33" />
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <CheckBox Name="cbRSR" Checked="cb_Checked" />
-                                    <ui:NumberBox Name="nudRSR" Text="{Binding ElementName=sdRSR, Path=Value}"
-                                                  Value="{Binding ElementName=sdRSR, Path=Value}" Minimum="100"
-                                                  Maximum="5" Grid.Column="1" SmallChange="1" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdRSR" Value="{Binding ElementName=nubRSR, Path=Value}" Maximum="100"
-                                            Minimum="5" Grid.Column="2" Margin="12,0,0,0" TickFrequency="1"
-                                            VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                <Grid ColumnDefinitions="33,150,*"
+                                      Margin="0,8,0,0">
+                                    <CheckBox Grid.Column="0"
+                                              Name="cbRSR" 
+                                              Checked="cb_Checked" />
+                                    <ui:NumberBox Name="nudRSR" 
+                                                  Grid.Column="1"
+                                                  Text="{Binding ElementName=sdRSR, Path=Value}"
+                                                  Value="{Binding ElementName=sdRSR, Path=Value}" 
+                                                  Minimum="100"
+                                                  Maximum="5"  
+                                                  SmallChange="1" />
+                                    <Slider Name="sdRSR" 
+                                            Grid.Column="2"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Value="{Binding ElementName=nudRSR, Path=Value}" 
+                                            Maximum="100"
+                                            Minimum="5"  
+                                            TickFrequency="1"
+                                            IsSnapToTickEnabled="True" />
                                 </Grid>
                             </StackPanel>
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Radeon™ Boost (%)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold"
+                                               FontSize="13"
+                                               Text="Radeon™ Boost (%)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Enables AMD Radeon™ Boost within drivers on supported hardware. Also allows you to set a minimum resolution in %."
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="33" />
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <CheckBox Name="cbBoost" Checked="cb_Checked" />
-                                    <ui:NumberBox Name="nudBoost" Text="{Binding ElementName=sdBoost, Path=Value}"
-                                                  Value="{Binding ElementName=sdBoost, Path=Value}" Maximum="83"
-                                                  Minimum="50" Grid.Column="1" SmallChange="1" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdBoost" Value="{Binding ElementName=nudBoost, Path=Value}"
-                                            Maximum="83" Minimum="50" Grid.Column="2" Margin="12,0,0,0"
-                                            TickFrequency="1" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                <Grid ColumnDefinitions="33,150,*"
+                                      Margin="0,8,0,0">
+                                    <CheckBox Grid.Column="0"
+                                              Name="cbBoost" 
+                                              Checked="cb_Checked" />
+                                    <ui:NumberBox Name="nudBoost" 
+                                                  Grid.Column="1"
+                                                  Text="{Binding ElementName=sdBoost, Path=Value}"
+                                                  Value="{Binding ElementName=sdBoost, Path=Value}"
+                                                  Maximum="83"
+                                                  Minimum="50" 
+                                                  SmallChange="1" />
+                                    <Slider Name="sdBoost" 
+                                            Grid.Column="2"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center" 
+                                            Value="{Binding ElementName=nudBoost, Path=Value}"
+                                            Maximum="83" 
+                                            Minimum="50" 
+                                            TickFrequency="1" 
+                                            IsSnapToTickEnabled="True"/>
                                 </Grid>
                             </StackPanel>
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Radeon™ Image Sharpening (%)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold"
+                                               FontSize="13"
+                                               Text="Radeon™ Image Sharpening (%)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Enables AMD Radeon™ Image Sharpening within drivers on supported hardware. Allows you to set a custom sharpness effect."
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="33" />
-                                        <ColumnDefinition Width="150" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <CheckBox Name="cbImageSharp" Checked="cb_Checked" />
+                                <Grid ColumnDefinitions="33,150,*"
+                                      Margin="0,8,0,0">
+                                    <CheckBox Grid.Column="0"
+                                              Name="cbImageSharp" 
+                                              Checked="cb_Checked" />
                                     <ui:NumberBox Name="nudImageSharp"
+                                                  Grid.Column="1"
                                                   Text="{Binding ElementName=sdImageSharp, Path=Value}"
-                                                  Value="{Binding ElementName=sdImageSharp, Path=Value}" Maximum="100"
-                                                  Minimum="10" Grid.Column="1" SmallChange="5" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdImageSharp" Value="{Binding ElementName=nudImageSharp, Path=Value}"
-                                            Maximum="100" Minimum="10" Grid.Column="2" Margin="12,0,0,0"
-                                            TickFrequency="5" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                                  Value="{Binding ElementName=sdImageSharp, Path=Value}" 
+                                                  Maximum="100"
+                                                  Minimum="10" 
+                                                  SmallChange="5" />
+                                    <Slider Name="sdImageSharp" 
+                                            Grid.Column="2"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center" 
+                                            Value="{Binding ElementName=nudImageSharp, Path=Value}"
+                                            Maximum="100" 
+                                            Minimum="10" 
+                                            TickFrequency="5" 
+                                            IsSnapToTickEnabled="True"/>
                                 </Grid>
                             </StackPanel>
 
-                            <StackPanel Margin="0,8,0,0">
-                                <Grid Margin="0,8,0,0">
-                                    <Grid.ColumnDefinitions>
-
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox Name="cbSync" Checked="cb_Checked" FontSize="13"
-                                                  FontWeight="DemiBold" Content="Enhanced Sync"
-                                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                        <ui:SymbolIcon Symbol="Info20"
-                                                                    Margin="6,0,0,-4"
-                                                       ToolTip.Tip="Enables AMD Enhanced Sync within drivers on supported hardware."
-                                                       VerticalAlignment="Center" />
-                                    </StackPanel>
-
-                                </Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Name="cbSync" 
+                                          Checked="cb_Checked" 
+                                          FontSize="13"
+                                          FontWeight="DemiBold" 
+                                          Content="Enhanced Sync"/>
+                                <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
+                                               Margin="6,0,0,-4"
+                                               ToolTip.Tip="Enables AMD Enhanced Sync within drivers on supported hardware."
+                                               VerticalAlignment="Center" />
                             </StackPanel>
                         </StackPanel>
-                    </ui:CardExpander>
-                    <ui:CardExpander Name="sdNVIDIA"
-                                     IsEnabled="True"
-                                     IsExpanded="False"
-                                     Icon="Pulse20" Margin="0,8,15,0">
-                        <ui:CardExpander.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="14"
-                                        FontWeight="Medium"
-                                        Text="NVIDIA GPU Tuning" />
-                                    <TextBlock
-                                        FontSize="12"
-                                        Text="Provides the ability to set tune your NVIDIA GPU." />
+                    </Expander>
+                    <Expander Name="sdNVIDIA"
+                              Margin="0,8,15,0">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" 
+                                            VerticalAlignment="Center">
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Pulse20Regular}"/>
+                                    <TextBlock FontSize="14"
+                                               FontWeight="Medium"
+                                               Text="NVIDIA GPU Tuning" />
+                                    <TextBlock FontSize="12"
+                                               Text="Provides the ability to set tune your NVIDIA GPU." />
                                 </StackPanel>
 
-                                <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                    <ui:ToggleSwitch Name="tsNV" Margin="0,0,9,0" />
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal" >
+                                    <ToggleSwitch Name="tsNV" 
+                                                  Margin="0,0,9,0" />
                                 </StackPanel>
                             </Grid>
-                        </ui:CardExpander.Header>
+                        </Expander.Header>
                         <!--  CardExpander content  -->
                         <StackPanel>
                             <StackPanel Margin="0,-8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        Frequency-Adjusted Voltage Limit (MHz)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold" 
+                                               FontSize="13"
+                                               Text="Frequency-Adjusted Voltage Limit (MHz)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows."
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
@@ -604,151 +662,181 @@
                                 <Grid ColumnDefinitions="150, *"
                                       Margin="0,8,0,0">
                                     <ui:NumberBox Name="nudNVMaxCore"
-                                                  Text="{Binding ElementName=sdMaxNVCore, Path=Value}"
-                                                  Value="{Binding ElementName=sdNVMaxCore, Path=Value}" Maximum="4000"
-                                                  Minimum="400" Grid.Column="0" SmallChange="5" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdNVMaxCore" Value="{Binding ElementName=nudNVMaxCore, Path=Value}"
-                                            Maximum="4000" Minimum="400" Grid.Column="1" Margin="12,0,0,0"
-                                            TickFrequency="5" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                                  Grid.Column="0"
+                                                  Text="{Binding ElementName=sdNVMaxCore, Path=Value}"
+                                                  Value="{Binding ElementName=sdNVMaxCore, Path=Value}" 
+                                                  Maximum="4000"
+                                                  Minimum="400" 
+                                                  SmallChange="5" />
+                                    <Slider Name="sdNVMaxCore"
+                                            Grid.Column="1"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Value="{Binding ElementName=nudNVMaxCore, Path=Value}"
+                                            Maximum="4000" 
+                                            Minimum="400" 
+                                            TickFrequency="5"
+                                            IsSnapToTickEnabled="True" />
                                 </Grid>
                             </StackPanel>
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        GPU Core Clock Offset (MHz)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold" 
+                                               FontSize="13"
+                                               Text="GPU Core Clock Offset (MHz)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock"
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudNVCore" Text="{Binding ElementName=sdNVCore, Path=Value}"
-                                                  Value="{Binding ElementName=sdNVCore, Path=Value}" Maximum="2000"
-                                                  Minimum="-500" Grid.Column="0" SmallChange="5" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdNVCore" Value="{Binding ElementName=nudNVCore, Path=Value}"
-                                            Maximum="2000" Minimum="-500" Grid.Column="1" Margin="12,0,0,0"
-                                            TickFrequency="5" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                    <ui:NumberBox Name="nudNVCore" 
+                                                  Grid.Column="0"
+                                                  Text="{Binding ElementName=sdNVCore, Path=Value}"
+                                                  Value="{Binding ElementName=sdNVCore, Path=Value}"
+                                                  Maximum="2000"
+                                                  Minimum="-500" 
+                                                  SmallChange="5" />
+                                    <Slider Name="sdNVCore" 
+                                            Grid.Column="1"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center" 
+                                            Value="{Binding ElementName=nudNVCore, Path=Value}"
+                                            Maximum="2000"
+                                            Minimum="-500" 
+                                            TickFrequency="5" 
+                                            IsSnapToTickEnabled="True" />
                                 </Grid>
                             </StackPanel>
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        GPU Memory Clock (MHz)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold" 
+                                               FontSize="13"
+                                               Text="GPU Memory Clock (MHz)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's VRAM clock"
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudNVMem" Text="{Binding ElementName=sdNVMem, Path=Value}"
-                                                  Value="{Binding ElementName=sdNVMem, Path=Value}" Maximum="2000"
-                                                  Minimum="-500" Grid.Column="0" SmallChange="25" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdNVMem" Value="{Binding ElementName=nudNVMem, Path=Value}"
-                                            Maximum="2000" Minimum="-500" Grid.Column="1" Margin="12,0,0,0"
-                                            TickFrequency="25" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                    <ui:NumberBox Name="nudNVMem" 
+                                                  Grid.Column="0"
+                                                  Text="{Binding ElementName=sdNVMem, Path=Value}"
+                                                  Value="{Binding ElementName=sdNVMem, Path=Value}"
+                                                  Maximum="2000"
+                                                  Minimum="-500"
+                                                  SmallChange="25" />
+                                    <Slider Name="sdNVMem"
+                                            Grid.Column="1" Margin="12,0,0,0"
+                                            Value="{Binding ElementName=nudNVMem, Path=Value}"
+                                            Maximum="2000"
+                                            Minimum="-500" 
+                                            TickFrequency="25" 
+                                            VerticalAlignment="Center" 
+                                            IsSnapToTickEnabled="True" />
                                 </Grid>
                             </StackPanel>
 
-                            <TextBlock
-                                FontSize="12"
-                                Text="Warning: We are not liable for any damages to hardware or resulting instabilities caused by adjustment of frequencies and voltages."
-                                TextWrapping="WrapWithOverflow" Margin="0,8,0,0" />
+                            <TextBlock FontSize="12"
+                                       Text="Warning: We are not liable for any damages to hardware or resulting instabilities caused by adjustment of frequencies and voltages."
+                                       TextWrapping="WrapWithOverflow"
+                                       Margin="0,8,0,0" />
                         </StackPanel>
-                    </ui:CardExpander>
-                    <ui:CardControl Name="sdAsusPower"
-                                    IsEnabled="True"
-                                    Icon="Power20" Margin="0,8,15,0">
-                        <ui:CardControl.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="14"
-                                        FontWeight="Medium"
-                                        Text="ASUS Power Profile" />
-                                    <TextBlock
-                                        FontSize="12"
-                                        Text="Provides the ability to set an ASUS power profile. This will override Armoury Crate!" />
-                                </StackPanel>
-                                <ComboBox
-                                    Grid.Column="1"
-                                    VerticalAlignment="Center" SelectedIndex="0" MinWidth="164" Name="cbxAsusPower"
-                                    Height="37">
-                                    <ComboBoxItem>AC Controlled</ComboBoxItem>
-                                    <ComboBoxItem>Silent</ComboBoxItem>
-                                    <ComboBoxItem>Performance</ComboBoxItem>
-                                    <ComboBoxItem>Turbo</ComboBoxItem>
-                                </ComboBox>
+                    </Expander>
+                    <controls:CardControl Name="sdAsusPower"
+                                          Margin="0,8,15,0">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" 
+                                        VerticalAlignment="Center">
+                                <ui:SymbolIcon Symbol="{icons:FluentIcon Power20Regular}"/>
+                                <TextBlock FontSize="14"
+                                           FontWeight="Medium"
+                                           Text="ASUS Power Profile" />
+                                <TextBlock FontSize="12"
+                                           Text="Provides the ability to set an ASUS power profile. This will override Armoury Crate!" />
+                            </StackPanel>
+                            <ComboBox Grid.Column="1"
+                                      VerticalAlignment="Center"
+                                      SelectedIndex="0"
+                                      MinWidth="164" 
+                                      Name="cbxAsusPower"
+                                      Height="37">
+                                <ComboBoxItem>AC Controlled</ComboBoxItem>
+                                <ComboBoxItem>Silent</ComboBoxItem>
+                                <ComboBoxItem>Performance</ComboBoxItem>
+                                <ComboBoxItem>Turbo</ComboBoxItem>
+                            </ComboBox>
 
-                            </Grid>
-                        </ui:CardControl.Header>
-                    </ui:CardControl>
+                        </Grid>
+                    </controls:CardControl>
 
-                    <ui:CardExpander Name="sdRTSS" Visibility="Collapsed"
-                                     IsEnabled="True"
-                                     IsExpanded="False"
-                                     Icon="Pulse20" Margin="0,8,15,0">
-                        <ui:CardExpander.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="14"
-                                        FontWeight="Medium"
-                                        Text="Static RTSS Frame Rate" />
-                                    <TextBlock
-                                        FontSize="12"
-                                        Text="Provides the ability to set a custom RTSS frame limit." />
+                    <Expander Name="sdRTSS" 
+                              Visibility="Collapsed"
+                              Margin="0,8,15,0">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0"
+                                            VerticalAlignment="Center">
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Pulse20Regular}"/>
+                                    <TextBlock FontSize="14"
+                                               FontWeight="Medium"
+                                               Text="Static RTSS Frame Rate" />
+                                    <TextBlock FontSize="12"
+                                               Text="Provides the ability to set a custom RTSS frame limit." />
                                 </StackPanel>
 
-                                <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                    <ui:ToggleSwitch Name="tsRTSS" Margin="0,0,9,0" />
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal">
+                                    <ToggleSwitch Name="tsRTSS"
+                                                  Margin="0,0,9,0" />
                                 </StackPanel>
                             </Grid>
-                        </ui:CardExpander.Header>
+                        </Expander.Header>
                         <!--  CardExpander content  -->
                         <StackPanel>
                             <StackPanel Margin="0,-8,0,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13">
-                                        RTSS Frame Limit (FPS)
-                                    </TextBlock>
-                                    <ui:SymbolIcon Symbol="Info20" Margin="6,0,0,-2"
+                                    <TextBlock FontWeight="DemiBold" 
+                                               FontSize="13"
+                                               Text="RTSS Frame Limit (FPS)"/>
+                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
+                                                   Margin="6,0,0,-2"
                                                    ToolTip.Tip="Controls the set FPS limit in RTSS"
                                                    VerticalAlignment="Bottom" />
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudRTSS" Text="{Binding ElementName=sdRTSSLim, Path=Value}"
-                                                  Value="{Binding ElementName=sdRTSSLim, Path=Value}" Maximum="999"
-                                                  Minimum="0" Grid.Column="0" SmallChange="2" MaxDecimalPlaces="0" />
-                                    <Slider Name="sdRTSSLim" Value="{Binding ElementName=nudRTSS, Path=Value}"
-                                            Maximum="999" Minimum="0" Grid.Column="1" Margin="12,0,0,0"
-                                            TickFrequency="2" VerticalAlignment="Center" IsSnapToTickEnabled="True"
-                                            TouchDown="SizeSlider_TouchDown" />
+                                    <ui:NumberBox Name="nudRTSS" 
+                                                  Grid.Column="0"
+                                                  Text="{Binding ElementName=sdRTSSLim, Path=Value}"
+                                                  Value="{Binding ElementName=sdRTSSLim, Path=Value}" 
+                                                  Maximum="999"
+                                                  Minimum="0" 
+                                                  SmallChange="2" />
+                                    <Slider Name="sdRTSSLim" 
+                                            Grid.Column="1" 
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center" 
+                                            Value="{Binding ElementName=nudRTSS, Path=Value}"
+                                            Maximum="999"
+                                            Minimum="0" 
+                                            TickFrequency="2" 
+                                            IsSnapToTickEnabled="True" />
                                 </Grid>
                             </StackPanel>
 
                         </StackPanel>
-                    </ui:CardExpander>
+                    </Expander>
 
-                    <TextBlock Name="tbLog" Margin="0,9,0,0"></TextBlock>
+                    <TextBlock Name="tbLog"
+                               Margin="0,9,0,0"/>
                 </StackPanel>
             </ScrollViewer>
         </DockPanel>
     </Grid>
-    </Page>
+</UserControl>

@@ -1582,7 +1582,7 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="CPU Balance"/>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" />-->
+                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" />-->
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1607,7 +1607,7 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="GPU Balance"/>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
+                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1662,7 +1662,7 @@
                                             <TextBlock FontWeight="DemiBold"
                                                        FontSize="13"
                                                        Text="{Binding CoreGroupIndex, StringFormat={}Core Group {0}}" />
-                                            <!-- <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" /> -->
+                                            <!-- <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" /> -->
                                         </StackPanel>
 
                                         <Grid ColumnDefinitions="150, *"
@@ -1715,7 +1715,7 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Core Offset (mV)"/>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" />-->
+                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" />-->
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1740,7 +1740,7 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="iGPU Offset (mV)"/>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
+                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1765,7 +1765,7 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Cache Offset (mV)"/>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
+                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1790,7 +1790,7 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="System Agent Offset (mV)"/>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2" Foreground="{DynamicResource TextFillColorPrimaryBrush}" ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
+                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"

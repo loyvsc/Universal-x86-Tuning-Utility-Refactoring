@@ -614,7 +614,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 commands.Add($"--stapm-limit={SelectedPreset.ApuStapmPower * 1000}");
             if (SelectedPreset.IsApuFastPow)
                 commands.Add($"--fast-limit={SelectedPreset.ApuFastPower * 1000}");
-            if (SelectedPreset.IsApuStapmTime)
+            if (SelectedPreset.IsApuStapmTime)  
                 commands.Add($"--stapm-time={SelectedPreset.ApuStapmPower} ");
             if (SelectedPreset.IsApuSlowPow)
                 commands.Add($"--slow-limit={SelectedPreset.ApuSlowPower * 1000}");
