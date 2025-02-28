@@ -13,7 +13,7 @@ public class LinuxAmdGpuService : IAmdGpuService
         throw new System.NotImplementedException();
     }
 
-    public int GetGpuMetrics(int gpuId, AmdGpuSensorEnum gpuSensor)
+    public int GetGpuMetrics(int gpuId, AmdGpuSensor gpuSensor)
     {
         throw new System.NotImplementedException();
     }

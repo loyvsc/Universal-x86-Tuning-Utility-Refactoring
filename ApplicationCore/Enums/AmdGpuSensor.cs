@@ -1,6 +1,6 @@
 namespace ApplicationCore.Enums;
 
-public enum AmdGpuSensorEnum
+public enum AmdGpuSensor
 {
     GpuLoad,
     GpuClock,

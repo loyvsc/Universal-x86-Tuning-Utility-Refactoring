@@ -32,18 +32,16 @@
                                VerticalAlignment="Center"
                                Text="Games/Apps:"/>
                     <ComboBox Width="225"
-                              Name="cbxPowerPreset" 
-                              SelectionChanged="cbxPowerPreset_SelectionChanged"
-                              Height="37">
-                    </ComboBox>
+                              ItemsSource="{Binding AvailablePresets, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValue="{Binding CurrentPreset, UpdateSourceTrigger=PropertyChanged}"
+                              Height="37"/>
                     <Button HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Height="37"
                             Width="50" 
                             DockPanel.Dock="Bottom" 
-                            Name="btnReloadApps"
                             ToolTip.Tip="Updates dropdown list with games/apps" 
-                            Click="btnReloadApps_Click"
+                            Command="{Binding ReloadGamesListCommand}"
                             Margin="9,0,0,0">
                         <ui:SymbolIcon Symbol="{icons:FluentIcon ArrowSync20Regular}"
                                        FontSize="24" />
@@ -65,25 +63,22 @@
                            Margin="0,0,9,9"
                            Text="Polling Rate"/>
                 <ui:NumberBox Margin="0,0,9,9" 
-                              x:Name="nudPolling" 
                               Minimum="1"
                               Maximum="8"
-                              Value="2" 
+                              Value="{Binding Polling, UpdateSourceTrigger=PropertyChanged}" 
                               SmallChange="0.05"/>
-                <CheckBox Name="cbAutoSwitch"
-                          Content="Auto switch app profile" 
+                <CheckBox Content="Auto switch app profile" 
                           Margin="0,0,9,9"
                           VerticalAlignment="Center"
-                          Click="cbAutoSwitch_Click" />
+                          IsChecked="{Binding IsAutoSwitchEnabled, UpdateSourceTrigger=PropertyChanged}"/>
                 <Button HorizontalAlignment="Right" 
                         VerticalAlignment="Center" 
                         Margin="0,0,9,9" 
                         Width="50" 
                         Height="40"
                         DockPanel.Dock="Bottom"
-                        Name="btnSave"
                         ToolTip.Tip="Save current settings"
-                        Click="btnSave_Click">
+                        Command="{Binding SavePresetCommand}">
                     <ui:SymbolIcon Symbol="{icons:FluentIcon Save20Regular}" 
                                    FontSize="24" />
                 </Button>
@@ -93,30 +88,35 @@
                         Height="40"
                         Width="185"
                         DockPanel.Dock="Bottom"
-                        Name="btnStart"
-                        Click="btnStart_Click">
+                        Command="{Binding ToggleAdaptiveModeCommand}">
                     <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Name="siStartIcon"
-                                       Symbol="{icons:FluentIcon Play20Regular}"
-                                       FontSize="24" />
-                        <TextBlock Name="tbxStartText" 
-                                   VerticalAlignment="Center"
+                        <ui:SymbolIcon Symbol="{icons:FluentIcon Play20Regular}"
+                                       Classes.IsStarted="{Binding IsStart, UpdateSourceTrigger=PropertyChanged}"
+                                       Classes.NotStarted="{Binding !IsStart, UpdateSourceTrigger=PropertyChanged}"
+                                       FontSize="24">
+                            <ui:SymbolIcon.Styles>
+                                <Style Selector="ui|SymbolIcon.IsStarted">
+                                    <Setter Property="Symbol" Value="{icons:FluentIcon Stop20Regular}"/>
+                                </Style>
+                                <Style Selector="ui|SymbolIcon.NotStarted">
+                                    <Setter Property="Symbol" Value="{icons:FluentIcon Play20Regular}"/>
+                                </Style>
+                            </ui:SymbolIcon.Styles>
+                        </ui:SymbolIcon>
+                        <TextBlock VerticalAlignment="Center"
                                    Margin="9,0,0,0"
                                    Text="Start Adaptive Mode"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
 
-            <ScrollViewer Name="mainScroll"
-                          Margin="0,9,0,0" 
+            <ScrollViewer Margin="0,9,0,0" 
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Auto" 
                           IsDeferredScrollingEnabled="False"
-                          DockPanel.Dock="Top"
-                          ScrollChanged="mainScroll_ScrollChanged">
-                <StackPanel Name="mainCon">
-                    <controls:CardControl Name="sdEnabled"
-                                          VerticalAlignment="Top"
+                          DockPanel.Dock="Top">
+                <StackPanel>
+                    <controls:CardControl VerticalAlignment="Top"
                                           Margin="0,0,15,0">
                         <Grid ColumnDefinitions="*, Auto">
                             <StackPanel Grid.Column="0" 
@@ -130,14 +130,13 @@
                             </StackPanel>
                             <StackPanel Grid.Column="1"
                                         Orientation="Horizontal" >
-                                <ToggleSwitch Name="tsAutoSwitch" 
-                                              Margin="0,0,9,0" />
+                                <ToggleSwitch Margin="0,0,9,0"
+                                              IsChecked="{Binding CurrentPreset.IsAutoSwitch, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </Grid>
                     </controls:CardControl>
                     
-                    <Expander Name="sdBasic"
-                              VerticalAlignment="Top" 
+                    <Expander VerticalAlignment="Top" 
                               Margin="0,8,15,0">
                         <Expander.Header>
                             <Grid ColumnDefinitions="*, Auto">
@@ -167,15 +166,12 @@
                                       Margin="0,8,0,0">
                                     <!--<CheckBox Name="cbTemp"/>-->
                                     <ui:NumberBox Grid.Column="1"
-                                                  Name="nudTemp"
-                                                  Text="{Binding ElementName=sdTemp, Path=Value}"
-                                                  Value="{Binding ElementName=sdTemp, Path=Value}" 
+                                                  Value="{Binding CurrentPreset.Temp, UpdateSourceTrigger=PropertyChanged}" 
                                                   Maximum="105"
                                                   Minimum="10" 
                                                   SmallChange="1" />
-                                    <Slider Name="sdTemp" 
-                                            Grid.Column="2"
-                                            Value="{Binding ElementName=nudTemp, Path=Value}"
+                                    <Slider Grid.Column="2"
+                                            Value="{Binding CurrentPreset.Temp, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="105" 
                                             Minimum="10" 
                                             Margin="12,0,0,0"
@@ -196,16 +192,13 @@
                                 </StackPanel>
                                 <Grid ColumnDefinitions="0,150,*"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudPowerLimit"
-                                                  Grid.Column="1"
-                                                  Text="{Binding ElementName=sdPowerLimit, Path=Value}"
-                                                  Value="{Binding ElementName=sdPowerLimit, Path=Value}"
+                                    <ui:NumberBox Grid.Column="1"
+                                                  Value="{Binding CurrentPreset.Power, UpdateSourceTrigger=PropertyChanged}"
                                                   Maximum="300"
                                                   Minimum="8" 
                                                   SmallChange="1" />
-                                    <Slider Name="sdPowerLimit" 
-                                            Grid.Column="2" 
-                                            Value="{Binding ElementName=nudPowerLimit, Path=Value}"
+                                    <Slider Grid.Column="2" 
+                                            Value="{Binding CurrentPreset.Power, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="300" 
                                             Minimum="8" 
                                             Margin="12,0,0,0"
@@ -214,8 +207,10 @@
                                             IsSnapToTickEnabled="True"/>
                                 </Grid>
                             </StackPanel>
+                            
+                            
                             <StackPanel Margin="0,8,0,0" 
-                                        Name="spCO">
+                                        IsVisible="{Binding IsCurveOptimizerOptionsAvailable, UpdateSourceTrigger=PropertyChanged}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
@@ -227,17 +222,16 @@
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33,150,*"
                                       Margin="0,8,0,0">
-                                    <CheckBox Grid.Column="0" Name="cbCurve" />
-                                    <ui:NumberBox Grid.Column="1" Name="nudCurve"
-                                                  Text="{Binding ElementName=sdCurve, Path=Value}"
-                                                  Value="{Binding ElementName=sdCurve, Path=Value}" 
+                                    <CheckBox Grid.Column="0"
+                                              IsChecked="{Binding CurrentPreset.IsCo, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ui:NumberBox Grid.Column="1"
+                                                  Value="{Binding CurrentPreset.Co, UpdateSourceTrigger=PropertyChanged}" 
                                                   Maximum="50"
                                                   Minimum="0"
                                                   SmallChange="1" />
-                                    <Slider Name="sdCurve"
-                                            Grid.Column="2"
+                                    <Slider Grid.Column="2"
                                             Margin="12,0,0,0"
-                                            Value="{Binding ElementName=nudCurve, Path=Value}"
+                                            Value="{Binding CurrentPreset.Co, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="50"
                                             Minimum="0" 
                                             TickFrequency="1" 
@@ -248,9 +242,10 @@
                         </StackPanel>
                     </Expander>
 
-                    <Expander Name="sdTBOiGPU"
-                              VerticalAlignment="Top" 
-                              Margin="0,8,15,0">
+                    <!-- AMD APU Turbo Boost Overdrive iGPU settings !-->
+                    <Expander VerticalAlignment="Top" 
+                              Margin="0,8,15,0"
+                              IsVisible="{Binding IsAmdApuTurboBoostOverdriveSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <Grid ColumnDefinitions="*, Auto">
                                 <StackPanel Grid.Column="0"
@@ -264,8 +259,8 @@
                                 </StackPanel>
                                 <StackPanel Grid.Column="1"
                                             Orientation="Horizontal">
-                                    <ToggleSwitch Name="tsTBOiGPU" 
-                                                  Margin="0,0,9,0" />
+                                    <ToggleSwitch Margin="0,0,9,0" 
+                                                  IsChecked="{Binding CurrentPreset.IsGfx, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                             </Grid>
                         </Expander.Header>
@@ -284,18 +279,15 @@
 
                                 <Grid Margin="0,8,0,0" ColumnDefinitions="0,150,*">
                                     <!--<CheckBox Name="cbMaxGfxClk"/>-->
-                                    <ui:NumberBox Name="nudMaxGfxClk"
-                                                  Grid.Column="1"
-                                                  Text="{Binding ElementName=sdMaxGfxClk, Path=Value}"
-                                                  Value="{Binding ElementName=sdMaxGfxClk, Path=Value}"
+                                    <ui:NumberBox Grid.Column="1"
+                                                  Value="{Binding CurrentPreset.MaxGfx, UpdateSourceTrigger=PropertyChanged}"
                                                   Maximum="3300"
                                                   Minimum="200" 
                                                   SmallChange="25" />
-                                    <Slider Name="sdMaxGfxClk"
-                                            Grid.Column="2" 
+                                    <Slider Grid.Column="2" 
                                             Margin="12,0,0,0"
                                             VerticalAlignment="Center"
-                                            Value="{Binding ElementName=nudMaxGfxClk, Path=Value}"
+                                            Value="{Binding CurrentPreset.MaxGfx, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="3400" 
                                             Minimum="200" 
                                             TickFrequency="25" 
@@ -316,18 +308,15 @@
 
                                 <Grid ColumnDefinitions="0,150,*"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudMinGfxClk"
-                                                  Grid.Column="1"
-                                                  Text="{Binding ElementName=sdMinGfxClk, Path=Value}"
-                                                  Value="{Binding ElementName=sdMinGfxClk, Path=Value}"
+                                    <ui:NumberBox Grid.Column="1"
+                                                  Value="{Binding CurrentPreset.MinGgx, UpdateSourceTrigger=PropertyChanged}"
                                                   Maximum="3300"
                                                   Minimum="200" 
                                                   SmallChange="25" />
-                                    <Slider Name="sdMinGfxClk" 
-                                            Grid.Column="2" 
+                                    <Slider Grid.Column="2" 
                                             Margin="12,0,0,0"
                                             VerticalAlignment="Center"
-                                            Value="{Binding ElementName=nudMinGfxClk, Path=Value}"
+                                            Value="{Binding CurrentPreset.MinGgx, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="3400" 
                                             Minimum="200" 
                                             TickFrequency="25" 
@@ -347,18 +336,15 @@
 
                                 <Grid ColumnDefinitions="0,150,*"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudMinCpuClk"
-                                                  Grid.Column="1" 
-                                                  Text="{Binding ElementName=sdMinCpuClk, Path=Value}"
-                                                  Value="{Binding ElementName=sdMinCpuClk, Path=Value}"
+                                    <ui:NumberBox Grid.Column="1" 
+                                                  Value="{Binding CurrentPreset.MinCpuClock, UpdateSourceTrigger=PropertyChanged}"
                                                   Maximum="4000"
                                                   Minimum="1000" 
                                                   SmallChange="25" />
-                                    <Slider Name="sdMinCpuClk" 
-                                            Grid.Column="2"
+                                    <Slider Grid.Column="2"
                                             Margin="12,0,0,0"
                                             VerticalAlignment="Center" 
-                                            Value="{Binding ElementName=nudMinCpuClk, Path=Value}"
+                                            Value="{Binding CurrentPreset.MinCpuClock, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="4000" 
                                             Minimum="1000" 
                                             TickFrequency="25" 
@@ -370,8 +356,7 @@
                                        Text="Notes: Ensure you balance CPU and iGPU clocks out for the best performance!"/>
                         </StackPanel>
                     </Expander>
-                    <Expander Name="sdUXTUSR"
-                              Margin="0,8,15,0">
+                    <Expander Margin="0,8,15,0">
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Grid.Column="0" 
@@ -385,16 +370,15 @@
                                 </StackPanel>
                                 <StackPanel Grid.Column="1"
                                             Orientation="Horizontal">
-                                    <ToggleSwitch Name="tsUXTUSR"
-                                                  Margin="0,0,9,0" />
+                                    <ToggleSwitch Margin="0,0,9,0" 
+                                                  IsChecked="{Binding CurrentPreset.IsMag, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <!--  CardExpander content  -->
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <CheckBox Name="cbVSync" 
-                                          Checked="cb_Checked"
+                                <CheckBox IsChecked="{Binding CurrentPreset.IsVsync, UpdateSourceTrigger=PropertyChanged}"
                                           FontSize="13"
                                           FontWeight="DemiBold"
                                           Content="Enable VSync"/>
@@ -405,8 +389,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox Width="130"
-                                          Name="cbAutoCap" 
-                                          Checked="cb_Checked" 
+                                          IsChecked="{Binding CurrentPreset.IsRecap, UpdateSourceTrigger=PropertyChanged}"
                                           FontSize="13"
                                           FontWeight="DemiBold"
                                           Content="Auto Recapture"/>
@@ -429,18 +412,15 @@
 
                                 <Grid ColumnDefinitions="150, *"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudSharp"
-                                                  Grid.Column="0"
-                                                  Text="{Binding ElementName=sdSharp, Path=Value}"
-                                                  Value="{Binding ElementName=sdSharp, Path=Value}" 
+                                    <ui:NumberBox Grid.Column="0"
+                                                  Value="{Binding CurrentPreset.Sharpness, UpdateSourceTrigger=PropertyChanged}" 
                                                   Maximum="100"
                                                   Minimum="5" 
                                                   SmallChange="1" />
-                                    <Slider Name="sdSharp"
-                                            Grid.Column="1" 
+                                    <Slider Grid.Column="1" 
                                             Margin="12,0,0,0"
                                             VerticalAlignment="Center" 
-                                            Value="{Binding ElementName=nudSharp, Path=Value}"
+                                            Value="{Binding CurrentPreset.Sharpness, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="100" 
                                             Minimum="5" 
                                             TickFrequency="1" 
@@ -461,9 +441,8 @@
 
                                 <ComboBox Margin="0,8,0,0"
                                           VerticalAlignment="Center" 
-                                          SelectedIndex="0" 
+                                          SelectedIndex="{Binding CurrentPreset.ResScaleIndex, UpdateSourceTrigger=PropertyChanged}" 
                                           Width="208" 
-                                          Name="cbxResScale"
                                           Height="37">
                                     <!-- todo: refact this !-->
                                     <ComboBoxItem>Application Controlled</ComboBoxItem>
@@ -476,8 +455,9 @@
                             </StackPanel>
                         </StackPanel>
                     </Expander>
-                    <Expander Name="sdADLX"
-                              Margin="0,8,15,0">
+                    
+                    <!-- Radeon™ Graphics Options -->
+                    <Expander Margin="0,8,15,0">
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Grid.Column="0" 
@@ -491,18 +471,17 @@
                                 </StackPanel>
                                 <StackPanel Grid.Column="1"
                                             Orientation="Horizontal">
-                                    <ToggleSwitch Name="tsRadeonGraph" 
-                                                  Margin="0,0,9,0" />
+                                    <ToggleSwitch Margin="0,0,9,0" 
+                                                  IsChecked="{Binding CurrentPreset.IsRadeonGraphics, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <!--  CardExpander content  -->
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <CheckBox Name="cbAntiLag" 
-                                          Checked="cb_Checked" 
-                                          FontSize="13"
+                                <CheckBox FontSize="13"
                                           FontWeight="DemiBold"
+                                          IsChecked="{Binding CurrentPreset.IsAntiLag, UpdateSourceTrigger=PropertyChanged}"
                                           Content="Radeon™ Anti-Lag"/>
                                 <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
                                                Margin="6,0,0,-4"
@@ -523,20 +502,16 @@
                                 <Grid ColumnDefinitions="33,150,*"
                                       Margin="0,8,0,0">
                                     <CheckBox Grid.Column="0"
-                                              Name="cbRSR" 
-                                              Checked="cb_Checked" />
-                                    <ui:NumberBox Name="nudRSR" 
-                                                  Grid.Column="1"
-                                                  Text="{Binding ElementName=sdRSR, Path=Value}"
-                                                  Value="{Binding ElementName=sdRSR, Path=Value}" 
+                                              IsChecked="{Binding CurrentPreset.IsRsr, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ui:NumberBox Grid.Column="1"
+                                                  Value="{Binding CurrentPreset.Rsr, UpdateSourceTrigger=PropertyChanged}" 
                                                   Minimum="100"
                                                   Maximum="5"  
                                                   SmallChange="1" />
-                                    <Slider Name="sdRSR" 
-                                            Grid.Column="2"
+                                    <Slider Grid.Column="2"
                                             Margin="12,0,0,0"
                                             VerticalAlignment="Center"
-                                            Value="{Binding ElementName=nudRSR, Path=Value}" 
+                                            Value="{Binding CurrentPreset.Rsr, UpdateSourceTrigger=PropertyChanged}" 
                                             Maximum="100"
                                             Minimum="5"  
                                             TickFrequency="1"
@@ -557,20 +532,16 @@
                                 <Grid ColumnDefinitions="33,150,*"
                                       Margin="0,8,0,0">
                                     <CheckBox Grid.Column="0"
-                                              Name="cbBoost" 
-                                              Checked="cb_Checked" />
-                                    <ui:NumberBox Name="nudBoost" 
-                                                  Grid.Column="1"
-                                                  Text="{Binding ElementName=sdBoost, Path=Value}"
-                                                  Value="{Binding ElementName=sdBoost, Path=Value}"
+                                              IsChecked="{Binding CurrentPreset.IsBoost, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ui:NumberBox Grid.Column="1"
+                                                  Value="{Binding CurrentPreset.Boost, UpdateSourceTrigger=PropertyChanged}"
                                                   Maximum="83"
                                                   Minimum="50" 
                                                   SmallChange="1" />
-                                    <Slider Name="sdBoost" 
-                                            Grid.Column="2"
+                                    <Slider Grid.Column="2"
                                             Margin="12,0,0,0"
                                             VerticalAlignment="Center" 
-                                            Value="{Binding ElementName=nudBoost, Path=Value}"
+                                            Value="{Binding CurrentPreset.Boost, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="83" 
                                             Minimum="50" 
                                             TickFrequency="1" 
@@ -591,20 +562,16 @@
                                 <Grid ColumnDefinitions="33,150,*"
                                       Margin="0,8,0,0">
                                     <CheckBox Grid.Column="0"
-                                              Name="cbImageSharp" 
-                                              Checked="cb_Checked" />
-                                    <ui:NumberBox Name="nudImageSharp"
-                                                  Grid.Column="1"
-                                                  Text="{Binding ElementName=sdImageSharp, Path=Value}"
-                                                  Value="{Binding ElementName=sdImageSharp, Path=Value}" 
+                                              IsChecked="{Binding CurrentPreset.IsImageSharp, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ui:NumberBox Grid.Column="1"
+                                                  Value="{Binding CurrentPreset.ImageSharp, UpdateSourceTrigger=PropertyChanged}" 
                                                   Maximum="100"
                                                   Minimum="10" 
                                                   SmallChange="5" />
-                                    <Slider Name="sdImageSharp" 
-                                            Grid.Column="2"
+                                    <Slider Grid.Column="2"
                                             Margin="12,0,0,0"
                                             VerticalAlignment="Center" 
-                                            Value="{Binding ElementName=nudImageSharp, Path=Value}"
+                                            Value="{Binding CurrentPreset.ImageSharp, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="100" 
                                             Minimum="10" 
                                             TickFrequency="5" 
@@ -613,10 +580,9 @@
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal">
-                                <CheckBox Name="cbSync" 
-                                          Checked="cb_Checked" 
-                                          FontSize="13"
+                                <CheckBox FontSize="13"
                                           FontWeight="DemiBold" 
+                                          IsChecked="{Binding CurrentPreset.IsSync, UpdateSourceTrigger=PropertyChanged}"
                                           Content="Enhanced Sync"/>
                                 <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
                                                Margin="6,0,0,-4"
@@ -625,8 +591,8 @@
                             </StackPanel>
                         </StackPanel>
                     </Expander>
-                    <Expander Name="sdNVIDIA"
-                              Margin="0,8,15,0">
+                    <Expander Margin="0,8,15,0"
+                              IsVisible="{Binding IsNvidiaGraphicsOptionsAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Grid.Column="0" 
@@ -641,8 +607,8 @@
 
                                 <StackPanel Grid.Column="1"
                                             Orientation="Horizontal" >
-                                    <ToggleSwitch Name="tsNV" 
-                                                  Margin="0,0,9,0" />
+                                    <ToggleSwitch Margin="0,0,9,0" 
+                                                  IsChecked="{Binding CurrentPreset.IsNvidia, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                             </Grid>
                         </Expander.Header>
@@ -661,18 +627,15 @@
 
                                 <Grid ColumnDefinitions="150, *"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudNVMaxCore"
-                                                  Grid.Column="0"
-                                                  Text="{Binding ElementName=sdNVMaxCore, Path=Value}"
-                                                  Value="{Binding ElementName=sdNVMaxCore, Path=Value}" 
+                                    <ui:NumberBox Grid.Column="0"
+                                                  Value="{Binding CurrentPreset.NvMaxCoreClock, UpdateSourceTrigger=PropertyChanged}" 
                                                   Maximum="4000"
                                                   Minimum="400" 
                                                   SmallChange="5" />
-                                    <Slider Name="sdNVMaxCore"
-                                            Grid.Column="1"
+                                    <Slider Grid.Column="1"
                                             Margin="12,0,0,0"
                                             VerticalAlignment="Center"
-                                            Value="{Binding ElementName=nudNVMaxCore, Path=Value}"
+                                            Value="{Binding CurrentPreset.NvMaxCoreClock, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="4000" 
                                             Minimum="400" 
                                             TickFrequency="5"
@@ -692,18 +655,15 @@
 
                                 <Grid ColumnDefinitions="150, *"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudNVCore" 
-                                                  Grid.Column="0"
-                                                  Text="{Binding ElementName=sdNVCore, Path=Value}"
-                                                  Value="{Binding ElementName=sdNVCore, Path=Value}"
+                                    <ui:NumberBox Grid.Column="0"
+                                                  Value="{Binding CurrentPreset.NvCoreClock, UpdateSourceTrigger=PropertyChanged}"
                                                   Maximum="2000"
                                                   Minimum="-500" 
                                                   SmallChange="5" />
-                                    <Slider Name="sdNVCore" 
-                                            Grid.Column="1"
+                                    <Slider Grid.Column="1"
                                             Margin="12,0,0,0"
                                             VerticalAlignment="Center" 
-                                            Value="{Binding ElementName=nudNVCore, Path=Value}"
+                                            Value="{Binding CurrentPreset.NvCoreClock, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="2000"
                                             Minimum="-500" 
                                             TickFrequency="5" 
@@ -723,16 +683,14 @@
 
                                 <Grid ColumnDefinitions="150, *"
                                       Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudNVMem" 
-                                                  Grid.Column="0"
-                                                  Text="{Binding ElementName=sdNVMem, Path=Value}"
-                                                  Value="{Binding ElementName=sdNVMem, Path=Value}"
+                                    <ui:NumberBox Grid.Column="0"
+                                                  Value="{Binding CurrentPreset.NvMemClock, UpdateSourceTrigger=PropertyChanged}"
                                                   Maximum="2000"
                                                   Minimum="-500"
                                                   SmallChange="25" />
-                                    <Slider Name="sdNVMem"
-                                            Grid.Column="1" Margin="12,0,0,0"
-                                            Value="{Binding ElementName=nudNVMem, Path=Value}"
+                                    <Slider Grid.Column="1" 
+                                            Margin="12,0,0,0"
+                                            Value="{Binding CurrentPreset.NvMemClock, UpdateSourceTrigger=PropertyChanged}"
                                             Maximum="2000"
                                             Minimum="-500" 
                                             TickFrequency="25" 
@@ -747,8 +705,9 @@
                                        Margin="0,8,0,0" />
                         </StackPanel>
                     </Expander>
-                    <controls:CardControl Name="sdAsusPower"
-                                          Margin="0,8,15,0">
+                    
+                    <!-- ASUS Power profile settings !-->
+                    <controls:CardControl Margin="0,8,15,0">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" 
                                         VerticalAlignment="Center">
@@ -761,9 +720,8 @@
                             </StackPanel>
                             <ComboBox Grid.Column="1"
                                       VerticalAlignment="Center"
-                                      SelectedIndex="0"
-                                      MinWidth="164" 
-                                      Name="cbxAsusPower"
+                                      SelectedIndex="{Binding CurrentPreset.AsusPowerProfile, UpdateSourceTrigger=PropertyChanged}"
+                                      MinWidth="164"
                                       Height="37">
                                 <ComboBoxItem>AC Controlled</ComboBoxItem>
                                 <ComboBoxItem>Silent</ComboBoxItem>
@@ -774,8 +732,7 @@
                         </Grid>
                     </controls:CardControl>
 
-                    <Expander Name="sdRTSS" 
-                              Visibility="Collapsed"
+                    <Expander IsVisible="False"
                               Margin="0,8,15,0">
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
@@ -792,7 +749,7 @@
                                 <StackPanel Grid.Column="1"
                                             Orientation="Horizontal">
                                     <ToggleSwitch Name="tsRTSS"
-                                                  Margin="0,0,9,0" />
+                                                  Margin="0,0,9,0"/>
                                 </StackPanel>
                             </Grid>
                         </Expander.Header>
@@ -832,9 +789,6 @@
 
                         </StackPanel>
                     </Expander>
-
-                    <TextBlock Name="tbLog"
-                               Margin="0,9,0,0"/>
                 </StackPanel>
             </ScrollViewer>
         </DockPanel>

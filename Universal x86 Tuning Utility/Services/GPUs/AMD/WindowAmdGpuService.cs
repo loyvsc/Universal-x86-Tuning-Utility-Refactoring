@@ -28,13 +28,13 @@ public class WindowAmdGpuService : IAmdGpuService
         return GetFPSData();
     }
 
-    public int GetGpuMetrics(int gpuId, AmdGpuSensorEnum gpuSensor)
+    public int GetGpuMetrics(int gpuId, AmdGpuSensor gpuSensor)
     {
         int sensorId = gpuSensor switch
         {
-            AmdGpuSensorEnum.GpuLoad => 7,
-            AmdGpuSensorEnum.GpuClock => 0,
-            AmdGpuSensorEnum.GpuMemClock => 1,
+            AmdGpuSensor.GpuLoad => 7,
+            AmdGpuSensor.GpuClock => 0,
+            AmdGpuSensor.GpuMemClock => 1,
             _ => throw new ArgumentOutOfRangeException(nameof(gpuSensor), gpuSensor, "Gpu sensor is not supported")
         };
 

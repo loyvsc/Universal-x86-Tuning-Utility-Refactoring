@@ -8,7 +8,7 @@ public interface IAmdGpuService
     public int RsrSharpness { get; set; }
     
     public int GetFpsData();
-    public int GetGpuMetrics(int gpuId, AmdGpuSensorEnum gpuSensor);
+    public int GetGpuMetrics(int gpuId, AmdGpuSensor gpuSensor);
     public void SetFpsLimit(int gpuId, int fpsLimit, bool isEnabled);
     public void SetAntilag(int gpuId, bool isEnabled);
     public void SetBoost(int gpuId, int percent, bool isEnabled);
