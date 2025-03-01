@@ -34,7 +34,14 @@
                     <ComboBox Width="225"
                               ItemsSource="{Binding AvailablePresets, UpdateSourceTrigger=PropertyChanged}"
                               SelectedValue="{Binding CurrentPreset, UpdateSourceTrigger=PropertyChanged}"
-                              Height="37"/>
+                              Height="37">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"
+                                           FontFamily="{Binding}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                     <Button HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Height="37"

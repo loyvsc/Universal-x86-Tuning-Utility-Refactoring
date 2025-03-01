@@ -186,10 +186,10 @@ public class WindowsSuperResolutionService
             if (foregroundWindow != IntPtr.Zero)
             {
                 var windowText = new StringBuilder(256);
-                GetWindowText(foregroundWindow, windowText, windowText.Capacity);
+                _ = GetWindowText(foregroundWindow, windowText, windowText.Capacity);
                 _currentAppName = windowText.ToString();
 
-                if (_currentAppName == _appName && !MagWindow.IsRunning) ToggleMagWindow();
+                if (_currentAppName == _appName && MagWindow?.IsRunning == false) ToggleMagWindow();
             }
         }
     }

@@ -676,6 +676,8 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         _systemInfoSearcher.Dispose();
         _processorInfoSearcher.Dispose();
         _batteryInfoSearcher.Dispose();
+        
+        
     }
 }
 

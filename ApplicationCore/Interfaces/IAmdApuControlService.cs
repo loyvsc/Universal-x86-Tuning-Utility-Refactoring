@@ -3,7 +3,7 @@ namespace ApplicationCore.Interfaces;
 public interface IAmdApuControlService
 {
     public int CurrentPowerLimit { get; set; }
-    public string Commmand { get; }
+    public string? Commmand { get; }
 
     public void UpdateiGPUClock(int maxClock, 
         int minClock, 

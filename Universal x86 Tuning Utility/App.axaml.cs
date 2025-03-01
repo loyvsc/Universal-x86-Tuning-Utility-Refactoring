@@ -9,7 +9,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Avalonia.Styling;
 using DesktopNotifications;
 using Microsoft.Extensions.Logging;
 using Splat;
@@ -34,28 +33,23 @@ public class App : Application
     public static readonly string ExecutableFileName = Process.GetCurrentProcess().MainModule.FileName;
 
     private ILogger<App> _logger;
-    private ISystemInfoService _systemInfoService;
+    private IClassicDesktopStyleApplicationLifetime _desktopApplicationLifetime;
     
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-        
-        if (Design.IsDesignMode)
-        {
-            RequestedThemeVariant = ThemeVariant.Dark;
-        }
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow()
+            _desktopApplicationLifetime = desktop;
+            _desktopApplicationLifetime.MainWindow = new MainWindow()
             {
                 DataContext = Locator.Current.GetService<MainWindowViewModel>()
             };
-            desktop.Exit += OnExit;
-            desktop.Startup += OnStartup;
+            _desktopApplicationLifetime.Startup += OnStartup;
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -96,7 +90,6 @@ public class App : Application
             SplatRegistrations.SetupIOC();
 
             _logger = Locator.Current.GetService<ILogger<App>>()!;
-            _systemInfoService = Locator.Current.GetService<ISystemInfoService>()!;
 
             try
             {
@@ -142,14 +135,17 @@ public class App : Application
         }
     }
 
-    /// <summary>
-    /// Occurs when the application is closing.
-    /// </summary>
-    private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
+    private void OnCloseMenuItemClick(object? sender, EventArgs e)
     {
-        if (_systemInfoService.Cpu.Manufacturer != Manufacturer.Intel)
+        var mainWindow = _desktopApplicationLifetime.MainWindow!;
+        if (mainWindow.WindowState != WindowState.Minimized)
         {
-            SMUCommands.RyzenAccess.Dispose();
+            mainWindow.WindowState = WindowState.Minimized;
+        }
+        else
+        {
+            mainWindow.Show();
+            mainWindow.WindowState = WindowState.Normal;
         }
     }
 }

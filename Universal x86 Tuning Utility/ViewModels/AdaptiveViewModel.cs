@@ -1,18 +1,16 @@
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Threading;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using ApplicationCore.Utilities;
+using Avalonia.Threading;
 using DesktopNotifications;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Properties;
-using Universal_x86_Tuning_Utility.Services.GPUs.AMD.Apu;
-using Universal_x86_Tuning_Utility.Services.RyzenAdj;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
@@ -85,6 +83,9 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         set => SetValue(ref _polling, value, () =>
         {
             Settings.Default.polling = value;
+            var newInterval = TimeSpan.FromSeconds(value);
+            _sensorsTimer.Interval = newInterval;
+            _adaptiveModeTimer.Interval = newInterval;
         });
     }
 
@@ -105,6 +106,8 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
     private readonly ICpuControlService _cpuControlService;
     private readonly IRtssService _rtssService;
     private readonly IAmdGpuService _amdGpuService;
+    private readonly IAmdApuControlService _amdApuControlService;
+    private readonly IRyzenAdjService _ryzenAdjService;
     private readonly DispatcherTimer _adaptiveModeTimer;
     private readonly DispatcherTimer _sensorsTimer;
 
@@ -115,7 +118,9 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
                              INotificationManager notificationManager,
                              ICpuControlService cpuControlService,
                              IRtssService rtssService,
-                             IAmdGpuService amdGpuService)
+                             IAmdGpuService amdGpuService,
+                             IAmdApuControlService amdApuControlService,
+                             IRyzenAdjService ryzenAdjService)
     {
         _systemInfoService = systemInfoService;
         _gameLauncherService = gameLauncherService;
@@ -125,6 +130,8 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         _cpuControlService = cpuControlService;
         _rtssService = rtssService;
         _amdGpuService = amdGpuService;
+        _amdApuControlService = amdApuControlService;
+        _ryzenAdjService = ryzenAdjService;
 
         _adaptiveModeTimer = new DispatcherTimer
         {
@@ -147,7 +154,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         Initialize();
     }
 
-    private int CPUTemp, CPULoad, CPUClock, GPULoad, GPUClock, GPUMemClock;
+    private int CPUTemp, CPULoad, CPUClock, GPULoad, GPUClock, GPUMemClock, CPUPower;
     private bool _isAutoSwitchEnabled;
     private double _polling;
 
@@ -226,9 +233,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
             GPUClock = _amdGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuClock);
             GPUMemClock = _amdGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuMemClock);
         }
-
-        IsGameRunning();
-
+        
         if (CPULoad < 100 / _systemInfoService.Cpu.CoresCount + 5)
         {
             newMinCPUClock = minCPUClock + 500;
@@ -240,15 +245,17 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
 
         if (AvailablePresets.Count > 0 && IsAutoSwitchEnabled)
         {
-            if (selectedGameName != runningGameName)
+            var runningGameName = GetRunningGame() ?? "Default";
+            if (CurrentPreset.Name != runningGameName)
             {
                 int selectedIndex = 0; // index to select if the search fails
 
-                foreach (var item in cbxPowerPreset.Items)
+                for (var i = 0; i < _availablePresets.Count; i++)
                 {
-                    if (item.ToString() == runningGameName)
+                    var item = _availablePresets[i];
+                    if (item.Name == runningGameName)
                     {
-                        cbxPowerPreset.SelectedItem = item;
+                        CurrentPreset = item;
                         return;
                     }
                 }
@@ -256,32 +263,29 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         }
     }
     
-    private void IsGameRunning()
+    private string? GetRunningGame()
     {
+        var installedGames = _gameLauncherService.InstalledGames.Value;
         foreach (GameLauncherItem item in installedGames)
         {
-            //var gamePath = game.Split("~");
-
             int i = 0;
             do
             {
-                Process[] processes = Process.GetProcesses();
-
-                foreach (Process process in processes)
+                var processes = Process.GetProcesses();
+                
+                foreach (var process in processes)
                 {
                     try
                     {
-                        string executablePath = process.MainModule.FileName;
-                        string executableDirectory = System.IO.Path.GetDirectoryName(executablePath);
-                        string executableName = System.IO.Path.GetFileName(executablePath);
+                        string executablePath = process.MainModule!.FileName;
 
-                        if (executablePath.Contains(item.path))
+                        if (executablePath.Contains(item.Path))
                         {
-                            bool autoSwitch = true;
-                            AdaptivePreset preset = _adaptivePresetService.GetPreset(item.gameName);
+                            var autoSwitch = true;
+                            var preset = _adaptivePresetService.GetPreset(item.GameName);
                             if (preset != null)
                             {
-                                autoSwitch = preset.isAutoSwitch;
+                                autoSwitch = preset.IsAutoSwitch;
                             }
 
                             if (!autoSwitch)
@@ -289,12 +293,12 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
                                 continue;
                             }
 
-                            runningGameName = item.gameName;
-                            return;
+                            return item.GameName;
                         }
                     }
-                    catch (Exception ex)
+                    catch
                     {
+                        // ignored
                     }
                 }
 
@@ -302,7 +306,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
             } while (i < 2);
         }
 
-        runningGameName = "Default";
+        return null;
     }
 
     private async Task AutoSwitch()
@@ -316,9 +320,12 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         _adaptivePresetService.SavePreset(CurrentPreset.Name, CurrentPreset);
     }
 
-    private void AdaptiveModeTick(object? sender, EventArgs e)
+    private int _adaptiveModeTickCount;
+    private string _lastCpu, _lastCo, _lastiGPU;
+
+    private async void AdaptiveModeTick(object? sender, EventArgs e)
     {
-        if (i < 2)
+        if (_adaptiveModeTickCount < 2)
         {
             _cpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, CurrentPreset.Power,
                 CurrentPreset.Power - 5, CurrentPreset.Temp);
@@ -326,7 +333,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
                 CurrentPreset.Power - 5, CurrentPreset.Temp);
             _cpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, CurrentPreset.Power,
                 CurrentPreset.Power - 5, CurrentPreset.Temp);
-            i++;
+            _adaptiveModeTickCount++;
         }
         else
         {
@@ -334,17 +341,18 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
                 CurrentPreset.Temp);
 
             if (CurrentPreset.IsCo)
+            {
                 _cpuControlService.CurveOptimiserLimit(CPULoad, CurrentPreset.Co);
+            }
 
             if (CurrentPreset.IsGfx)
-                AmdApuControlService.UpdateiGPUClock(CurrentPreset.MaxGfx, CurrentPreset.MinGgx,
-                    (int)CurrentPreset.Temp, CPUPower, CPUTemp, GPUClock, GPULoad, GPUMemClock, CPUClock,
+            {
+                _amdApuControlService.UpdateiGPUClock(CurrentPreset.MaxGfx, CurrentPreset.MinGgx,
+                    CurrentPreset.Temp, CPUPower, CPUTemp, GPUClock, GPULoad, GPUMemClock, CPUClock,
                     minCPUClock);
+            }
 
-            string commandString = "";
-
-            commandString = commandString +
-                            $"--UXTUSR={CurrentPreset.IsMag}-{CurrentPreset.IsVsync}-{CurrentPreset.Sharpness / 100}-{CurrentPreset.ResScaleIndex}-{CurrentPreset.IsRecap} ";
+            var commandString = $"--UXTUSR={CurrentPreset.IsMag}-{CurrentPreset.IsVsync}-{CurrentPreset.Sharpness / 100}-{CurrentPreset.ResScaleIndex}-{CurrentPreset.IsRecap} ";
 
             if (Settings.Default.isASUS)
             {
@@ -352,25 +360,24 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
                     commandString = commandString + $"--ASUS-Power={CurrentPreset.AsusPowerProfile} ";
             }
 
-            _cpuControlService.UpdatePowerLimit();
-            if (_cpuControlService.CpuCommand != lastCPU)
+            if (_cpuControlService.CpuCommand != _lastCpu)
             {
                 commandString += _cpuControlService.CpuCommand;
-                lastCPU = _cpuControlService.CpuCommand;
+                _lastCpu = _cpuControlService.CpuCommand;
             }
 
             if (_cpuControlService.CoCommand != null && _cpuControlService.CoCommand != "" &&
-                CurrentPreset.IsCo && _cpuControlService.CoCommand != lastCO)
+                CurrentPreset.IsCo && _cpuControlService.CoCommand != _lastCo)
             {
                 commandString += _cpuControlService.CoCommand;
-                lastCO = _cpuControlService.CoCommand;
+                _lastCo = _cpuControlService.CoCommand;
             }
 
-            if (AmdApuControlService.Commmand != null && AmdApuControlService.Commmand != "" &&
-                CurrentPreset.IsGfx && AmdApuControlService.Commmand != lastiGPU)
+            if (!string.IsNullOrEmpty(_amdApuControlService.Commmand) &&
+                CurrentPreset.IsGfx && _amdApuControlService.Commmand != _lastiGPU)
             {
-                commandString += AmdApuControlService.Commmand;
-                lastiGPU = AmdApuControlService.Commmand;
+                commandString += _amdApuControlService.Commmand;
+                _lastiGPU = _amdApuControlService.Commmand;
             }
 
             if (CurrentPreset.IsRadeonGraphics)
@@ -408,13 +415,11 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
                                 $"--NVIDIA-Clocks={CurrentPreset.NvMaxCoreClock}-{CurrentPreset.NvCoreClock}-{CurrentPreset.NvMemClock} ";
             }
 
-            if (commandString != null && commandString != "")
-                await Task.Run(() => RyzenAdjService.Translate(commandString));
+            await _ryzenAdjService.Translate(commandString);
         }
 
-        if (_rtssService.IsRTSSRunning() && tsRTSS.IsChecked == true)
-            _rtssService.FpsLimit = nudRTSS.Value;
-
+        // if (_rtssService.IsRTSSRunning() && tsRTSS.IsChecked == true)
+        //     _rtssService.FpsLimit = nudRTSS.Value;
 
         //if (RTSS.RTSSRunning())
         //{
@@ -432,26 +437,6 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         //        i++;
         //    } while (i < RunningGames.appFlags.Count && found == false);
         //}
-
-        if (Settings.Default.polling != nudPolling.Value)
-        {
-            Settings.Default.polling = (double)nudPolling.Value;
-            Settings.Default.Save();
-        }
-
-        if (adaptiveMode.Interval != TimeSpan.FromSeconds((double)nudPolling.Value))
-        {
-            adaptiveMode.Stop();
-            adaptiveMode.Interval = TimeSpan.FromSeconds((double)nudPolling.Value);
-            adaptiveMode.Start();
-        }
-        
-        if (sensors.Interval != TimeSpan.FromSeconds((double)nudPolling.Value))
-        {
-            sensors.Stop();
-            sensors.Interval = TimeSpan.FromSeconds((double)nudPolling.Value);
-            sensors.Start();
-        }
     }
 
     private void Initialize()

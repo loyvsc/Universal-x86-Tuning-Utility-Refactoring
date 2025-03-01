@@ -17,7 +17,7 @@ public class PremadePresets : IPremadePresets
     {
         _systemInfoService = systemInfoService;
         
-        PremadePresetsList = new List<PremadePreset>();
+        PremadePresetsList = new List<PremadePreset>(4);
     }
 
     public void InitializePremadePresets()
@@ -956,25 +956,25 @@ public class PremadePresets : IPremadePresets
 
             var ecoPreset = new PremadePreset()
             {
-                Name = "Eco",
+                Name = "PM - Eco",
                 RyzenAdjParameters = ecoPresetParameters.BuildParamtersString()
             };
 
             var balancePreset = new PremadePreset()
             {
-                Name = "Balance",
+                Name = "PM - Balance",
                 RyzenAdjParameters = balancePresetParameters.BuildParamtersString()
             };
 
             var performancePreset = new PremadePreset()
             {
-                Name = "Performance",
+                Name = "PM - Performance",
                 RyzenAdjParameters = performancePresetParameters.BuildParamtersString()
             };
 
             var extremePreset = new PremadePreset()
             {
-                Name = "Extreme",
+                Name = "PM - Extreme",
                 RyzenAdjParameters = extremePresetParameters.BuildParamtersString()
             };
 

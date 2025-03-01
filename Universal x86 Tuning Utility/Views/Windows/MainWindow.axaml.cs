@@ -1,8 +1,9 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Universal_x86_Tuning_Utility.Properties;
-using Window = Avalonia.Controls.Window;
+using Universal_x86_Tuning_Utility.ViewModels;
 
 namespace Universal_x86_Tuning_Utility.Views.Windows;
 
@@ -12,7 +13,7 @@ public partial class MainWindow : Window, IDisposable
     {
         InitializeComponent();
         
-        this.PropertyChanged += OnPropertyChanged;
+        PropertyChanged += OnPropertyChanged;
     }
     
     private void UiWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -22,24 +23,27 @@ public partial class MainWindow : Window, IDisposable
             WindowState = WindowState.Minimized;
             e.Cancel = true;
         }
+        
+        Settings.Default.isAdaptiveModeRunning = false;
+        Settings.Default.Save();
     }
 
     private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property == WindowStateProperty)
         {
-            
+            if (WindowState == WindowState.Minimized)
+            {
+                ShowInTaskbar = false;
+            }
+            else
+            {
+                ShowInTaskbar = true;
+            }
         }
     }
-    
-    private void miClose_Click(object sender, RoutedEventArgs e)
-    {
-        Settings.Default.isAdaptiveModeRunning = false;
-        Settings.Default.Save();
-        Application.Current.Shutdown();
-    }
 
-    private void MainWindowLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void MainWindowLoaded(object? sender, RoutedEventArgs e)
     {
         if (Settings.Default.StartMini)
         {
@@ -47,51 +51,26 @@ public partial class MainWindow : Window, IDisposable
         }
         else
         {
-            if (GetSystemInfo.Manufacturer.ToUpper().Contains("AYANEO") ||
-                GetSystemInfo.Manufacturer.ToUpper().Contains("GPD") ||
-                GetSystemInfo.Product.ToUpper().Contains("ONEXPLAYER"))
+            if (DataContext is MainWindowViewModel viewModel)
             {
-                int displayCount = Screen.AllScreens.Length;
-                if (displayCount < 2)
+                var manufacturer = viewModel.ProductManufacturer.ToUpper();
+                if (manufacturer.Contains("AYANEO") ||
+                    manufacturer.Contains("GPD") ||
+                    manufacturer.Contains("ONEXPLAYER"))
                 {
-                    MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
-                    WindowState = WindowState.Maximized;
+                    var topLevel = GetTopLevel(this)!;
+                    var displayCount = topLevel.Screens!.ScreenCount;
+                    if (displayCount == 1)
+                    {
+                        var maxHeight = topLevel.Screens.Primary!.Bounds.Height;
+                        MaxHeight = maxHeight;
+                        WindowState = WindowState.Maximized;
+                    }
                 }
             }
         }
-
-        PremadePresets.InitializePremadePresets();
     }
     
-    private void UiWindow_StateChanged(object sender, EventArgs e)
-    {
-        if (this.WindowState == WindowState.Minimized)
-        {
-            isMini = true;
-            this.WindowStyle = WindowStyle.ToolWindow;
-            ShowInTaskbar = false;
-        }
-        else
-        {
-            isMini = false;
-            this.WindowStyle = WindowStyle.SingleBorderWindow;
-            ShowInTaskbar = true;
-        }
-    }
-    
-    private void NotifyIcon_LeftClick(Wpf.Ui.Controls.NotifyIcon sender, RoutedEventArgs e)
-    {
-        if (WindowState != WindowState.Minimized)
-        {
-            WindowState = WindowState.Minimized;
-        }
-        else
-        {
-            WindowState = WindowState.Normal;
-            Activate();
-        }
-    }
-
     public void Dispose()
     {
         PropertyChanged -= OnPropertyChanged;

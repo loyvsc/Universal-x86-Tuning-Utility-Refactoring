@@ -10,10 +10,9 @@ public class AmdApuControlService : IAmdApuControlService
     private const int LastWindowSize = 8; // Number of samples in the sliding window
     
     public int CurrentPowerLimit { get; set; } = 28;
-    public string Commmand { get; private set; }
+    public string? Commmand { get; private set; }
     
     private int _lastClock; // mhz
-    private int _lastGpuUsage = 50; // %
     private double _averageLastGpuLoad;
     private double _averageGpuLoad;
     
@@ -125,7 +124,6 @@ public class AmdApuControlService : IAmdApuControlService
             }
 
             _gpuLastLoadSamples.Enqueue(gpuLoad);
-            _lastGpuUsage = (int)gpuLoad;
         }
         catch (Exception ex)
         {

@@ -1,6 +1,6 @@
 namespace ApplicationCore.Interfaces;
 
-public interface IFanControlService
+public interface IFanControlService : IDisposable
 {
     public int MaxFanSpeed { get; }
     public int MinFanSpeed { get; }

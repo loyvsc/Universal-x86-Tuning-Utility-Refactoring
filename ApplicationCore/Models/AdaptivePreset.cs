@@ -33,6 +33,13 @@ public class AdaptivePreset : NotifyPropertyChangedBase
     private int _sharpness;
     private int _resScaleIndex;
     private bool _isAutoSwitch;
+    private string _name;
+
+    public string Name
+    {
+        get => _name;
+        set => SetValue(ref _name, value);
+    }
 
     public int Temp
     {

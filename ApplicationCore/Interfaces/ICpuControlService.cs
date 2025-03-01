@@ -6,7 +6,10 @@ public interface ICpuControlService
     /// Current power limit in watts
     /// </summary>
     public int CurrentPowerLimit { get; }
-    
+
+    public string CpuCommand { get; }
+    public string CoCommand { get; }
+
     public void UpdatePowerLimit(int temperature,
         int cpuLoad,
         int maxPowerLimit,

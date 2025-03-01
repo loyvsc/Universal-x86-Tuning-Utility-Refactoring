@@ -363,4 +363,9 @@ public class RyzenAdjService : IRyzenAdjService
             _logger.LogError(ex, "Exception occurred when executing Asus Wmi command");
         }
     }
+
+    public void Dispose()
+    {
+        SMUCommands.RyzenAccess.Dispose();
+    }
 }

@@ -93,6 +93,11 @@ public class WindowsFanControlService : IFanControlService
         double fanPercentage = Math.Round(100 * (Convert.ToDouble(returnValue) / MaxFanSpeed), 0);
         FanSpeed = fanPercentage;
     }
+
+    public void Dispose()
+    {
+        DisableFanControl();
+    }
 }
 
 internal class WinRingECManagement

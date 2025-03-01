@@ -4,7 +4,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
-             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              x:DataType="viewModels:DashboardViewModel"
              mc:Ignorable="d"
              d:DesignHeight="1000"
@@ -17,78 +16,69 @@
                 MinHeight="425"
                 CornerRadius="8,0,0,0">
             <Border.Background>
-                    <ImageBrush Source="pack://application:,,,/Assets/pexels-photo-8037008.jpeg"
-                                RenderOptions.BitmapInterpolationMode="HighQuality"
-                                Stretch="UniformToFill" />
+                <ImageBrush Source="pack://application:,,,/Assets/pexels-photo-8037008.jpeg"
+                            RenderOptions.BitmapInterpolationMode="HighQuality"
+                            Stretch="UniformToFill" />
+            </Border.Background>
+            <Border CornerRadius="8,0,0,0">
+                <Border.Background>
+                    <RadialGradientBrush>
+                        <GradientStop Offset="0" Color="#1F000000" />
+                        <GradientStop Offset="1" Color="#4F000000" />
+                    </RadialGradientBrush>
                 </Border.Background>
-                <Border CornerRadius="8,0,0,0">
-                    <Border.Background>
-                        <RadialGradientBrush>
-                            <GradientStop Offset="0" Color="#1F000000" />
-                            <GradientStop Offset="1" Color="#4F000000" />
-                        </RadialGradientBrush>
-                    </Border.Background>
-                    <Grid>
-                        <!--Background="#66242424"-->
-                        <Border Margin="64"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                CornerRadius="8"
-                                Padding="9">
-                            <StackPanel Background="Transparent">
-                                <TextBlock FontSize="18"
-                                           Foreground="#B7FFFFFF"
-                                           Text="Welcome To" />
-                                <TextBlock FontSize="28"
-                                           FontWeight="Bold"
-                                           Foreground="#FFFFFF"
-                                           Text="Universal x86 Tuning Utility" />
-                                <TextBlock FontSize="18"
-                                           Foreground="#B7FFFFFF"
-                                           Text="V2.5.6 Stable" />
-                                <Button Name="btnPremade"
-                                        Height="36"
-                                        Margin="0,12,0,0"
-                                        Padding="30,6"
-                                        HorizontalAlignment="Left"
-                                        Appearance="Transparent"
-                                        Command="{Binding ViewModel.NavigateCommand}"
-                                        CommandParameter="premade"
-                                        Content="Try Out The Premade Presets"
-                                        Foreground="{DynamicResource TextFillColorLightPrimaryBrush}" />
-                            </StackPanel>
-                        </Border>
-                        <TextBlock Margin="12"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Bottom"
-                                   FontSize="10"
-                                   Foreground="#57FFFFFF"
-                                   Text="Created by JamesCJ, sbski and ProjectSBC" />
-
-                    <Border Width="320" Height="120" HorizontalAlignment="Left" VerticalAlignment="Bottom" CornerRadius="0,4,0,0">
-                        <Border.Background>
-                            <ImageBrush
-    ImageSource="pack://application:,,,/Assets/PCC Banner.png"
-    RenderOptions.BitmapScalingMode="HighQuality"
-    Stretch="UniformToFill" />
-                        </Border.Background>
+                <Grid>
+                    <!--Background="#66242424"-->
+                    <Border Margin="64"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            CornerRadius="8"
+                            Padding="9">
+                        <StackPanel Background="Transparent">
+                            <TextBlock FontSize="18"
+                                       Foreground="#B7FFFFFF"
+                                       Text="Welcome To" />
+                            <TextBlock FontSize="28"
+                                       FontWeight="Bold"
+                                       Foreground="#FFFFFF"
+                                       Text="Universal x86 Tuning Utility" />
+                            <TextBlock FontSize="18"
+                                       Foreground="#B7FFFFFF"
+                                       Text="V2.4.0 Beta 2" />
+                            <Button Name="btnPremade"
+                                    Height="36"
+                                    Margin="0,12,0,0"
+                                    Padding="30,6"
+                                    HorizontalAlignment="Left"
+                                    Background="Transparent"
+                                    Command="{Binding NavigateCommand}"
+                                    CommandParameter="premade"
+                                    Content="Try Out The Premade Presets"
+                                    IsVisible="{Binding IsAmdSettingsAvailable, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
                     </Border>
-                    </Grid>
-                </Border>
+                    <TextBlock Margin="12"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Bottom"
+                               FontSize="10"
+                               Foreground="#57FFFFFF"
+                               Text="Created by JamesCJ, sbski and ProjectSBC" />
+                </Grid>
             </Border>
+        </Border>
 
         <Grid Grid.Row="1"
               RowDefinitions="Auto, Auto"
               ColumnDefinitions="*, *, *, *"
               Margin="12,18,12,0">
-            <ui:CardAction Name="caPremade"
+            <Button Name="caPremade"
                            Grid.Row="0"
                            Grid.Column="0"
                            Margin="0,0,4,0"
-                           Command="{Binding ViewModel.NavigateCommand}"
+                           IsVisible="{Binding IsAmdSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
+                           Command="{Binding NavigateCommand}"
                            CommandParameter="premade"
-                           Icon="Predictions20"
-                           IsChevronVisible="True">
+                           Icon="Predictions20">
                 <StackPanel>
                     <TextBlock
                         Margin="0"
@@ -96,15 +86,14 @@
                         FontWeight="Medium"
                         Text="Premade Presets" />
                 </StackPanel>
-            </ui:CardAction>
+            </Button>
 
-            <ui:CardAction
-                Grid.Row="0"
-                Grid.Column="1"
-                Margin="4,0,4,0"
-                Command="{Binding ViewModel.NavigateCommand}"
-                CommandParameter="custom"
-                Icon="Book20">
+            <Button Grid.Row="0"
+                    Grid.Column="1"
+                    Margin="4,0,4,0"
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="custom"
+                    Icon="Book20">
                 <StackPanel>
                     <TextBlock
                         Margin="0"
@@ -112,13 +101,13 @@
                         FontWeight="Medium"
                         Text="Custom Presets" />
                 </StackPanel>
-            </ui:CardAction>
+            </Button>
 
-            <ui:CardAction
+            <Button
                 Grid.Row="0"
                 Grid.Column="2"
                 Margin="4,0,4,0"
-                Command="{Binding ViewModel.NavigateCommand}"
+                Command="{Binding NavigateCommand}"
                 CommandParameter="adaptive"
                 Icon="Radar20">
                 <StackPanel>
@@ -128,13 +117,13 @@
                         FontWeight="Medium"
                         Text="Adaptive Mode" />
                 </StackPanel>
-            </ui:CardAction>
+            </Button>
 
-            <ui:CardAction
+            <Button
                 Grid.Row="0"
                 Grid.Column="3"
                 Margin="4,0,0,0"
-                Command="{Binding ViewModel.NavigateCommand}"
+                Command="{Binding NavigateCommand}"
                 CommandParameter="auto"
                 Icon="Transmission20">
                 <StackPanel>
@@ -144,12 +133,12 @@
                         FontWeight="Medium"
                         Text="Automations" />
                 </StackPanel>
-            </ui:CardAction>
-            <ui:CardAction
+            </Button>
+            <Button
                 Grid.Row="1"
                 Grid.Column="1"
                 Margin="4,8,4,0"
-                Command="{Binding ViewModel.NavigateCommand}"
+                Command="{Binding NavigateCommand}"
                 CommandParameter="info"
                 Icon="Info20">
                 <StackPanel>
@@ -159,12 +148,12 @@
                         FontWeight="Medium"
                         Text="System Info" />
                 </StackPanel>
-            </ui:CardAction>
-            <ui:CardAction
+            </Button>
+            <Button
                 Grid.Row="1"
                 Grid.Column="0"
                 Margin="0,8,4,0"
-                Command="{Binding ViewModel.NavigateCommand}"
+                Command="{Binding NavigateCommand}"
                 CommandParameter="games"
                 Icon="Games20"
                 IsEnabled="true">
@@ -175,12 +164,12 @@
                         FontWeight="Medium"
                         Text="Game Library" />
                 </StackPanel>
-            </ui:CardAction>
-            <ui:CardAction
+            </Button>
+            <Button
                 Grid.Row="1"
                 Grid.Column="2"
                 Margin="4,8,4,0"
-                Command="{Binding ViewModel.NavigateCommand}"
+                Command="{Binding NavigateCommand}"
                 CommandParameter="help"
                 Icon="ChatHelp20">
                 <StackPanel>
@@ -190,12 +179,12 @@
                         FontWeight="Medium"
                         Text="Need Help?" />
                 </StackPanel>
-            </ui:CardAction>
-            <ui:CardAction
+            </Button>
+            <Button
                 Grid.Row="1"
                 Grid.Column="3"
                 Margin="4,8,0,0"
-                Command="{Binding ViewModel.NavigateCommand}"
+                Command="{Binding NavigateCommand}"
                 CommandParameter="support"
                 Icon="Money20">
                 <StackPanel>
@@ -205,7 +194,7 @@
                         FontWeight="Medium"
                         Text="Support Us" />
                 </StackPanel>
-            </ui:CardAction>
+            </Button>
         </Grid>
     </Grid>
 </UserControl>

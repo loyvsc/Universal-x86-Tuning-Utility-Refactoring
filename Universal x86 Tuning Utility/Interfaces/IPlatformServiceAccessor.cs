@@ -7,4 +7,5 @@ public interface IPlatformServiceAccessor
 {
     public IClipboard Clipboard { get; }
     public Screen? PrimaryScreen { get; }
+    public bool IsMinimized { get; }
 }

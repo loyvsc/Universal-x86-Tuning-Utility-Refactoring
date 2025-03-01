@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input.Platform;
 using Avalonia.Platform;
@@ -9,6 +10,7 @@ public class DefaultPlatformServiceAccessor : IPlatformServiceAccessor
 {
     public IClipboard Clipboard => _desktop.MainWindow!.Clipboard!;
     public Screen? PrimaryScreen => _desktop.MainWindow!.Screens.Primary;
+    public bool IsMinimized => _desktop.MainWindow!.WindowState == WindowState.Minimized;
     
     private readonly IClassicDesktopStyleApplicationLifetime _desktop;
 

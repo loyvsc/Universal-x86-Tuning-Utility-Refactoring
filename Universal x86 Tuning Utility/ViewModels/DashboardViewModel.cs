@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
+using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Utilities;
+using Avalonia.Threading;
+using ReactiveUI;
 using Universal_x86_Tuning_Utility.Services.GameLauncherServices;
 using Settings = Universal_x86_Tuning_Utility.Properties.Settings;
 
@@ -12,35 +13,34 @@ namespace Universal_x86_Tuning_Utility.ViewModels;
 
 public partial class DashboardViewModel : NotifyPropertyChangedBase
 {
-    private readonly ISystemInfoService _systemInfoService;
-
-
-    private ICommand _openWindowCommand;
-
-
-    public ICommand OpenWindowCommand => _openWindowCommand ??= new RelayCommand<string>(OnOpenWindow);
-
-    public DispatcherTimer autoAdaptive = new DispatcherTimer();
-    public DashboardViewModel(ISystemInfoService systemInfoService)
+    public ICommand OpenWindowCommand { get; }
+    public ICommand NavigateCommand { get; }
+    
+    public bool IsAmdSettingsAvailable
     {
-        _navigationService = navigationService;
-        _systemInfoService = systemInfoService;
-
-        if (Family.TYPE == Family.ProcessorType.Intel)
-        {
-            caPremade.IsEnabled = false;
-            btnPremade.IsEnabled = false;
-        }
-
-        autoAdaptive.Interval = TimeSpan.FromSeconds(1);
-        autoAdaptive.Tick += AutoAdaptive_Tick;
-        autoAdaptive.Start();
+        get => _isAmdSettingsAvailable;
+        set => SetValue(ref _isAmdSettingsAvailable, value);
     }
 
-    public void AutoAdaptive_Tick(object sender, EventArgs e)
+    private readonly DispatcherTimer _autoAdaptive = new();
+    private bool _isAmdSettingsAvailable;
+    
+    public DashboardViewModel(ISystemInfoService systemInfoService)
+    {
+        IsAmdSettingsAvailable = systemInfoService.Cpu.Manufacturer == Manufacturer.AMD;
+
+        _autoAdaptive.Interval = TimeSpan.FromSeconds(1);
+        _autoAdaptive.Tick += AutoAdaptive_Tick;
+        _autoAdaptive.Start();
+
+        OpenWindowCommand = ReactiveCommand.Create<string>(OnOpenWindow);
+        NavigateCommand = ReactiveCommand.Create<string>(OnNavigate);
+    }
+
+    private void AutoAdaptive_Tick(object sender, EventArgs e)
     {
         if(Settings.Default.isStartAdpative) _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));
-        autoAdaptive.Stop();
+        _autoAdaptive.Stop();
     }
 
     public void OnNavigatedTo()
