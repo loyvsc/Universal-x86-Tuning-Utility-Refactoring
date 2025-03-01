@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Helpers;
+using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Properties;
 using Task = System.Threading.Tasks.Task;
 
@@ -98,6 +99,8 @@ public class SettingsViewModel : NotifyPropertyChangedBase
     private readonly IUpdateInstallerService _updateInstallerService;
     private readonly INotificationManager _toastNotificationsManager;
     private readonly ISystemBootService _systemBootService;
+    private readonly IPlatformServiceAccessor _platformServiceAccessor;
+    private readonly IStressTestService _stressTestService;
     private string _appVersion = string.Empty;
     private string _updatesMessage;
     private int _reapplySecond;
@@ -115,16 +118,20 @@ public class SettingsViewModel : NotifyPropertyChangedBase
                              IUpdateService updateService,
                              IUpdateInstallerService updateInstallerService,
                              INotificationManager toastNotificationsManager,
-                             ISystemBootService systemBootService)
+                             ISystemBootService systemBootService,
+                             IPlatformServiceAccessor platformServiceAccessor,
+                             IStressTestService stressTestService)
     {
         _logger = logger;
         _updateService = updateService;
         _updateInstallerService = updateInstallerService;
         _toastNotificationsManager = toastNotificationsManager;
         _systemBootService = systemBootService;
+        _platformServiceAccessor = platformServiceAccessor;
+        _stressTestService = stressTestService;
 
         CheckUpdateCommand = ReactiveCommand.CreateFromTask(CheckUpdate);
-        StartStressTestCommand = ReactiveCommand.CreateFromTask(StartStressTest);
+        StartStressTestCommand = ReactiveCommand.Create(StartStressTest);
         DownloadUpdateCommand = ReactiveCommand.CreateFromTask(DownloadUpdate);
         StartOnSystemBootCommand = ReactiveCommand.CreateFromTask(StartOnSystemBoot);
 
@@ -138,14 +145,14 @@ public class SettingsViewModel : NotifyPropertyChangedBase
         IsAutoStartAdaptiveMode = Settings.Default.isStartAdpative;
         IsAutoTrackGames = Settings.Default.isTrack;
 
-        ApplicationVersion = App.Version;
+        ApplicationVersion = _platformServiceAccessor.ProductVersion;
     }
 
     private async Task StartOnSystemBoot()
     {
         if (IsAutoStartEnabled)
         {
-            _systemBootService.CreateTask("UXTU", Path.Combine(App.RootDirectory, App.ExecutableFileName), taskDescription: "Start UXTU");
+            _systemBootService.CreateTask("UXTU", _platformServiceAccessor.PathToExecutable, taskDescription: "Start UXTU");
         }
         else
         {
@@ -153,17 +160,9 @@ public class SettingsViewModel : NotifyPropertyChangedBase
         }
     }
 
-    private async Task StartStressTest()
+    private void StartStressTest()
     {
-        // todo: create new service for run stress tests??
-        if (File.Exists(Settings.Default.Path + @"\Assets\Stress-Test\AVX2 Stress Test.exe"))
-        {
-            using (var process = new Process())
-            {
-                process.StartInfo.FileName = @".\Assets\Stress-Test\AVX2 Stress Test.exe";
-                process.Start();
-            }
-        }
+        _stressTestService.Start();
     }
 
     private async Task DownloadUpdate()
@@ -190,7 +189,7 @@ public class SettingsViewModel : NotifyPropertyChangedBase
     {
         if (UpdateHelper.IsInternetAvailable())
         {
-            var isUpdateAvailable = await _updateService.IsUpdatesAvailable(App.Version);
+            var isUpdateAvailable = await _updateService.IsUpdatesAvailable(ApplicationVersion);
 
             if (isUpdateAvailable)
             {

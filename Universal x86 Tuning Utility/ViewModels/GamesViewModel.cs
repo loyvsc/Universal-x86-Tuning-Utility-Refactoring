@@ -119,7 +119,7 @@ public class GamesViewModel : NotifyPropertyChangedBase, IDisposable
             Title = "Select game",
             Filters = new List<FileFilter>()
             {
-                new("Executable", ".Exe")
+                new("Executable", ".exe")
             }
         };
 
@@ -127,7 +127,6 @@ public class GamesViewModel : NotifyPropertyChangedBase, IDisposable
         
         if (openFileDialogResult != null)
         {
-            // todo check path: expected - contains filename
             var filePath = openFileDialogResult.Path.ToString();
             var gameName = Path.GetFileNameWithoutExtension(filePath);
             

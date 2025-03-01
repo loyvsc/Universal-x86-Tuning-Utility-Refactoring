@@ -12,7 +12,6 @@ using Universal_x86_Tuning_Utility.Services.Amd;
 
 namespace Universal_x86_Tuning_Utility.Services.SystemInfoServices;
 
-// todo: move cpu info to CpuInfo
 public class WindowsSystemInfoService : ISystemInfoService, IDisposable
 {
     private readonly ILogger<WindowsSystemInfoService> _logger;
@@ -107,7 +106,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             }
         }
 
-        try //todo try find another solution for getting information
+        try
         {
             var processorIdentifier = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER");
 
@@ -121,7 +120,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             Cpu.Model = int.Parse(words[modelIndex]);
             Cpu.Stepping = int.Parse(words[steppingIndex].TrimEnd(','));
             
-            foreach (var cpuInfo in _processorInfoSearcher.Get()) //todo test this shit
+            foreach (var cpuInfo in _processorInfoSearcher.Get())
             {
                 Cpu.Name = cpuInfo["Name"].ToString();
                 Cpu.Description = cpuInfo["Description"].ToString();
@@ -129,7 +128,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                 Cpu.LogicalCoresCount = Convert.ToInt32(cpuInfo["NumberOfLogicalProcessors"]);
                 Cpu.L2Size = Convert.ToDouble(cpuInfo["L2CacheSize"]) / 1024;
                 Cpu.L3Size = Convert.ToDouble(cpuInfo["L3CacheSize"]) / 1024;
-                Cpu.BaseClock = cpuInfo["MaxClockSpeed"].ToString(); //todo: check why is base clock here
+                Cpu.BaseClock = cpuInfo["MaxClockSpeed"].ToString();
             }
         }
         catch (Exception ex)
@@ -176,6 +175,23 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         if (Cpu.Name.Contains("Intel"))
         {
             Cpu.Manufacturer = ApplicationCore.Enums.Manufacturer.Intel;
+
+            Cpu.ProcessorType = Cpu.Name.Contains('U') ||
+                                Cpu.Name.Contains('H') ||
+                                Cpu.Name.Contains("HQ") ||
+                                Cpu.Name.Contains("HK") ||
+                                Cpu.Name.Contains('U') ||
+                                Cpu.Name.Contains('Y') ||
+                                Cpu.Name.Contains('M') ||
+                                Cpu.Name.Contains("MQ") ||
+                                Cpu.Name.Contains("QM") ||
+                                Cpu.Name.Contains('G') ||
+                                Cpu.Name.Contains('P') ||
+                                Cpu.Name.Contains("EQ") ||
+                                Cpu.Name.Contains('E')
+                ? ProcessorType.Apu
+                : ProcessorType.Desktop;
+            
             _intelManagementService.DetermineCpu();
         }
         else
@@ -240,15 +256,15 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                 }
             }
 
-            Cpu.AmdProcessorType = Cpu.RyzenFamily is RyzenFamily.SummitRidge
+            Cpu.ProcessorType = Cpu.RyzenFamily is RyzenFamily.SummitRidge
                 or RyzenFamily.PinnacleRidge
                 or RyzenFamily.Matisse
                 or RyzenFamily.Vermeer
                 or RyzenFamily.Raphael
                 or RyzenFamily.DragonRange
                 or RyzenFamily.GraniteRidge
-                ? AmdProcessorType.Desktop
-                : AmdProcessorType.Apu;
+                ? ProcessorType.Desktop
+                : ProcessorType.Apu;
 
             Addresses.SetAddresses(Cpu);
         }
@@ -386,8 +402,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             _ => RamType.Unknown
         };
     }
-
-    //todo try store gpu names in collection and subscribe to events on plug in or out video controller
+    
     public bool IsGPUPresent(string gpuName)
     {
         using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_VideoController"))
@@ -633,8 +648,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         return "";
     }
 
-    // todo mvoe to analyze system
-    public string GetBigLITTLE(int cores, double l2)
+    public string GetBigLITTLE()
     {
         int bigCores = 0;
         int smallCores = 0;
@@ -660,11 +674,11 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             Cpu.Name.Contains("Z1") && Cpu.RyzenFamily == RyzenFamily.PhoenixPoint2 || Cpu.Name.Contains("7440U"))
         {
             bigCores = Cpu.Name.Contains("7440U") ? 0 : 2;
-            smallCores = cores - bigCores;
-            return $"{cores} ({bigCores} Prime Cores + {smallCores} Compact Cores)";
+            smallCores = Cpu.CoresCount - bigCores;
+            return $"{Cpu.CoresCount} ({bigCores} Prime Cores + {smallCores} Compact Cores)";
         }
             
-        return cores.ToString();
+        return Cpu.CoresCount.ToString();
     }
     
     public void Dispose()

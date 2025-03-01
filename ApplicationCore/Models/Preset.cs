@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using ApplicationCore.Utilities;
 
 namespace ApplicationCore.Models;
@@ -33,7 +32,7 @@ public class Preset : NotifyPropertyChangedBase
     private int _dtCpuTdc;
     private int _dtCpuEdc;
 
-    private int _boostProfile;
+    private AmdPowerProfile _boostProfile;
 
     private int _intelPl1;
     private int _intelPl2;
@@ -165,13 +164,13 @@ public class Preset : NotifyPropertyChangedBase
 
     private int _displayHz;
 
-    private int _powerMode;
+    private PowerMode _powerMode;
 
     private bool _isMag;
     private bool _isVsync;
     private bool _isRecap;
     private int _sharpness;
-    private int _resScaleIndex;
+    private UXTUSuperResolutionScale _resolutionScale;
     
     private string _name;
     private List<IntelClockRatio> _intelClockRatios;
@@ -307,9 +306,8 @@ public class Preset : NotifyPropertyChangedBase
         get => _dtCpuEdc;
         set => SetValue(ref _dtCpuEdc, value);
     }
-
-    // todo: refactor this. create enum for exmpl
-    public int BoostProfile
+    
+    public AmdPowerProfile BoostProfile
     {
         get => _boostProfile;
         set => SetValue(ref _boostProfile, value);
@@ -834,7 +832,7 @@ public class Preset : NotifyPropertyChangedBase
         set => SetValue(ref _displayHz, value);
     }
 
-    public int PowerMode
+    public PowerMode PowerMode
     {
         get => _powerMode;
         set => SetValue(ref _powerMode, value);
@@ -864,9 +862,9 @@ public class Preset : NotifyPropertyChangedBase
         set => SetValue(ref _sharpness, value);
     }
 
-    public int ResScaleIndex
+    public UXTUSuperResolutionScale ResolutionScale
     {
-        get => _resScaleIndex;
-        set => SetValue(ref _resScaleIndex, value);
+        get => _resolutionScale;
+        set => SetValue(ref _resolutionScale, value);
     }
 }

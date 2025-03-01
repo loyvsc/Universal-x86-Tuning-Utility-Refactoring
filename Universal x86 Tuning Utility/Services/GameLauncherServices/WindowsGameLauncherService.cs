@@ -41,7 +41,6 @@ public class WindowsGameLauncherService : IGameLauncherService
             };
             var gameLauncher = new LauncherManager(gameLauncherOptions);
             
-            // todo: refactor this
             foreach (var launcher in gameLauncher.GetLaunchers())
             {
                 switch (launcher.Name)
@@ -56,14 +55,12 @@ public class WindowsGameLauncherService : IGameLauncherService
                                 && !game.Name.Contains("tModLoader") 
                                 && !game.Name.Contains("- Original Soundtrack"))
                             {
-                                if (game.Id == "228980") continue; // Steamworks Common Redistributables id
-                                
                                 var launcherItem = new GameLauncherItem
                                 {
                                     GameName = game.Name,
                                     GameId = game.Id
                                 };
-                                //launcherItem.iconPath = game.ExecutableIcon;
+                                // launcherItem.iconPath = game.ExecutableIcon;
 
                                 if (game.Executables.Count() == 1)
                                 {
@@ -75,7 +72,6 @@ public class WindowsGameLauncherService : IGameLauncherService
                                     string[] array = launcherItem.GameName.Split(' ');
                                     foreach (var exe in game.Executables)
                                     {
-
                                         string exeName = Path.GetFileNameWithoutExtension(exe);
                                         if (game.Name.Contains("Call of duty", StringComparison.OrdinalIgnoreCase))
                                         {
@@ -174,16 +170,14 @@ public class WindowsGameLauncherService : IGameLauncherService
             var packageManager = new PackageManager();
             IEnumerable<Package> packages = packageManager.FindPackages();
 
-
             foreach (var driveInfo in DriveInfo.GetDrives())
             {
                 try
                 {
                     string xboxGameDirectory = Path.Combine(driveInfo.Name, "XboxGames");
-                    string[] filesInDirectory;
                     if (Directory.Exists(xboxGameDirectory))
                     {
-                        filesInDirectory = Directory.GetDirectories(xboxGameDirectory);
+                        var filesInDirectory = Directory.GetDirectories(xboxGameDirectory);
 
                         if (filesInDirectory.Length > 0)
                         {
@@ -225,6 +219,7 @@ public class WindowsGameLauncherService : IGameLauncherService
 
             list = list.OrderBy(item => item.GameName).ToList();
 
+            // we don't know where is 
             // if (isAdaptive)
             // {
             //     extraApps = new GameLauncherItem();

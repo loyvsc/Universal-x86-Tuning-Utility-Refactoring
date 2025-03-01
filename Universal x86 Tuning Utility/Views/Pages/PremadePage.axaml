@@ -51,11 +51,10 @@
                 </UniformGrid>
             </NotificationCard>
             <UniformGrid Columns="2">
-                <!-- todo: refact this.  !-->
-                <!-- <Image Source="pack://application:,,,/Assets/config.png" -->
-                <!--        MaxWidth="500" -->
-                <!--        MaxHeight="500" -->
-                <!--        Stretch="Uniform" /> -->
+                <Image Source="pack://application:,,,/Assets/config.png"
+                       MaxWidth="500"
+                       MaxHeight="500"
+                       Stretch="Uniform" />
                 <NotificationCard Margin="0,0,18,0"
                                   MaxWidth="475"
                                   MaxHeight="475">

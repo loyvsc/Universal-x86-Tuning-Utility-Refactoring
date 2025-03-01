@@ -31,7 +31,7 @@ public class AdaptivePreset : NotifyPropertyChangedBase
     private bool _isVsync;
     private bool _isRecap;
     private int _sharpness;
-    private int _resScaleIndex;
+    private UXTUSuperResolutionScale _superResolutionScale;
     private bool _isAutoSwitch;
     private string _name;
 
@@ -223,10 +223,10 @@ public class AdaptivePreset : NotifyPropertyChangedBase
         set => SetValue(ref _sharpness, value);
     }
 
-    public int ResScaleIndex
+    public UXTUSuperResolutionScale SuperResolutionScale
     {
-        get => _resScaleIndex;
-        set => SetValue(ref _resScaleIndex, value);
+        get => _superResolutionScale;
+        set => SetValue(ref _superResolutionScale, value);
     }
 
     [DefaultValue(true)]

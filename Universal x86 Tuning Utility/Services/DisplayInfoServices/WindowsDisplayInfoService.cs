@@ -207,7 +207,7 @@ public class WindowsDisplayInfoService : IDisplayInfoService
 
     private string FindLaptopScreen()
     {
-        try //todo: check what exception can be thrown this
+        try
         {
             var devices = ScreenInterrogatory.GetAllDevices().ToList();
 
@@ -218,7 +218,7 @@ public class WindowsDisplayInfoService : IDisplayInfoService
             
             if (deviceIndex != -1)
             {
-                var screenName = devices[deviceIndex].monitorFriendlyDeviceName; // todo: but what about DefaultName ???
+                var screenName = devices[deviceIndex].monitorFriendlyDeviceName;
                 if (screenName == string.Empty) screenName = null;
                 return screenName;
             }

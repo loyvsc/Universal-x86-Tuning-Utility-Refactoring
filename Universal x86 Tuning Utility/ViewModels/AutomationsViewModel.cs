@@ -68,7 +68,7 @@ public class AutomationsViewModel : NotifyPropertyChangedBase
         _premadePresets = premadePresets;
 
         var presetService = _systemInfoService.Cpu.Manufacturer == Manufacturer.AMD
-            ? _systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu
+            ? _systemInfoService.Cpu.ProcessorType == ProcessorType.Apu
                 ? presetServiceFactory.GetAmdApuPresetService()
                 : presetServiceFactory.GetAmdDesktopPresetService()
             : presetServiceFactory.GetAmdDesktopPresetService();

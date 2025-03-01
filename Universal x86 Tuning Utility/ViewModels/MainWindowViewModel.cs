@@ -21,6 +21,7 @@ using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.Services.PresetServices;
 using Universal_x86_Tuning_Utility.Services.RyzenAdj;
 using Universal_x86_Tuning_Utility.Services.SuperResolutionServices.Windows;
+using PowerMode = ApplicationCore.Enums.PowerMode;
 using PowerModeChangedEventArgs = ApplicationCore.Events.PowerModeChangedEventArgs;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
@@ -37,7 +38,6 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
     private readonly IFanControlService _fanControlService;
     private readonly IPremadePresets _premadePresets;
     private readonly IGameDataService _gameDataService;
-    private bool _isInitialized;
     private string _lastAppliedState = "";
 
     public ObservableCollection<NavigationViewItemBase> NavigationItems { get; set; }
@@ -55,9 +55,8 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
     private readonly DispatcherTimer _autoRestoreTimer;
 
     private string _title;
-    public static bool isMini { get; private set; }
-    private static bool _firstRun = true;
-    private static List<GameLauncherItem> _gamesList;
+    private bool _firstRun = true;
+    private List<GameLauncherItem> _gamesList;
 
     public MainWindowViewModel(ILogger<MainWindowViewModel> logger,
         ISystemInfoService systemInfoService,
@@ -341,8 +340,6 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
         //         Tag = "tray_home"
         //     }
         // };
-
-        _isInitialized = true;
     }
 
     public ICommand NavigateCommand { get; }

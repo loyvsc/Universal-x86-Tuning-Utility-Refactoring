@@ -1,6 +1,5 @@
 using Avalonia;
-using Avalonia.Controls.Notifications;
-using DesktopNotifications;
+using Avalonia.ReactiveUI;
 using DesktopNotifications.Avalonia;
 using Splat;
 
@@ -18,7 +17,8 @@ public class Program
         var appBuilder = AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .SetupDesktopNotifications(out var notificationManager)
-            .LogToTrace();
+            .LogToTrace()
+            .UseReactiveUI();
         
         Locator.CurrentMutable.RegisterConstant(notificationManager);
         

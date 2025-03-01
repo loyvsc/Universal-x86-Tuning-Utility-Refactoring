@@ -68,8 +68,7 @@ public class RyzenAdjService : IRyzenAdjService
                         var ryzenAdjCommandString = command.Split('=')[0].Replace("=", null).Replace("--", null).Trim();
                         // Extract the command string after the "=" sign
                         var ryzenAdjCommandValueString = command.Substring(ryzenAdjCommand.IndexOf('=') + 1);
-
-                        // todo: check this shit
+                        
                         if (ryzenAdjCommandString.Contains("UXTUSR"))
                         {
                             UXTUSR(ryzenAdjCommandString, ryzenAdjCommandValueString);

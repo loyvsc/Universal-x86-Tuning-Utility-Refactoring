@@ -16,6 +16,7 @@ namespace Universal_x86_Tuning_Utility.Services.SuperResolutionServices.Windows;
 internal class ScaleModelManager
 {
     private readonly FileSystemWatcher scaleModelsWatcher = new();
+    private const string ScaleModelsPath = @".\ScaleModels.json";
 
     private ScaleModel[]? scaleModels = null;
 
@@ -28,7 +29,7 @@ internal class ScaleModelManager
         // 监视ScaleModels.json的更改
         scaleModelsWatcher.Path = AppDomain.CurrentDomain.BaseDirectory;
         scaleModelsWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName;
-        scaleModelsWatcher.Filter = App.SCALE_MODELS_JSON_PATH.Substring(App.SCALE_MODELS_JSON_PATH.LastIndexOf('\\') + 1);
+        scaleModelsWatcher.Filter = ScaleModelsPath.Substring(ScaleModelsPath.LastIndexOf('\\') + 1);
         scaleModelsWatcher.Changed += ScaleModelsWatcher_Changed;
         scaleModelsWatcher.Deleted += ScaleModelsWatcher_Changed;
         try
@@ -54,11 +55,11 @@ internal class ScaleModelManager
     private void LoadFromLocal()
     {
         string json = "";
-        if (File.Exists(App.SCALE_MODELS_JSON_PATH))
+        if (File.Exists(ScaleModelsPath))
         {
             try
             {
-                json = File.ReadAllText(App.SCALE_MODELS_JSON_PATH);
+                json = File.ReadAllText(ScaleModelsPath);
             }
             catch (Exception e)
             {
@@ -75,7 +76,7 @@ internal class ScaleModelManager
                 {
                     json = reader.ReadToEnd();
                 }
-                File.WriteAllText(App.SCALE_MODELS_JSON_PATH, json);
+                File.WriteAllText(ScaleModelsPath, json);
             }
             catch (Exception e)
             {

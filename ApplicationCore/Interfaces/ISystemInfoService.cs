@@ -24,5 +24,5 @@ public interface ISystemInfoService
     public int GetBatteryCycle();
     public decimal GetBatteryHealth();
 
-    public string GetBigLITTLE(int cores, double l2);
+    public string GetBigLITTLE();
 }

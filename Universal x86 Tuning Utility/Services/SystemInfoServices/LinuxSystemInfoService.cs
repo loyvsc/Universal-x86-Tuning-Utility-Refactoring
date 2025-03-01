@@ -56,7 +56,7 @@ public class LinuxSystemInfoService : ISystemInfoService
         throw new System.NotImplementedException();
     }
 
-    public string GetBigLITTLE(int cores, double l2)
+    public string GetBigLITTLE()
     {
         throw new System.NotImplementedException();
     }

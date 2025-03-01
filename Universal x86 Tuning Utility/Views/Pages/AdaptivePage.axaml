@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             xmlns:models="clr-namespace:ApplicationCore.Models;assembly=ApplicationCore"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:icons="clr-namespace:FluentAvalonia.FluentIcons;assembly=FluentAvalonia.FluentIcons"
              xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
@@ -448,16 +449,16 @@
 
                                 <ComboBox Margin="0,8,0,0"
                                           VerticalAlignment="Center" 
-                                          SelectedIndex="{Binding CurrentPreset.ResScaleIndex, UpdateSourceTrigger=PropertyChanged}" 
+                                          ItemsSource="{Binding UXTUSuperResolutionScales}"
+                                          SelectedValue="{Binding CurrentPreset.SuperResolutionScale, UpdateSourceTrigger=PropertyChanged}" 
                                           Width="208" 
                                           Height="37">
-                                    <!-- todo: refact this !-->
-                                    <ComboBoxItem>Application Controlled</ComboBoxItem>
-                                    <ComboBoxItem>Ultra Quality (77%)</ComboBoxItem>
-                                    <ComboBoxItem>Quality (67%)</ComboBoxItem>
-                                    <ComboBoxItem>Balanced (59%)</ComboBoxItem>
-                                    <ComboBoxItem>Performance (50%)</ComboBoxItem>
-                                    <ComboBoxItem>Ultra Performance (33%)</ComboBoxItem>
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate DataType="models:UXTUSuperResolutionScale">
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontFamily="{Binding}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
                                 </ComboBox>
                             </StackPanel>
                         </StackPanel>

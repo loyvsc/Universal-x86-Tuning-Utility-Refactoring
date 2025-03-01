@@ -22,7 +22,7 @@ public class PremadePresets : IPremadePresets
 
     public void InitializePremadePresets()
     {
-        if (_systemInfoService.Cpu.AmdProcessorType is AmdProcessorType.Apu or AmdProcessorType.Desktop)
+        if (_systemInfoService.Cpu.ProcessorType is ProcessorType.Apu or ProcessorType.Desktop)
         {
             string cpuName = _systemInfoService.Cpu.Name.Replace("AMD", null).Replace("with", null)
                 .Replace("Mobile", null).Replace("Ryzen", null).Replace("Radeon", null).Replace("Graphics", null)
@@ -33,7 +33,7 @@ public class PremadePresets : IPremadePresets
             RyzenAdjParameters.RyzenAdjParametersBuilder performancePresetParameters = new();
             RyzenAdjParameters.RyzenAdjParametersBuilder extremePresetParameters = new();
 
-            if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
+            if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Apu)
             {
                 var product = _systemInfoService.Product.ToLower();
 
@@ -675,7 +675,7 @@ public class PremadePresets : IPremadePresets
                 }
             }
 
-            if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
+            if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop)
             {
                 var cpuNameParts = cpuName.Split(" ");
 

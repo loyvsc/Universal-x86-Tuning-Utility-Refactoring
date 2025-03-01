@@ -8,4 +8,6 @@ public interface IPlatformServiceAccessor
     public IClipboard Clipboard { get; }
     public Screen? PrimaryScreen { get; }
     public bool IsMinimized { get; }
+    public string ProductVersion { get; }
+    public string PathToExecutable { get; }
 }

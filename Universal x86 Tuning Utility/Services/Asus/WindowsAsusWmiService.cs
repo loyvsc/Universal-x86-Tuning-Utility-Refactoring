@@ -12,11 +12,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Universal_x86_Tuning_Utility.Services.Asus;
 
-// todo: remove references to implementation
 public class WindowsAsusWmiService : IASUSWmiService
 {
-    // todo: log get set device
-    private readonly ILogger<WindowsAsusWmiService> _logger;
     //
     // This is a customised version of ASUSWmi.cs from https://github.com/seerge/g-helper
     // I do not take credit for the full functionality of the code.
@@ -143,6 +140,7 @@ public class WindowsAsusWmiService : IASUSWmiService
 
     private IntPtr _eventHandle;
     private readonly IntPtr _handle;
+    private readonly ILogger<WindowsAsusWmiService> _logger;
     private readonly ManagementEventWatcher _eventWatcher;
     
     public WindowsAsusWmiService(ILogger<WindowsAsusWmiService> logger)

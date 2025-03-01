@@ -62,7 +62,7 @@ public class WindowsCpuControlService : ICpuControlService
             {
                 case Manufacturer.AMD:
                 {
-                    if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
+                    if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Apu)
                     {
                         int tdp = _newPowerLimit * 1000;
 
@@ -76,7 +76,7 @@ public class WindowsCpuControlService : ICpuControlService
                             _amdApuControlService.CurrentPowerLimit = _newPowerLimit;
                         }
                     }
-                    else if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
+                    else if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop)
                     {
                         int tdp = _newPowerLimit * 1000;
 

@@ -1,11 +1,8 @@
-﻿using System.Diagnostics;
-using System;
+﻿using System;
 using System.IO;
 using Universal_x86_Tuning_Utility.Properties;
 using System.Configuration;
-using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -15,7 +12,7 @@ using Splat;
 using Splat.Serilog;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Helpers;
-using Universal_x86_Tuning_Utility.Services.Amd;
+using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Services.SystemInfoServices;
 using Universal_x86_Tuning_Utility.ViewModels;
 using Universal_x86_Tuning_Utility.Views.Pages;
@@ -26,12 +23,6 @@ namespace Universal_x86_Tuning_Utility;
 
 public class App : Application
 {
-    public static readonly string SCALE_MODELS_JSON_PATH = @".\ScaleModels.json";
-
-    public static readonly string Version = typeof(AvaloniaObject).Assembly.GetName().Version.ToString(); // todo: test this
-    public static readonly string RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-    public static readonly string ExecutableFileName = Process.GetCurrentProcess().MainModule.FileName;
-
     private ILogger<App> _logger;
     private IClassicDesktopStyleApplicationLifetime _desktopApplicationLifetime;
     
@@ -117,8 +108,9 @@ public class App : Application
             
             if (UpdateHelper.IsInternetAvailable() && Settings.Default.UpdateCheck)
             {
-                var updateManager = Locator.Current.GetService<IUpdateService>()!; 
-                var isUpdateAvailable = await updateManager.IsUpdatesAvailable(Version);
+                var updateManager = Locator.Current.GetService<IUpdateService>()!;
+                var platformServiceAccessor = Locator.Current.GetService<IPlatformServiceAccessor>()!;
+                var isUpdateAvailable = await updateManager.IsUpdatesAvailable(platformServiceAccessor.ProductVersion);
 
                 if (isUpdateAvailable)
                 {
@@ -128,8 +120,8 @@ public class App : Application
                         text: "Head to the settings menu to easily download the new Universal x86 Tuning Utility update!");
                 }
             }
-        } 
-        catch (Exception ex) 
+        }
+        catch (Exception ex)
         { 
             _logger.LogCritical(ex, "Failed to build and start a host");
         }

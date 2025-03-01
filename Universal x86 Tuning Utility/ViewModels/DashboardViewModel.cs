@@ -5,6 +5,7 @@ using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Utilities;
 using Avalonia.Threading;
+using DesktopNotifications;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Services.GameLauncherServices;
 using Settings = Universal_x86_Tuning_Utility.Properties.Settings;
@@ -13,6 +14,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels;
 
 public partial class DashboardViewModel : NotifyPropertyChangedBase
 {
+    private readonly INotificationManager _notificationManager;
     public ICommand OpenWindowCommand { get; }
     public ICommand NavigateCommand { get; }
     
@@ -25,8 +27,10 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
     private readonly DispatcherTimer _autoAdaptive = new();
     private bool _isAmdSettingsAvailable;
     
-    public DashboardViewModel(ISystemInfoService systemInfoService)
+    public DashboardViewModel(ISystemInfoService systemInfoService,
+                             INotificationManager notificationManager)
     {
+        _notificationManager = notificationManager;
         IsAmdSettingsAvailable = systemInfoService.Cpu.Manufacturer == Manufacturer.AMD;
 
         _autoAdaptive.Interval = TimeSpan.FromSeconds(1);
@@ -39,7 +43,10 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
 
     private void AutoAdaptive_Tick(object sender, EventArgs e)
     {
-        if(Settings.Default.isStartAdpative) _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));
+        if (Settings.Default.isStartAdpative)
+        {
+            _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));
+        }
         _autoAdaptive.Stop();
     }
 
@@ -90,7 +97,6 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
                 return;
             default:
                 string[] parts = parameter.Split('-');
-                toastNotiifcation.Show("Worked!");
                 if (!parts[0].Contains("Microsoft Store")) WindowsGameLauncherService.LaunchGame(parts[2], parts[0], parts[1], parts[1]);
                 else WindowsGameLauncherService.LaunchGame(parts[1], parts[0], parts[1], parts[1]);
                 return;

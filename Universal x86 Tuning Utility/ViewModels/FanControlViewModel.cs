@@ -199,7 +199,6 @@ public class FanControlViewModel : NotifyPropertyChangedBase
         }
     }
 
-    // todo: check on linux
     private async Task<int> GetCpuTemperature()
     {
         try

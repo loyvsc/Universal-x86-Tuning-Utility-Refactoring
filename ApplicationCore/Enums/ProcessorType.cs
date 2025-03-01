@@ -1,6 +1,6 @@
 namespace ApplicationCore.Enums;
 
-public enum AmdProcessorType
+public enum ProcessorType
 {
     Unknown = -1,
     Apu,

@@ -35,4 +35,9 @@ public class LinuxFanControlService : IFanControlService
     {
         throw new System.NotImplementedException();
     }
+
+    public void Dispose()
+    {
+        
+    }
 }

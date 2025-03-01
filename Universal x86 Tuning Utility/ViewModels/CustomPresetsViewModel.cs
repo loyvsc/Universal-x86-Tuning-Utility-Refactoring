@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Properties;
+using AmdPowerProfile = ApplicationCore.Models.AmdPowerProfile;
+using PowerMode = ApplicationCore.Models.PowerMode;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
@@ -199,10 +201,29 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         set => SetValue(ref _selectedPreset, value);
     }
 
+    public List<PowerMode> PowerModes
+    {
+        get => _powerModes;
+        set => SetValue(ref _powerModes, value);
+    }
+
+    public List<AmdPowerProfile> AmdPowerProfiles
+    {
+        get => _amdPowerProfiles;
+        set => SetValue(ref _amdPowerProfiles, value);
+    }
+
+    public List<UXTUSuperResolutionScale> UXTUSuperResolutionScales
+    {
+        get => _uxtuSuperResolutionScales;
+        set => SetValue(ref _uxtuSuperResolutionScales, value);
+    }
+
     #endregion
 
     #region Backing fields
 
+    private List<UXTUSuperResolutionScale> _uxtuSuperResolutionScales;
     private Preset _selectedPreset;
     private bool _isAsusMux;
     private bool _isAsusEcoMode;
@@ -232,6 +253,8 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     private bool _undoActionAvailable;
     private bool _isAmdCpuSettingsAvailable;
     private bool _isAmdApuVrmSettingAvailable;
+    private List<AmdPowerProfile> _amdPowerProfiles;
+    private List<PowerMode> _powerModes;
 
     #endregion
 
@@ -276,6 +299,31 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         DeletePresetCommand = ReactiveCommand.CreateFromTask(DeleteCurrentPreset);
         UndoCommand = ReactiveCommand.CreateFromTask(Undo);
         SavePresetCommand = ReactiveCommand.CreateFromTask(SavePreset);
+
+        PowerModes = new List<PowerMode>
+        {
+            new PowerMode(PowerPlan.SystemControlled, "System Controlled"),
+            new PowerMode(PowerPlan.SystemControlled, "Best Power Efficiency"),
+            new PowerMode(PowerPlan.SystemControlled, "Balanced"),
+            new PowerMode(PowerPlan.SystemControlled, "Best Performance")
+        };
+        
+        AmdPowerProfiles = new List<AmdPowerProfile>
+        {
+            new AmdPowerProfile(AmdBoostProfile.Auto, "Auto"),
+            new AmdPowerProfile(AmdBoostProfile.PowerSave, "Power Saving"),
+            new AmdPowerProfile(AmdBoostProfile.Performance, "Performance")
+        };
+        
+        UXTUSuperResolutionScales = new List<UXTUSuperResolutionScale>()
+        {
+            new UXTUSuperResolutionScale(ResolutionScale.ApplicationControlled, "Application Controlled"),
+            new UXTUSuperResolutionScale(ResolutionScale.UltraQuality, "Ultra Quality (77%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.Quality, "Quality (67%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.Balanced, "Balanced (59%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.Performance, "Performance (50%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.UltraPerformance, "Ultra Performance (33%)"),
+        };
 
         Initialize();
     }
@@ -355,7 +403,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         {
             IsAmdCpuSettingsAvailable = true;
 
-            if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
+            if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Apu)
             {
                 IsAmdApuSettingsAvailable = _systemInfoService.Cpu.RyzenFamily is 
                                             RyzenFamily.PhoenixPoint or
@@ -394,7 +442,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 var apuPresets = _apuPresetService.GetPresets();
                 AvailablePresets = apuPresets.ToList();
             }
-            else if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
+            else if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop)
             {
                 IsAmdCpuThermalSettingsAvailable = true;
                 IsAmdCOSettingAvailable = _systemInfoService.Cpu.RyzenFamily >= RyzenFamily.Vermeer;
@@ -459,7 +507,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     {
         var presetService = _systemInfoService.Cpu.Manufacturer switch
         {
-            Manufacturer.AMD => _systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu
+            Manufacturer.AMD => _systemInfoService.Cpu.ProcessorType == ProcessorType.Apu
                 ? _apuPresetService
                 : _amdDesktopPresetService,
             Manufacturer.Intel => _intelPresetService
@@ -515,9 +563,9 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             {
                 case Manufacturer.AMD:
                 {
-                    if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
+                    if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Apu)
                         _apuPresetService.DeletePreset(SelectedPreset.Name);
-                    else if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
+                    else if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop)
                         _amdDesktopPresetService.DeletePreset(SelectedPreset.Name);
                     break;
                 }
@@ -548,7 +596,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             {
                 case Manufacturer.AMD:
                 {
-                    if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu)
+                    if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Apu)
                     {
                         // Save a preset
                         SelectedPreset.AsusPowerProfile = (int)SelectedAsusPowerProfile.PowerProfileMode;
@@ -558,7 +606,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                         IsRadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
                         IsNvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
                     }
-                    else if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
+                    else if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop)
                     {
                         _amdDesktopPresetService.SavePreset(SelectedPreset.Name, SelectedPreset); 
                     }
@@ -578,11 +626,11 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
 
     private string GetCommandValues()
     {
-        var commands = new List<string>(64);
+        var commands = new List<string>(32);
 
         commands.Add(
             $"--UXTUSR={SelectedPreset.IsMag}-{SelectedPreset.IsVsync}-{SelectedPreset.Sharpness / 100}" +
-            $"-{SelectedPreset.ResScaleIndex}-{SelectedPreset.IsRecap}");
+            $"-{SelectedPreset.ResolutionScale.ResolutionScale}-{SelectedPreset.IsRecap}");
 
         if (_systemInfoService.LaptopInfo?.IsAsus == true)
         {
@@ -594,16 +642,16 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 commands.Add($"--ASUS-MUX={IsAsusGpuUltimateSettingsAvailable}");
         }
 
-        //todo: remove using of indexes
         if (IsChangeRefreshRateAvailable && SelectedPreset.DisplayHz > 0)
         {
             commands.Add($"--Refresh-Rate={RefreshRates[SelectedPreset.DisplayHz - 1]}");
         }
 
-        if (SelectedPreset.PowerMode > 0)
-            commands.Add($"--Win-Power={SelectedPreset.PowerMode - 1}");
+        if (SelectedPreset.PowerMode.PowerPlan != PowerPlan.SystemControlled)
+            commands.Add($"--Win-Power={SelectedPreset.PowerMode.PowerPlan}");
 
-        if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Apu) // todo: why this is amd processor type??? why only amd?
+        if (_systemInfoService.Cpu.Manufacturer == Manufacturer.AMD && 
+            _systemInfoService.Cpu.ProcessorType == ProcessorType.Apu)
         {
             if (SelectedPreset.IsApuTemp)
                 commands.Add(
@@ -646,7 +694,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 else if (SelectedPreset.CoAllCore < 0)
                 {
                     commands.Add(
-                        $"--set-coall={Convert.ToUInt32(0x100000 - (uint)(-1 * (int)SelectedPreset.CoAllCore))} ");
+                        $"--set-coall={Convert.ToUInt32(0x100000 - (uint)(-1 * SelectedPreset.CoAllCore))} ");
                 }
             }
 
@@ -692,14 +740,14 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             if (SelectedPreset.IsSoftMaxSoCClk)
                 commands.Add($"--max-socclk-frequency={SelectedPreset.SoftMaxSoCClk}");
 
-            switch (SelectedPreset.BoostProfile)
+            switch (SelectedPreset.BoostProfile.BoostPlan)
             {
-                case 1:
+                case AmdBoostProfile.PowerSave:
                 {
                     commands.Add("--power-saving");
                     break;
                 }
-                case 2:
+                case AmdBoostProfile.Performance:
                 {
                     commands.Add("--max-performance");
                     break;
@@ -714,7 +762,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                     if (state.IsEnabled)
                     {
                         commands.Add(
-                            $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((state.CoreIndex % coresCount) & 15)) << 20) | ((int)state.Value & 0xFFFF)}");
+                            $"--set-coper={(((((0 << 4) | ((0 % 1) & 15)) << 4) | ((state.CoreIndex % coresCount) & 15)) << 20) | (state.Value & 0xFFFF)}");
                     }
                 }
 
@@ -723,7 +771,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                     if (state.IsEnabled)
                     {
                         commands.Add(
-                            $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((state.CoreIndex % 8) & 15)) << 20) | ((int)state.Value & 0xFFFF)}");
+                            $"--set-coper={(((((1 << 4) | ((0 % 1) & 15)) << 4) | ((state.CoreIndex % 8) & 15)) << 20) | (state.Value & 0xFFFF)}");
                     }
                 }
 
@@ -734,7 +782,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 {
                     if (state.IsEnabled)
                     {
-                        commands.Add($"--set-coper={(state.CoreIndex << 20) | ((int)state.Value & 0xFFFF)} ");
+                        commands.Add($"--set-coper={(state.CoreIndex << 20) | (state.Value & 0xFFFF)} ");
                     }
                 }
             }
@@ -756,11 +804,11 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                         $"--oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)} --oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)}");
                 }
 
-                commands.Add("--enable-oc --enable-oc"); // todo: why it is doubled?
+                commands.Add("--enable-oc");
             }
         }
 
-        if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop)
+        if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop)
         {
             if (SelectedPreset.IsDtCpuTemp)
                 commands.Add($"--tctl-limit={SelectedPreset.DtCpuTemperature * 1000}");
@@ -782,7 +830,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 else if (SelectedPreset.CoAllCore < 0)
                 {
                     commands.Add(
-                        $"--set-coall={Convert.ToUInt32(0x100000 - (uint)(-1 * (int)SelectedPreset.CoAllCore))}");
+                        $"--set-coall={Convert.ToUInt32(0x100000 - (uint)(-1 * SelectedPreset.CoAllCore))}");
                 }
 
                 if (SelectedPreset.IsCoGfx)
@@ -794,7 +842,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                     else if (SelectedPreset.CoGfx < 0)
                     {
                         commands.Add(
-                            $"--set-cogfx={Convert.ToUInt32(0x100000 - (uint)(-1 * (int)SelectedPreset.CoGfx))}");
+                            $"--set-cogfx={Convert.ToUInt32(0x100000 - (uint)(-1 * SelectedPreset.CoGfx))}");
                     }
                 }
 
@@ -834,7 +882,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                             $"--oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)} --oc-volt={Convert.ToUInt32((1.55 - vid) / 0.00625)}");
                     }
 
-                    commands.Add("--enable-oc --enable-oc"); // todo: why it is doubled?
+                    commands.Add("--enable-oc");
                 }
             }
 

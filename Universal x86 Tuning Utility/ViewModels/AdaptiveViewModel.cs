@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -89,6 +90,13 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         });
     }
 
+    public List<UXTUSuperResolutionScale> UXTUSuperResolutionScales
+    {
+        get => _UXTUSuperResolutionScales;
+        set => SetValue(ref _UXTUSuperResolutionScales, value);
+    }
+
+    private List<UXTUSuperResolutionScale> _UXTUSuperResolutionScales;
     private bool _isStart;
     private bool _isAsusPowerSettingsAvailable;
     private bool _isAmdApuTurboBoostOverdriveSettingsAvailable;
@@ -151,6 +159,16 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         
         Polling = Settings.Default.polling;
 
+        UXTUSuperResolutionScales = new List<UXTUSuperResolutionScale>()
+        {
+            new UXTUSuperResolutionScale(ResolutionScale.ApplicationControlled, "Application Controlled"),
+            new UXTUSuperResolutionScale(ResolutionScale.UltraQuality, "Ultra Quality (77%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.Quality, "Quality (67%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.Balanced, "Balanced (59%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.Performance, "Performance (50%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.UltraPerformance, "Ultra Performance (33%)"),
+        };
+
         Initialize();
     }
 
@@ -169,7 +187,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         {
             defaultPreset = new AdaptivePreset();
         
-            if (_systemInfoService.Cpu.AmdProcessorType == AmdProcessorType.Desktop ||
+            if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop ||
                 _systemInfoService.Cpu.RyzenFamily == RyzenFamily.DragonRange)
             {
                 defaultPreset.Power = 86;
@@ -352,7 +370,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
                     minCPUClock);
             }
 
-            var commandString = $"--UXTUSR={CurrentPreset.IsMag}-{CurrentPreset.IsVsync}-{CurrentPreset.Sharpness / 100}-{CurrentPreset.ResScaleIndex}-{CurrentPreset.IsRecap} ";
+            var commandString = $"--UXTUSR={CurrentPreset.IsMag}-{CurrentPreset.IsVsync}-{CurrentPreset.Sharpness / 100}-{CurrentPreset.SuperResolutionScale.ResolutionScale}-{CurrentPreset.IsRecap} ";
 
             if (Settings.Default.isASUS)
             {

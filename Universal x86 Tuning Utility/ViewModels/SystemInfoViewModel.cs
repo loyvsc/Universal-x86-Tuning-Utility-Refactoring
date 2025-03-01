@@ -173,7 +173,7 @@ public class SystemInfoViewModel : NotifyPropertyChangedBase, IDisposable
         
         CpuCoresInfo = CpuInfo.LogicalCoresCount == CpuInfo.CoresCount 
             ? CpuInfo.CoresCount.ToString() 
-            : _systemInfoService.GetBigLITTLE(CpuInfo.CoresCount, CpuInfo.L2Size);
+            : _systemInfoService.GetBigLITTLE();
             
         var l1Size = _systemInfoService.Cpu.L1Size / 1024;
         CpuL1Cache = $"{l1Size.ToString("0.##")} MB";

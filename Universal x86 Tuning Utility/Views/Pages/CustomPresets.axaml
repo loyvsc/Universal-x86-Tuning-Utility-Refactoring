@@ -551,7 +551,6 @@
                             </StackPanel>
                             <StackPanel Margin="0,8,0,0"
                                         IsVisible="False">
-                                <!-- todo: Why not visible? !-->
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
@@ -1287,16 +1286,15 @@
                                 <ComboBox Grid.Column="1"
                                           Margin="0,8,0,0"
                                           VerticalAlignment="Center"
-                                          SelectedIndex="{Binding SelectedPreset.ResScaleIndex, UpdateSourceTrigger=PropertyChanged}"
+                                          ItemsSource="{Binding UXTUSuperResolutionScales}"
+                                          SelectedIndex="{Binding SelectedPreset.ResolutionScale, UpdateSourceTrigger=PropertyChanged}"
                                           MinWidth="138"
                                           Height="37">
-                                    <!-- Todo: move this to list of type ResolutionScale [Title, Value] !-->
-                                    <ComboBoxItem>Application Controlled</ComboBoxItem>
-                                    <ComboBoxItem>Ultra Quality (77%)</ComboBoxItem>
-                                    <ComboBoxItem>Quality (67%)</ComboBoxItem>
-                                    <ComboBoxItem>Balanced (59%)</ComboBoxItem>
-                                    <ComboBoxItem>Performance (50%)</ComboBoxItem>
-                                    <ComboBoxItem>Ultra Performance (33%)</ComboBoxItem>
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate DataType="models:UXTUSuperResolutionScale">
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
                                 </ComboBox>
                             </Grid>
                         </StackPanel>
@@ -2153,14 +2151,10 @@
                             </StackPanel>
                             <ComboBox Grid.Column="1"
                                       VerticalAlignment="Center"
+                                      ItemsSource="{Binding AmdPowerProfiles}"
                                       SelectedIndex="{Binding SelectedPreset.BoostProfile, UpdateSourceTrigger=PropertyChanged}"
                                       MinWidth="164" 
-                                      Height="37">
-                                <!-- todo: refact this.  !-->
-                                <ComboBoxItem>Auto</ComboBoxItem>
-                                <ComboBoxItem>Power Saving</ComboBoxItem>
-                                <ComboBoxItem>Performance</ComboBoxItem>
-                            </ComboBox>
+                                      Height="37"/>
                         </Grid>
                     </controls:CardControl>
 
@@ -2193,29 +2187,16 @@
                                 <ui:SymbolIcon Symbol="{ic:FluentIcon Power20Regular}" />
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="Windows Power Mode" />
+                                           Text=" Power Mode" />
                                 <TextBlock FontSize="12"
                                            Text="Provides the ability to change the Windows power mode from a preset." />
                             </StackPanel>
                             <ComboBox Grid.Column="1"
                                       VerticalAlignment="Center"
+                                      ItemsSource="{Binding PowerModes}"
                                       SelectedIndex="{Binding SelectedPreset.PowerMode, UpdateSourceTrigger=PropertyChanged}"
                                       MinWidth="164"
-                                      Height="37">
-                                <!-- todo: refact this.  !-->
-                                <ComboBoxItem>
-                                    System Controlled
-                                </ComboBoxItem>
-                                <ComboBoxItem>
-                                    Best Power Effciency
-                                </ComboBoxItem>
-                                <ComboBoxItem>
-                                    Balanced
-                                </ComboBoxItem>
-                                <ComboBoxItem>
-                                    Best Performance
-                                </ComboBoxItem>
-                            </ComboBox>
+                                      Height="37"/>
 
                         </Grid>
                     </controls:CardControl>
