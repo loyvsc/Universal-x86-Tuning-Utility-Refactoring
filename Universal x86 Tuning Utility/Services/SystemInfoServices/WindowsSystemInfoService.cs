@@ -127,9 +127,11 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                 Cpu.CoresCount = Convert.ToInt32(cpuInfo["NumberOfCores"]);
                 Cpu.LogicalCoresCount = Convert.ToInt32(cpuInfo["NumberOfLogicalProcessors"]);
                 Cpu.L2Size = Convert.ToDouble(cpuInfo["L2CacheSize"]) / 1024;
-                Cpu.L3Size = Convert.ToDouble(cpuInfo["L3CacheSize"]) / 1024;
                 Cpu.BaseClock = cpuInfo["MaxClockSpeed"].ToString();
             }
+
+            var l3CacheInfo = GetCacheSize(ApplicationCore.Enums.CacheLevel.L3).FirstOrDefault();
+            Cpu.L3Size = Convert.ToDouble(l3CacheInfo);
         }
         catch (Exception ex)
         {
@@ -563,7 +565,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         Level3 = 5
     }
 
-    public List<uint> GetCacheSize(ApplicationCore.Enums.CacheLevel level) //todo: test
+    private List<uint> GetCacheSize(ApplicationCore.Enums.CacheLevel level)
     {
         var searchLevel = level switch
         {
