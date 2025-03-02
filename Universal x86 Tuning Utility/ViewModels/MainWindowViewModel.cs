@@ -135,7 +135,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
                     if (!string.IsNullOrEmpty(Settings.Default.dcCommandString) &&
                         Settings.Default.dcPreset != "None")
                     {
-                        var preset = _premadePresets.PremadePresetsList.Find(x => x.Name == Settings.Default.acPreset);
+                        var preset = _premadePresets.PremadePresetsList.Find(x => x.Name == Settings.Default.dcPreset);
 
                         if (preset != null)
                         {
@@ -163,7 +163,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
                     if (!string.IsNullOrEmpty(Settings.Default.resumeCommandString) &&
                         Settings.Default.resumePreset != "None")
                     {
-                        var preset = _premadePresets.PremadePresetsList.Find(x => x.Name == Settings.Default.acPreset);
+                        var preset = _premadePresets.PremadePresetsList.Find(x => x.Name == Settings.Default.resumePreset);
 
                         if (preset != null)
                         {
