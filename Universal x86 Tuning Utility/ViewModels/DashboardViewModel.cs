@@ -7,6 +7,7 @@ using ApplicationCore.Utilities;
 using Avalonia.Threading;
 using DesktopNotifications;
 using ReactiveUI;
+using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Services.GameLauncherServices;
 using Settings = Universal_x86_Tuning_Utility.Properties.Settings;
 
@@ -15,6 +16,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels;
 public partial class DashboardViewModel : NotifyPropertyChangedBase
 {
     private readonly INotificationManager _notificationManager;
+    private readonly INvidiaGpuService _nvidiaGpuService;
     public ICommand OpenWindowCommand { get; }
     public ICommand NavigateCommand { get; }
     
@@ -28,9 +30,11 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
     private bool _isAmdSettingsAvailable;
     
     public DashboardViewModel(ISystemInfoService systemInfoService,
-                             INotificationManager notificationManager)
+                             INotificationManager notificationManager,
+                             INvidiaGpuService nvidiaGpuService)
     {
         _notificationManager = notificationManager;
+        _nvidiaGpuService = nvidiaGpuService;
         IsAmdSettingsAvailable = systemInfoService.Cpu.Manufacturer == Manufacturer.AMD;
 
         _autoAdaptive.Interval = TimeSpan.FromSeconds(1);
@@ -43,6 +47,10 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
 
     private void AutoAdaptive_Tick(object sender, EventArgs e)
     {
+        foreach (var checkResult in _nvidiaGpuService.CheckIsGpusOriginal())
+        {
+            _notificationManager.ShowTextNotification("NVIDIA GPU Warning", $"ROP count is lower than expected on {checkResult.GpuName} (#{checkResult.GpuNumber}) ({checkResult.ActualRopCount } ROPs out of {checkResult.ExpectedRopCount} ROPs)");
+        }
         if (Settings.Default.isStartAdpative)
         {
             _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));

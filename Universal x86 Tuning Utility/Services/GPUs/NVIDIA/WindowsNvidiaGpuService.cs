@@ -1,7 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text.Json;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
 using Microsoft.Extensions.Logging;
 using NvAPIWrapper.GPU;
 using NvAPIWrapper.Native;
@@ -23,6 +29,12 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
     private const int MaxMemoryOffset = 4000;
     
     private readonly ILogger<WindowsNvidiaGpuService> _logger;
+    private readonly Lazy<Dictionary<string, int>> _ropCountDictionary = new Lazy<Dictionary<string, int>>(() =>
+    {
+        var data = File.ReadAllText(@"./Assets/nvidiaGpusData.json");
+        var deserializedData = JsonSerializer.Deserialize<Dictionary<string, int>>(data);
+        return deserializedData ?? new Dictionary<string, int>();
+    });
     
     public WindowsNvidiaGpuService(ILogger<WindowsNvidiaGpuService> logger)
     {
@@ -134,5 +146,43 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
         cmd.Start();
 
         cmd.WaitForExit();
+    }
+
+    public ReadOnlyCollection<CheckIsGpuOriginalResult> CheckIsGpusOriginal()
+    {
+        var gpus = PhysicalGPU.GetPhysicalGPUs();
+        
+        var results = new List<CheckIsGpuOriginalResult>();
+        for (var i = 0; i < gpus.Length; i++)
+        {
+            var gpu = gpus[i];
+            var gpuName = gpu.ArchitectInformation.PhysicalGPU.ToString();
+
+            var expectedRopCount = GetRopCount(gpuName);
+            var actualRopCount = gpu.ArchitectInformation.NumberOfROPs;
+
+            var result = new CheckIsGpuOriginalResult()
+            {
+                GpuName = gpuName,
+                GpuNumber = i + 1,
+                IsGpuOriginal = expectedRopCount == actualRopCount,
+                ExpectedRopCount = expectedRopCount,
+                ActualRopCount = actualRopCount
+            };
+            results.Add(result);
+        }
+
+        return new ReadOnlyCollection<CheckIsGpuOriginalResult>(results);
+    }
+    
+    private int GetRopCount(string gpuName)
+    {
+        var index = gpuName.IndexOf("Geforce", StringComparison.InvariantCulture);
+        if (index != -1)
+        {
+            gpuName = gpuName.Remove(index, 8);
+        }
+
+        return _ropCountDictionary.Value.GetValueOrDefault(gpuName, -1);
     }
 }
