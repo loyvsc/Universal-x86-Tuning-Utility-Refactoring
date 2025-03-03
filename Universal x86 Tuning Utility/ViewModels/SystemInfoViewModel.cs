@@ -64,6 +64,12 @@ public class SystemInfoViewModel : NotifyPropertyChangedBase, IDisposable
         set => SetValue(ref _ramSlots, value);
     }
 
+    public MemoryTimings RamTimings
+    {
+        get => _ramTimings;
+        set => SetValue(ref _ramTimings, value);
+    }
+
     public bool IsBatteryInfoAvailable
     {
         get => _isBatteryInfoAvailable;
@@ -144,6 +150,7 @@ public class SystemInfoViewModel : NotifyPropertyChangedBase, IDisposable
     private string _ramProducer;
     private string _ramModel;
     private string _ramWidth;
+    private MemoryTimings _ramTimings;
     private string _ramSlots;
     private string _batteryHealth;
     private string _batteryCycle;

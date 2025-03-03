@@ -9,6 +9,7 @@ public class RamInfo
     public int CountOfModules { get; set; }
     public double Capacity { get; set; }
     public double Speed { get; set; }
+    public MemoryTimings Timings { get; set; }
     
     public RamModule[] Modules { get; set; }
 }

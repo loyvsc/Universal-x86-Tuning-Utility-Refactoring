@@ -49,7 +49,10 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
     {
         foreach (var checkResult in _nvidiaGpuService.CheckIsGpusOriginal())
         {
-            _notificationManager.ShowTextNotification("NVIDIA GPU Warning", $"ROP count is lower than expected on {checkResult.GpuName} (#{checkResult.GpuNumber}) ({checkResult.ActualRopCount } ROPs out of {checkResult.ExpectedRopCount} ROPs)");
+            if (!checkResult.IsGpuOriginal)
+            {
+                _notificationManager.ShowTextNotification("NVIDIA GPU Warning", $"ROP count is lower than expected on {checkResult.GpuName} (#{checkResult.GpuNumber}) ({checkResult.ActualRopCount } ROPs out of {checkResult.ExpectedRopCount} ROPs)");
+            }
         }
         if (Settings.Default.isStartAdpative)
         {
