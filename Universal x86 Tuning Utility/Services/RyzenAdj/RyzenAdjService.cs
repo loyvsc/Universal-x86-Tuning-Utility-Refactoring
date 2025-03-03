@@ -346,10 +346,6 @@ public class RyzenAdjService : IRyzenAdjService
                             _asusWmiService.DeviceSet(device, 1);
                             
                             Process.Start("shutdown", "/r /t 1");
-
-                            // todo: add this message before apply settings
-                            // messageBox.Show("GPU Ultimate Mode",
-                            //     "Disabling GPU Ultimate Mode requires a restart to take\naffect!");
                         }
                     }
 

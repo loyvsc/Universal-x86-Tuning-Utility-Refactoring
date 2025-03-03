@@ -24,6 +24,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     public ICommand DeletePresetCommand { get; }
     public ICommand UndoCommand { get; }
     public ICommand ReloadPresetValuesCommand { get; }
+    public ICommand AsusGpuUltimateModSwitchedCommand { get; }
 
     #region Properties
 
@@ -500,6 +501,14 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             IsAsusPowerSettingsAvailable = false;
             IsAsusGpuUltimateSettingsAvailable = false;
             IsAsusGpuEcoModeSettingsAvailable = false;
+        }
+    }
+
+    private async Task AsusGpuUltimateModSwitched()
+    {
+        if (!_selectedPreset.IsAsusGpuUlti)
+        {
+            await _notificationManager.ShowTextNotification("GPU Ultimate Mode", "Disabling GPU Ultimate Mode requires a restart to take\naffect!");
         }
     }
     

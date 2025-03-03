@@ -100,7 +100,6 @@ public class App : Application
             }
             catch (ConfigurationErrorsException ex)
             {
-                // todo: check inner exception
                 string filename = ((ConfigurationErrorsException)ex.InnerException).Filename;
                 File.Delete(filename);
                 Settings.Default.Reload();

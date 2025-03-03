@@ -59,7 +59,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         GpuNames = new List<string>();
     }
 
-    private void OnDeviceUninstalled(object sender, EventArrivedEventArgs e) //todo: test this
+    private void OnDeviceUninstalled(object sender, EventArrivedEventArgs e)
     {
         using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE PNPClass = 'DISPLAY'"))
         {
@@ -68,12 +68,20 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                 if (device["Name"] is string name)
                 {
                     GpuNames.Remove(name);
+                    if (name.Contains("Radeon"))
+                    {
+                        RadeonGpuCount--;
+                    }
+                    else if (name.Contains("NVIDIA"))
+                    {
+                        NvidiaGpuCount--;
+                    }
                 }
             }
         }
     }
 
-    private void OnNewDeviceInstalled(object sender, EventArrivedEventArgs e) //todo: test this
+    private void OnNewDeviceInstalled(object sender, EventArrivedEventArgs e)
     {
         using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE PNPClass = 'DISPLAY'"))
         {
@@ -82,6 +90,14 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                 if (device["Name"] is string name)
                 {
                     GpuNames.Add(name);
+                    if (name.Contains("Radeon"))
+                    {
+                        RadeonGpuCount++;
+                    }
+                    else if (name.Contains("NVIDIA"))
+                    {
+                        NvidiaGpuCount++;
+                    }
                 }
             }
         }

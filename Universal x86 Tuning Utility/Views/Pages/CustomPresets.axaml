@@ -2245,7 +2245,9 @@
 
                             <StackPanel Grid.Column="1"
                                         Orientation="Horizontal">
-                                <ToggleSwitch IsChecked="{Binding SelectedPreset.IsAsusGpuUlti, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,9,0" />
+                                <ToggleSwitch IsChecked="{Binding SelectedPreset.IsAsusGpuUlti, UpdateSourceTrigger=PropertyChanged}" 
+                                              Command="{Binding AsusGpuUltimateModSwitchedCommand}"
+                                              Margin="0,0,9,0" />
                             </StackPanel>
                         </Grid>
                     </controls:CardControl>
