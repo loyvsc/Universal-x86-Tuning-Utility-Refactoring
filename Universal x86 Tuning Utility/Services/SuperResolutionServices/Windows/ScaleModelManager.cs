@@ -70,7 +70,7 @@ internal class ScaleModelManager
         {
             try
             {
-                Uri uri = new("pack://application:,,,/Assets/BuiltInScaleModels.json", UriKind.Absolute);
+                Uri uri = new("/Assets/BuiltInScaleModels.json", UriKind.Absolute);
                 StreamResourceInfo info = Application.GetResourceStream(uri);
                 using (StreamReader reader = new(info.Stream))
                 {

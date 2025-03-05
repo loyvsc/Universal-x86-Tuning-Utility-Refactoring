@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ic="clr-namespace:FluentAvalonia.FluentIcons;assembly=FluentAvalonia.FluentIcons"
+             xmlns:primitives="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
              x:DataType="viewModels:DashboardViewModel"
              mc:Ignorable="d"
@@ -16,8 +18,7 @@
                 MinHeight="425"
                 CornerRadius="8,0,0,0">
             <Border.Background>
-                <ImageBrush Source="pack://application:,,,/Assets/pexels-photo-8037008.jpeg"
-                            RenderOptions.BitmapInterpolationMode="HighQuality"
+                <ImageBrush Source="Assets/pexels-photo-8037008.jpeg"
                             Stretch="UniformToFill" />
             </Border.Background>
             <Border CornerRadius="8,0,0,0">
@@ -77,9 +78,9 @@
                            Margin="0,0,4,0"
                            IsVisible="{Binding IsAmdSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
                            Command="{Binding NavigateCommand}"
-                           CommandParameter="premade"
-                           Icon="Predictions20">
+                           CommandParameter="premade">
                 <StackPanel>
+                    <primitives:SymbolIcon Symbol="{ic:FluentIcon Predictions20Regular}"/>
                     <TextBlock
                         Margin="0"
                         FontSize="13"
@@ -92,9 +93,9 @@
                     Grid.Column="1"
                     Margin="4,0,4,0"
                     Command="{Binding NavigateCommand}"
-                    CommandParameter="custom"
-                    Icon="Book20">
+                    CommandParameter="custom">
                 <StackPanel>
+                    <primitives:SymbolIcon Symbol="{ic:FluentIcon Book20Regular}"/>
                     <TextBlock
                         Margin="0"
                         FontSize="13"
@@ -108,9 +109,9 @@
                 Grid.Column="2"
                 Margin="4,0,4,0"
                 Command="{Binding NavigateCommand}"
-                CommandParameter="adaptive"
-                Icon="Radar20">
+                CommandParameter="adaptive">
                 <StackPanel>
+                    <primitives:SymbolIcon Symbol="{ic:FluentIcon Radar20Regular}"/>
                     <TextBlock
                         Margin="0"
                         FontSize="13"
@@ -124,9 +125,9 @@
                 Grid.Column="3"
                 Margin="4,0,0,0"
                 Command="{Binding NavigateCommand}"
-                CommandParameter="auto"
-                Icon="Transmission20">
+                CommandParameter="auto">
                 <StackPanel>
+                    <primitives:SymbolIcon Symbol="{ic:FluentIcon Transmission20Regular}"/>
                     <TextBlock
                         Margin="0"
                         FontSize="13"
@@ -139,9 +140,9 @@
                 Grid.Column="1"
                 Margin="4,8,4,0"
                 Command="{Binding NavigateCommand}"
-                CommandParameter="info"
-                Icon="Info20">
+                CommandParameter="info">
                 <StackPanel>
+                    <primitives:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"/>
                     <TextBlock
                         Margin="0"
                         FontSize="13"
@@ -155,9 +156,9 @@
                 Margin="0,8,4,0"
                 Command="{Binding NavigateCommand}"
                 CommandParameter="games"
-                Icon="Games20"
                 IsEnabled="true">
                 <StackPanel>
+                    <primitives:SymbolIcon Symbol="{ic:FluentIcon Games20Regular}"/>
                     <TextBlock
                         Margin="0"
                         FontSize="13"
@@ -170,9 +171,9 @@
                 Grid.Column="2"
                 Margin="4,8,4,0"
                 Command="{Binding NavigateCommand}"
-                CommandParameter="help"
-                Icon="ChatHelp20">
+                CommandParameter="help">
                 <StackPanel>
+                    <primitives:SymbolIcon Symbol="{ic:FluentIcon ChatHelp20Regular}"/>
                     <TextBlock
                         Margin="0"
                         FontSize="13"
@@ -185,9 +186,9 @@
                 Grid.Column="3"
                 Margin="4,8,0,0"
                 Command="{Binding NavigateCommand}"
-                CommandParameter="support"
-                Icon="Money20">
+                CommandParameter="support">
                 <StackPanel>
+                    <primitives:SymbolIcon Symbol="{ic:FluentIcon Money20Regular}"/>
                     <TextBlock
                         Margin="0"
                         FontSize="13"

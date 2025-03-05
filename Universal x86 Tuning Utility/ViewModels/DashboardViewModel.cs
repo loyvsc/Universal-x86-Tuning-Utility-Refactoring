@@ -17,6 +17,7 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
 {
     private readonly INotificationManager _notificationManager;
     private readonly INvidiaGpuService _nvidiaGpuService;
+    private readonly INavigationService _navigationService;
     public ICommand OpenWindowCommand { get; }
     public ICommand NavigateCommand { get; }
     
@@ -31,10 +32,12 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
     
     public DashboardViewModel(ISystemInfoService systemInfoService,
                              INotificationManager notificationManager,
-                             INvidiaGpuService nvidiaGpuService)
+                             INvidiaGpuService nvidiaGpuService,
+                             INavigationService navigationService)
     {
         _notificationManager = notificationManager;
         _nvidiaGpuService = nvidiaGpuService;
+        _navigationService = navigationService;
         IsAmdSettingsAvailable = systemInfoService.Cpu.Manufacturer == Manufacturer.AMD;
 
         _autoAdaptive.Interval = TimeSpan.FromSeconds(1);
@@ -105,11 +108,6 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
                 return;
             case "games":
                 _navigationService.Navigate(typeof(Views.Pages.GamesPage));
-                return;
-            default:
-                string[] parts = parameter.Split('-');
-                if (!parts[0].Contains("Microsoft Store")) WindowsGameLauncherService.LaunchGame(parts[2], parts[0], parts[1], parts[1]);
-                else WindowsGameLauncherService.LaunchGame(parts[1], parts[0], parts[1], parts[1]);
                 return;
         }
     }

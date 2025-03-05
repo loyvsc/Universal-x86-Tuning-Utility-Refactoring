@@ -6,7 +6,7 @@ public interface IXgMobileConnectionService
 {
     public bool Connected { get; }
     public bool Detected { get; }
-    event EventHandler<XgMobileStatusEventArgs>? XgMobileStatusChanged;
+    public event EventHandler<XgMobileStatusEventArgs>? XgMobileStatusChanged;
     public bool IsEGPUConnected();
     public void EnableXgMobileLight();
     public void DisableXgMobileLight();

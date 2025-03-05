@@ -5,7 +5,7 @@ using ApplicationCore.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.Services.GPUs.AMD;
 
-public class WindowAmdGpuService : IAmdGpuService
+public class WindowsAmdGpuService : IAmdGpuService
 {
     private const string PerfMetrics = "ADLX_PerformanceMetrics.dll";
     private const string GraphSettings = "ADLX_3DSettings.dll";

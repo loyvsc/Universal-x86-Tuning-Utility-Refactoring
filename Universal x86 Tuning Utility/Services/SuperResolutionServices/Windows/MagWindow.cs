@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using Avalonia.Controls;
 using Avalonia.Threading;
 using Universal_x86_Tuning_Utility.Properties;
 using Window = Avalonia.Controls.Window;
@@ -66,7 +67,7 @@ public class MagWindow : IDisposable
     
     private readonly string _logFileName = Path.GetFullPath("./SuperResolutionLog.txt");
 
-    public MagWindow(Window parent)
+    public MagWindow(IntPtr platformHandle)
     {
         _magThread = new Thread(() => {
             Environment.CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -107,7 +108,6 @@ public class MagWindow : IDisposable
             if (!initSuccess)
             {
                 CloseEvent?.Invoke("Msg_Error_Init");
-                parent.Close();
                 return;
             }
 
@@ -188,7 +188,7 @@ public class MagWindow : IDisposable
             {
                 Dispatcher.UIThread.Invoke(() =>
                 {
-                    _ = NativeMethods.SetForegroundWindow(parent.TryGetPlatformHandle()!.Handle);
+                    _ = NativeMethods.SetForegroundWindow(platformHandle);
                 });
             }
         };

@@ -26,7 +26,7 @@ public class DefaultPlatformServiceAccessor : IPlatformServiceAccessor
         
         var assembly = Assembly.GetExecutingAssembly();
         var fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-        ProductVersion = fileVersionInfo.ProductVersion!;
+        ProductVersion = fileVersionInfo.FileVersion!;
 
         PathToExecutable = Environment.ProcessPath!;
     }

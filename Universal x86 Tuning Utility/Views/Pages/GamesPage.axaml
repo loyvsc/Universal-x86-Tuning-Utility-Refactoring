@@ -75,23 +75,11 @@
             <ListBox x:Name="GamesListBox"
                      DockPanel.Dock="Left"
                      Margin="0,8,0,0"
-                     Width="Auto"
                      HorizontalAlignment="Stretch"
                      BorderBrush="Transparent"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                      ScrollViewer.IsDeferredScrollingEnabled="False">
-                <ListBox.Resources>
-                    <Style Selector="ListBoxItem">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                    <ContentPresenter />
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.Resources>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:GameLauncherItem}">
                         <NotificationCard x:Name="ccMain"

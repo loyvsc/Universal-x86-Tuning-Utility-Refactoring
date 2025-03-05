@@ -1,31 +1,21 @@
-﻿<Application
-    x:Class="Universal_x86_Tuning_Utility.App"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:styling="using:FluentAvalonia.Styling">
-    <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="avares://FAControlsGallery/Styling/Resources.axaml" />
-                <ResourceInclude Source="Resources/Generic.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Application.Resources>
+﻿<Application x:Class="Universal_x86_Tuning_Utility.App"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:styling="using:FluentAvalonia.Styling">
     
     <Application.Styles>
-        <!-- As of preview5, these properties now default to false -->
         <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
-        <StyleInclude Source="avares://FAControlsGallery/Styling/ControlsGalleryStyles.axaml" />
     </Application.Styles>
     
     <TrayIcon.Icons>
         <TrayIcons>
-            <TrayIcon Icon="/Assets/avalonia-logo.ico" 
-                      ToolTipText="Avalonia Tray Icon ToolTip">
+            <TrayIcon Icon="/Assets/applicationIcon-256.png" 
+                      ToolTipText="Universal x86 Tuning Utility"
+                      Clicked="OnTrayIconClicked">
                 <TrayIcon.Menu>
                     <NativeMenu>
                         <NativeMenuItem Header="Close Application" 
-                                        Click="OnCloseMenuItemClick"/>
+                                        Click="OnCloseMenuItemClicked"/>
                     </NativeMenu>
                 </TrayIcon.Menu>
             </TrayIcon>

@@ -7,9 +7,9 @@ namespace Universal_x86_Tuning_Utility.Extensions;
 
 public static class NotificationManagerExtensions
 {
-    public static readonly DateTimeOffset DefaultNotificationExpirationTime = new(0, 0, 0, 0, 0, 3, TimeSpan.Zero);
+    private static readonly TimeSpan DefaultNotificationExpirationTimeSpan = TimeSpan.FromSeconds(3);
     
-    public static readonly DateTimeOffset ErrorNotificationExpirationTime = new(0, 0, 0, 0, 0, 3, TimeSpan.Zero);
+    private static readonly TimeSpan ErrorNotificationExpirationTimeSpan = TimeSpan.FromSeconds(4);
 
     public enum NotificationType
     {
@@ -30,10 +30,10 @@ public static class NotificationManagerExtensions
 
         var expirationTime = notificationType switch
         {
-            NotificationType.Normal => DefaultNotificationExpirationTime,
-            NotificationType.Error => ErrorNotificationExpirationTime
+            NotificationType.Normal => DefaultNotificationExpirationTimeSpan,
+            NotificationType.Error => ErrorNotificationExpirationTimeSpan
         };
         
-        await notificationManager.ShowNotification(notification, expirationTime);
+        await notificationManager.ShowNotification(notification, DateTimeOffset.Now + expirationTime);
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Runtime.Intrinsics.X86;
@@ -44,7 +45,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         _baseboardSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard");
         _motherboardSearcher = 
             new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_MotherboardDevice");
-        _systemInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_ComputerSystemProduct");
+        _systemInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_ComputerSystem");
         _processorInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
         _batteryInfoSearcher = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM BatteryStatus");
         _memoryInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_PhysicalMemory");
@@ -57,6 +58,8 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         Cpu = new CpuInfo();
         Ram = new RamInfo();
         GpuNames = new List<string>();
+        
+        AnalyzeSystem();
     }
 
     private void OnDeviceUninstalled(object sender, EventArrivedEventArgs e)

@@ -9,14 +9,12 @@
         x:DataType="viewModels:MainWindowViewModel"
         mc:Ignorable="d"
         Title="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
-        Icon="pack://application:,,,/Assets/applicationIcon-256.png"
+        Icon="/Assets/applicationIcon-256.png"
         Width="1080"
         MinWidth="980"
         Height="640"
         MinHeight="420"
-        WindowStartupLocation="CenterScreen"
-        Closing="UiWindow_Closing"
-        Loaded="MainWindowLoaded">
+        WindowStartupLocation="CenterScreen">
     <!-- <ui:TitleBar.Header> -->
     <!--     <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal"> -->
     <!--         <Button Appearance="Transparent" Margin="0,0,9,0" Command="{Binding ViewModel.NavigateCommand}" -->
@@ -34,35 +32,24 @@
     <!--     </StackPanel> -->
     <!-- </ui:TitleBar.Header> -->
     
-    <Grid ColumnDefinitions="448*, 39*, 13*, 40*"
-          RowDefinitions="Auto, *">
-        <Grid x:Name="RootMainGrid"
-              Grid.Row="1"
-              Grid.Column="0"
-              Grid.ColumnSpan="4"
-              ColumnDefinitions="Auto,*">
+    <Grid x:Name="RootMainGrid"
+          ColumnDefinitions="Auto, *">
 
-            <ui:NavigationView AlwaysShowHeader="False"
-                               PaneDisplayMode="Left"
-                               Grid.RowSpan="2"
-                               Name="NavView"
-                               IsSettingsVisible="False"
-                               IsBackEnabled="{Binding #FrameView.CanGoBack}"/>
-            <!--  We display our pages inside this element.  -->
-            <Border Grid.Column="1"
-                    Background="{DynamicResource ControlFillColorDefaultBrush}"
-                    CornerRadius="8,0,0,0">
-                <Grid RowDefinitions="Auto,*">
-                    <ui:Frame Name="FrameView" />
-                    <!--<ui:Breadcrumb
-                        Grid.Row="0"
-                        Margin="56,36"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        FontSize="28"
-                        Navigation="{Binding ElementName=RootNavigation, Mode=OneWay}" />-->
-                </Grid>
-            </Border>
-        </Grid>
+        <ui:NavigationView Grid.Column="0"
+                           AlwaysShowHeader="False"
+                           PaneDisplayMode="Left"
+                           Name="NavView"
+                           IsSettingsVisible="False"
+                           IsPaneToggleButtonVisible="False"
+                           IsPaneOpen="False"
+                           IsBackEnabled="False">
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem Content="asdf"/>
+                <ui:NavigationViewItem Content="video"/>
+            </ui:NavigationView.MenuItems>
+        </ui:NavigationView>
+        <!--  We display our pages inside this element.  -->
+        <ui:Frame Grid.Column="1"
+                  Name="FrameView" />
     </Grid>
 </Window>

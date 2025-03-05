@@ -158,7 +158,8 @@ public class WindowsAsusWmiService : IASUSWmiService
 
         if (_handle == new IntPtr(-1))
         {
-            throw new Exception("Can't connect to ACPI");
+            // todo: refactor
+            //throw new Exception("Can't connect to ACPI");
         }
         
         _eventWatcher = new ManagementEventWatcher("root\\wmi", "SELECT * FROM AsusAtkWmiEvent");

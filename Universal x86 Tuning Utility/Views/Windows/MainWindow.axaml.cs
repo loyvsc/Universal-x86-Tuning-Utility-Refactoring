@@ -2,6 +2,9 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using FluentAvalonia.UI.Controls;
+using FluentAvalonia.UI.Media.Animation;
+using Universal_x86_Tuning_Utility.Navigation;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.ViewModels;
 
@@ -13,10 +16,12 @@ public partial class MainWindow : Window, IDisposable
     {
         InitializeComponent();
         
+        Closing += UiWindow_Closing;
+        Loaded += MainWindowLoaded;
         PropertyChanged += OnPropertyChanged;
     }
     
-    private void UiWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void UiWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
         if (Settings.Default.MinimizeClose)
         {
@@ -42,16 +47,30 @@ public partial class MainWindow : Window, IDisposable
             }
         }
     }
+    
+    public void OnNavigationViewItemInvoked(object sender, NavigationViewItemInvokedEventArgs e)
+    {
+        // Change the current selected item back to normal
+        // SetNVIIcon(sender as NavigationViewItem, false);
+
+        if (e.InvokedItemContainer is NavigationViewItem nvi)
+        {
+            NavigationService.Instance.NavigateFromContext(nvi.Tag);
+        }
+    }
 
     private void MainWindowLoaded(object? sender, RoutedEventArgs e)
     {
-        if (Settings.Default.StartMini)
+        NavigationService.Instance.SetFrame(FrameView);
+        if (DataContext is MainWindowViewModel viewModel)
         {
-            WindowState = WindowState.Minimized;
-        }
-        else
-        {
-            if (DataContext is MainWindowViewModel viewModel)
+            FrameView.NavigationPageFactory = viewModel.NavigationPageFactory;
+            NavigationService.Instance.NavigateFromContext(viewModel.NavigationItems[0]);
+            if (Settings.Default.StartMini)
+            {
+                WindowState = WindowState.Minimized;
+            }
+            else
             {
                 var manufacturer = viewModel.ProductManufacturer.ToUpper();
                 if (manufacturer.Contains("AYANEO") ||

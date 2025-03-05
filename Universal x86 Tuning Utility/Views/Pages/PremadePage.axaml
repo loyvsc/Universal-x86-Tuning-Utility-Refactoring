@@ -35,7 +35,7 @@
                             <DataTemplate DataType="models:PremadePreset">
                                 <ToggleButton Width="155"
                                               Margin="4.5,0"
-                                              Command="{Binding DataContext.ApplyPresetCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}">
+                                              Command="{Binding $parent.((viewModels:PremadePresetsViewModel)DataContext).ApplyPresetCommand}">
                                     <StackPanel Orientation="Horizontal">
                                         <controls:SymbolIcon Symbol="{ic:FluentIcon LeafTwo20Regular}"
                                                              Margin="0,0,9,0"
@@ -51,7 +51,7 @@
                 </UniformGrid>
             </NotificationCard>
             <UniformGrid Columns="2">
-                <Image Source="pack://application:,,,/Assets/config.png"
+                <Image Source="/Assets/config.png"
                        MaxWidth="500"
                        MaxHeight="500"
                        Stretch="Uniform" />
@@ -67,9 +67,8 @@
                                        Text="{Binding CurrentPreset.Name, UpdateSourceTrigger=PropertyChanged}" />
                             <controls:InfoBadge Margin="0,9,0,0"
                                                 Width="150"
-                                                HorizontalAlignment="Left"
-                                                Value="Device Certified Preset" />
-                            <!-- todo: infobadge not displays text !-->
+                                                HorizontalAlignment="Left"/>
+                            <!-- todo: infobadge not displays text ! Value="Device Certified Preset"-->
                             <TextBlock FontSize="14.5"
                                        Margin="0,9,0,0"
                                        TextWrapping="Wrap"

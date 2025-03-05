@@ -41,7 +41,7 @@ public class PremadePresets : IPremadePresets
                     _systemInfoService.Manufacturer.ToLower().Contains("framework"))
                 {
                     PrematePresetType = PrematePresetType.Laptop16;
-                    // uri = new Uri("pack://application:,,,/Assets/Laptops/Framework/framework-laptop-16.png");
+                    // uri = new Uri("/Assets/Laptops/Framework/framework-laptop-16.png");
                     bool has7700S = _systemInfoService.IsGPUPresent("AMD Radeon(TM) RX 7700S");
 
                     ecoPresetParameters
@@ -95,7 +95,7 @@ public class PremadePresets : IPremadePresets
                 else if (product.Contains("laptop 13 (amd ryzen 7040") &&
                          _systemInfoService.Manufacturer.ToLower().Contains("framework"))
                 {
-                    // uri = new Uri("pack://application:,,,/Assets/Laptops/Framework/framework-laptop-13.png");
+                    // uri = new Uri("/Assets/Laptops/Framework/framework-laptop-13.png");
 
                     ecoPresetParameters
                         .WithTctlTemp(100)
@@ -243,7 +243,7 @@ public class PremadePresets : IPremadePresets
                         }
                         else if (cpuName.Contains("GE"))
                         {
-                            // uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
+                            // uri = new Uri("/Assets/config-DT-AM4.png");
                             PrematePresetType = PrematePresetType.AM4;
                             ecoPresetParameters
                                 .WithTctlTemp(95)
@@ -291,7 +291,7 @@ public class PremadePresets : IPremadePresets
                         }
                         else if (cpuName.Contains("G"))
                         {
-                            // uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
+                            // uri = new Uri("/Assets/config-DT-AM4.png");
                             PrematePresetType = PrematePresetType.AM4;
                             ecoPresetParameters
                                 .WithTctlTemp(95)
@@ -527,7 +527,7 @@ public class PremadePresets : IPremadePresets
                         }
                         else if (cpuName.Contains("GE"))
                         {
-                            // uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
+                            // uri = new Uri("/Assets/config-DT-AM4.png");
                             PrematePresetType = PrematePresetType.AM4;
                             ecoPresetParameters
                                 .WithTctlTemp(95)
@@ -575,7 +575,7 @@ public class PremadePresets : IPremadePresets
                         }
                         else if (cpuName.Contains("G"))
                         {
-                            // uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
+                            // uri = new Uri("/Assets/config-DT-AM4.png");
                             PrematePresetType = PrematePresetType.AM4;
                             ecoPresetParameters
                                 .WithTctlTemp(95)
@@ -679,7 +679,7 @@ public class PremadePresets : IPremadePresets
             {
                 var cpuNameParts = cpuName.Split(" ");
 
-                // uri = new Uri("pack://application:,,,/Assets/config-DT-AM4.png");
+                // uri = new Uri("/Assets/config-DT-AM4.png");
                 PrematePresetType = PrematePresetType.AM4;
                 
                 cpuName = cpuNameParts[3];
@@ -818,7 +818,7 @@ public class PremadePresets : IPremadePresets
                 }
                 else
                 {
-                    // uri = new Uri("pack://application:,,,/Assets/config-DT-AM5.png");
+                    // uri = new Uri("/Assets/config-DT-AM5.png");
                     PrematePresetType = PrematePresetType.AM5;
                     
                     if (cpuName.Contains('E'))

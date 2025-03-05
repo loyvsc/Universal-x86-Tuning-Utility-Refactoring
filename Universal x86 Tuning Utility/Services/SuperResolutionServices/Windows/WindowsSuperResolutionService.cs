@@ -35,7 +35,9 @@ public class WindowsSuperResolutionService
 
     private IntPtr _handle;
     // private IntPtr _prevSrcWindow = IntPtr.Zero; 
-    
+
+    #region PInvoke declarations
+
     private const uint SWP_SHOWWINDOW = 0x0040;
     // private const int SPI_GETWORKAREA = 48;
     // private const int SM_CYBORDER = 6;
@@ -77,6 +79,8 @@ public class WindowsSuperResolutionService
         public int Right;
         public int Bottom;
     }
+
+    #endregion
 
     private void ToggleMagWindow()
     {
@@ -208,7 +212,7 @@ public class WindowsSuperResolutionService
     {
         _handle = TopLevel.GetTopLevel(main)!.TryGetPlatformHandle()!.Handle;
 
-        MagWindow = new MagWindow(main);
+        MagWindow = new MagWindow(_handle);
 
         OnHotkeyChanged();
     }
@@ -235,6 +239,6 @@ public class WindowsSuperResolutionService
 
     public void Dispose()
     {
-        MagWindow.Dispose();
+        MagWindow?.Dispose();
     }
 }

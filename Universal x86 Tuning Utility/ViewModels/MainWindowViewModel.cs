@@ -12,11 +12,13 @@ using ApplicationCore.Models;
 using ApplicationCore.Utilities;
 using Avalonia.Threading;
 using DesktopNotifications;
+using FluentAvalonia.FluentIcons;
 using FluentAvalonia.UI.Controls;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using RTSSSharedMemoryNET;
 using Universal_x86_Tuning_Utility.Extensions;
+using Universal_x86_Tuning_Utility.Navigation;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.Services.PresetServices;
 using Universal_x86_Tuning_Utility.Services.RyzenAdj;
@@ -40,7 +42,8 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
     private readonly IGameDataService _gameDataService;
     private string _lastAppliedState = "";
 
-    public ObservableCollection<NavigationViewItemBase> NavigationItems { get; set; }
+    public ObservableCollection<NavigationViewModel> NavigationItems { get; set; }
+    public INavigationPageFactory NavigationPageFactory { get; set; }
 
     public string Title
     {
@@ -91,6 +94,8 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
         InitializeViewModel();
 
         Title = $"Universal x86 Tuning Utility - {_systemInfoService.Cpu.Name}";
+
+        NavigationPageFactory = new NavigationFactory(this);
 
         NavigateCommand = ReactiveCommand.Create<string>(tag => OnNavigate(tag));
     }
@@ -253,72 +258,74 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
 
     private void InitializeViewModel()
     {
-        NavigationItems = new ObservableCollection<NavigationViewItemBase>
+        NavigationItems = new ObservableCollection<NavigationViewModel>
         {
-            new NavigationViewItemBase()
+            new NavigationViewModel()
             {
-                Content = "Home",
-                Tag = "dashboard",
-                Icon = SymbolRegular.Home20,
-                PageType = typeof(Views.Pages.DashboardPage)
+                Title = "Home",
+                //Tag = "dashboard",    
+                IconSymbol = FluentIconSymbol.Home20Regular,
+                ViewModelType = typeof(DashboardViewModel)
             },
-            new NavigationViewItem()
-            {
-                Content = "Premade",
-                Tag = "premade",
-                Icon = SymbolRegular.Predictions20,
-                PageType = typeof(Views.Pages.PremadePage),
-                IsVisible = _systemInfoService.Cpu.Manufacturer == Manufacturer.AMD
-            },
-            new NavigationViewItemBase()
-            {
-                Content = "Custom",
-                Tag = "custom",
-                Icon = SymbolRegular.Book20,
-                PageType = typeof(Views.Pages.CustomPresetsPage)
-            },
-            new NavigationViewItemBase()
-            {
-                Content = "Adaptive",
-                Tag = "adaptive",
-                Icon = SymbolRegular.Radar20,
-                PageType = typeof(Views.Pages.AdaptivePage)
-            },
-            new NavigationViewItemBase()
-            {
-                Content = "Games",
-                Tag = "games",
-                Icon = SymbolRegular.Games20,
-                PageType = typeof(Views.Pages.GamesPage)
-            },
-            new NavigationViewItemBase()
-            {
-                Content = "Auto",
-                Tag = "auto",
-                Icon = SymbolRegular.Transmission20,
-                PageType = typeof(Views.Pages.AutomationsPage)
-            },
-            //new NavigationViewItemBase()
-            //{
-            //    Content = "Fan",
-            //    Tag = "fan",
-            //    Icon = SymbolRegular.WeatherDuststorm20,
-            //    PageType = typeof(Views.Pages.FanControl)
-            //},
+            // new NavigationViewItem()
+            // {
+            //     Content = "Premade",
+            //     Tag = "premade",
+            //     Icon = SymbolRegular.Predictions20,
+            //     PageType = typeof(Views.Pages.PremadePage),
+            //     IsVisible = _systemInfoService.Cpu.Manufacturer == Manufacturer.AMD
+            // },
             // new NavigationViewItemBase()
-            //{
-            //    Content = "Magpie",
-            //    Tag = "magpie",
-            //    Icon = SymbolRegular.FullScreenMaximize20,
-            //    PageType = typeof(Views.Pages.DataPage)
-            //},
-            new NavigationViewItemBase()
-            {
-                Content = "Info",
-                Tag = "info",
-                Icon = SymbolRegular.Info20,
-                PageType = typeof(Views.Pages.SystemInfoPage)
-            }
+            // {
+            //     Content = "Custom",
+            //     Tag = "custom",
+            //     Icon = SymbolRegular.Book20,
+            //     PageType = typeof(Views.Pages.CustomPresetsPage)
+            // },
+            // new NavigationViewItemBase()
+            // {
+            //     Content = "Adaptive",
+            //     Tag = "adaptive",
+            //     Icon = SymbolRegular.Radar20,
+            //     PageType = typeof(Views.Pages.AdaptivePage)
+            // },
+            // new NavigationViewItemBase()
+            // {
+            //     Content = "Games",
+            //     Tag = "games",
+            //     Icon = SymbolRegular.Games20,
+            //     PageType = typeof(Views.Pages.GamesPage)
+            // },
+            // new NavigationViewItemBase()
+            // {
+            //     Content = "Auto",
+            //     Tag = "auto",
+            //     Icon = SymbolRegular.Transmission20,
+            //     PageType = typeof(Views.Pages.AutomationsPage)
+            // },
+            // // todo: remove this todos later
+            // //new NavigationViewItemBase()
+            // //{
+            // //    Content = "Fan",
+            // //    Tag = "fan",
+            // //    Icon = SymbolRegular.WeatherDuststorm20,
+            // //    PageType = typeof(Views.Pages.FanControl)
+            // //},
+            // // todo: remove later
+            // // new NavigationViewItemBase()
+            // //{
+            // //    Content = "Magpie",
+            // //    Tag = "magpie",
+            // //    Icon = SymbolRegular.FullScreenMaximize20,
+            // //    PageType = typeof(Views.Pages.DataPage)
+            // //},
+            // new NavigationViewItemBase()
+            // {
+            //     Content = "Info",
+            //     Tag = "info",
+            //     Icon = SymbolRegular.Info20,
+            //     PageType = typeof(Views.Pages.SystemInfoPage)
+            // }
         };
 
         // NavigationFooter = new ObservableCollection<INavigationControl>
