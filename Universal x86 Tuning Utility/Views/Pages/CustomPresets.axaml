@@ -2170,13 +2170,24 @@
                                 <TextBlock FontSize="12"
                                            Text="Provides the ability to set a custom supported display refresh rate. May not work for everyone!" />
                             </StackPanel>
-                            <ComboBox Grid.Column="1"
-                                      ItemsSource="{Binding RefreshRates, UpdateSourceTrigger=PropertyChanged}"
-                                      SelectedValue="{Binding SelectedPreset.DisplayHz, UpdateSourceTrigger=PropertyChanged}"
-                                      VerticalAlignment="Center"
-                                      SelectedIndex="0"
-                                      MinWidth="164"
-                                      Height="37" />
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                <ComboBox ItemsSource="{Binding AvailableDisplays, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedValue="{Binding SelectedDisplay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMemberBinding="{Binding Name}"
+                                          IsVisible="{Binding !!AvailableDisplays.Count}"
+                                          VerticalAlignment="Center"
+                                          SelectedIndex="0"
+                                          MinWidth="164"
+                                          Height="37" />
+                                <ComboBox ItemsSource="{Binding SelectedDisplay.SupportedRefreshRates, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedValue="{Binding SelectedPreset.DisplayHz, UpdateSourceTrigger=PropertyChanged}"
+                                          VerticalAlignment="Center"
+                                          SelectedIndex="0"
+                                          MinWidth="164"
+                                          Height="37" />
+                            </StackPanel>
                         </Grid>
                     </controls:CardControl>
 

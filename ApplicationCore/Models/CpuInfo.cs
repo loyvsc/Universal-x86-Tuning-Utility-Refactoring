@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using ApplicationCore.Enums;
-using ApplicationCore.Utilities;
 
 namespace ApplicationCore.Models;
 
@@ -18,8 +17,10 @@ public class CpuInfo
     
     public int CoresCount { get; set; }
     public int LogicalCoresCount { get; set; }
+    
+    public string? BigLITTLEInfo { get; set; }
 
-    public string BaseClock { get; set; }
+    public int BaseClock { get; set; }
     
     public ProcessorType ProcessorType { get; set; } = ProcessorType.Unknown;
     
@@ -27,8 +28,9 @@ public class CpuInfo
     public double L2Size { get; set; }
     public double L3Size { get; set; }
 
-    public ReadOnlyCollection<string> SupportedInstructions { get; set; } = new(Array.Empty<string>());
+    public IReadOnlyCollection<string> SupportedInstructions { get; set; } = ReadOnlyCollection<string>.Empty;
     
     public RyzenFamily RyzenFamily { get; set; } = RyzenFamily.Unknown;
     public RyzenGenerations RyzenGeneration { get; set; } = RyzenGenerations.Unknown;
+    public RyzenSeries RyzenSeries { get; set; } = RyzenSeries.Unknown;
 }

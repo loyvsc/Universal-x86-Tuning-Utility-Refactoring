@@ -106,12 +106,12 @@ namespace Universal_x86_Tuning_Utility.Services.SuperResolutionServices.Windows
             int len = GetWindowTextLength(hWnd);
             if (len <= 0)
             {
-                return "";
+                return string.Empty;
             }
 
             StringBuilder sb = new(len + 1);
             len = GetWindowText(hWnd, sb, sb.Capacity);
-            return len > 0 ? sb.ToString() : "";
+            return len > 0 ? sb.ToString() : string.Empty;
         }
 
         private static readonly int LOCALE_NAME_MAX_LENGTH = 85;

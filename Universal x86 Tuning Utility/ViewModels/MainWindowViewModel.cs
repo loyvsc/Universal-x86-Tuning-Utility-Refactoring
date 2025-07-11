@@ -31,6 +31,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels;
 public class MainWindowViewModel : NotifyPropertyChangedBase
 {
     private readonly ISystemInfoService _systemInfoService;
+    private readonly IBatteryInfoService _batteryInfoService;
     private readonly INotificationManager _toastNotificationManager;
     private readonly IRyzenAdjService _ryzenAdjService;
     private readonly IRtssService _rtssService;
@@ -59,10 +60,11 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
 
     private string _title;
     private bool _firstRun = true;
-    private List<GameLauncherItem> _gamesList;
+    private IReadOnlyCollection<GameLauncherItem> _gamesList;
 
     public MainWindowViewModel(ILogger<MainWindowViewModel> logger,
         ISystemInfoService systemInfoService,
+        IBatteryInfoService batteryInfoService,
         INotificationManager toastNotificationManager,
         IRyzenAdjService ryzenAdjService,
         IRtssService rtssService,
@@ -74,6 +76,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
         IGameDataService gameDataService)
     {
         _systemInfoService = systemInfoService;
+        _batteryInfoService = batteryInfoService;
         _toastNotificationManager = toastNotificationManager;
         _ryzenAdjService = ryzenAdjService;
         _rtssService = rtssService;
@@ -85,7 +88,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
         _gameDataService = gameDataService;
         _powerPlanService.PowerModeChanged += OnPowerModeChange;
 
-        ProductManufacturer = _systemInfoService.Manufacturer;
+        ProductManufacturer = _systemInfoService.Manufacturer.Value;
 
         _miscTimer = CreateTimer(1, (s, e) => HandleMiscellaneousTasks(s, e));
         _autoReapplyTimer = CreateTimer(Settings.Default.AutoReapplyTime, (s, e) => AutoReapplySettings(s, e));
@@ -95,7 +98,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
 
         Title = $"Universal x86 Tuning Utility - {_systemInfoService.Cpu.Name}";
 
-        NavigationPageFactory = new NavigationFactory(this);
+        NavigationPageFactory = new NavigationFactory();
 
         NavigateCommand = ReactiveCommand.Create<string>(tag => OnNavigate(tag));
     }
@@ -106,7 +109,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
         {
             if (e.BatteryStatus == BatteryStatus.Charging)
             {
-                var batteryStatus = _systemInfoService.GetBatteryStatus();
+                var batteryStatus = _batteryInfoService.GetBatteryStatus();
 
                 if (batteryStatus == BatteryStatus.Charging)
                 {
@@ -236,7 +239,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
     {
         if (!Settings.Default.ApplyOnStart || string.IsNullOrWhiteSpace(Settings.Default.CommandString)) return;
 
-        var statusCode = _systemInfoService.GetBatteryStatus();
+        var statusCode = _batteryInfoService.GetBatteryStatus();
 
         var isCharging = statusCode == BatteryStatus.Charging;
         var commandString = isCharging ? Settings.Default.acCommandString : Settings.Default.dcCommandString;

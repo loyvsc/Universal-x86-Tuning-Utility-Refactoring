@@ -8,9 +8,9 @@ using ApplicationCore.Models;
 
 [assembly: CLSCompliant(false)]
 
-namespace Universal_x86_Tuning_Utility.Services.Amd;
+namespace Universal_x86_Tuning_Utility.Services.Amd.Windows;
 
-static class Addresses
+public static class Addresses
 {
     private static CpuInfo _cpuInfo;
     
@@ -78,7 +78,7 @@ static class Addresses
             }
         }
 
-        SMUCommands.RyzenAccess.Initialize();
+        WindowsSMUCommands.RyzenAccess.Initialize();
     }
 
     private static void Socket_FT5_FP5_AM4()
@@ -91,7 +91,7 @@ static class Addresses
         Smu.PSMU_ADDR_RSP = 0x03B10A80;
         Smu.PSMU_ADDR_ARG = 0x03B10A88;
 
-        SMUCommands.Commands = new List<(string, bool, uint)>
+        WindowsSMUCommands.Commands = new List<(string, bool, uint)>
         {
             // Store the commands
             ("stapm-limit",true, 0x1a), // Use MP1 address
@@ -139,7 +139,7 @@ static class Addresses
         Smu.PSMU_ADDR_RSP = 0x03B10A80;
         Smu.PSMU_ADDR_ARG = 0x03B10A88;
 
-        SMUCommands.Commands = new List<(string, bool, uint)>
+        WindowsSMUCommands.Commands = new List<(string, bool, uint)>
         {
             // Store the commands
             ("stapm-limit",true , 0x14), // Use MP1 address
@@ -180,30 +180,30 @@ static class Addresses
         };
     }
 
-        private static void Socket_FT6_FP7_FP8()
+    private static void Socket_FT6_FP7_FP8()
+    {
+        if(_cpuInfo.RyzenFamily == RyzenFamily.StrixPoint || _cpuInfo.RyzenFamily == Family.RyzenFamily.KrackanPoint || _cpuInfo.RyzenFamily == Family.RyzenFamily.KrackanPoint2 || _cpuInfo.RyzenFamily == Family.RyzenFamily.StrixHalo)
         {
-            if(Family.FAM == Family.RyzenFamily.StrixPoint || Family.FAM == Family.RyzenFamily.KrackanPoint || Family.FAM == Family.RyzenFamily.KrackanPoint2 || Family.FAM == Family.RyzenFamily.StrixHalo)
-            {
-                Smu.MP1_ADDR_MSG = 0x3b10928;
-                Smu.MP1_ADDR_RSP = 0x3b10978;
-                Smu.MP1_ADDR_ARG = 0x3b10998;
+            Smu.MP1_ADDR_MSG = 0x3b10928;
+            Smu.MP1_ADDR_RSP = 0x3b10978;
+            Smu.MP1_ADDR_ARG = 0x3b10998;
 
-                Smu.PSMU_ADDR_MSG = 0x03B10a20;
-                Smu.PSMU_ADDR_RSP = 0x03B10a80;
-                Smu.PSMU_ADDR_ARG = 0x03B10a88;
-            }
-            else 
-            {
-                Smu.MP1_ADDR_MSG = 0x3B10528;
-                Smu.MP1_ADDR_RSP = 0x3B10578;
-                Smu.MP1_ADDR_ARG = 0x3B10998;
+            Smu.PSMU_ADDR_MSG = 0x03B10a20;
+            Smu.PSMU_ADDR_RSP = 0x03B10a80;
+            Smu.PSMU_ADDR_ARG = 0x03B10a88;
+        }
+        else 
+        {
+            Smu.MP1_ADDR_MSG = 0x3B10528;
+            Smu.MP1_ADDR_RSP = 0x3B10578;
+            Smu.MP1_ADDR_ARG = 0x3B10998;
 
-                Smu.PSMU_ADDR_MSG = 0x03B10a20;
-                Smu.PSMU_ADDR_RSP = 0x03B10a80;
-                Smu.PSMU_ADDR_ARG = 0x03B10a88;
-            }
+            Smu.PSMU_ADDR_MSG = 0x03B10a20;
+            Smu.PSMU_ADDR_RSP = 0x03B10a80;
+            Smu.PSMU_ADDR_ARG = 0x03B10a88;
+        }
 
-        SMUCommands.Commands = new List<(string, bool, uint)>
+        WindowsSMUCommands.Commands = new List<(string, bool, uint)>
         {
             // Store the commands
             ("stapm-limit", true, 0x14), // Use MP1 address
@@ -248,34 +248,34 @@ static class Addresses
         Smu.PSMU_ADDR_RSP = 0x03B10a80;
         Smu.PSMU_ADDR_ARG = 0x03B10a88;
 
-            SMUCommands.Commands = new List<(string, bool, uint)>
-            {
-                // Store the commands
-                ("stapm-limit",true, 0x14), // Use MP1 address
-                //("stapm-limit",false , 0x31), // Use RSMU address
-                ("stapm-time",true , 0x18),
-                ("fast-limit",true , 0x15),
-                ("slow-limit",true , 0x16),
-                ("slow-time",true , 0x17),
-                ("tctl-temp",true , 0x19),
-                ("cHTC-temp",false , 0x37),
-                ("apu-skin-temp",true , 0x33),
-                ("vrm-current",true , 0x1a),
-                ("vrmmax-current",true , 0x1c),
-                ("vrmsoc-current",true , 0x1b),
-                ("vrmsocmax-current",true , 0x1d),
-                ("vrmgfx-current",true , 0x1e),
-                ("vrmgfxmax-current",true , 0x1f),
-                ("prochot-deassertion-ramp",true , 0x22),
-                ("gfx-clk",false , 0x89),
-                ("power-saving",true , 0x12),
-                ("max-performance",true , 0x11),
-                ("set-coall",true , 0x4c),
-                ("set-coall",false , 0x5d),
-                ("set-coper",true , 0x4b),
-                ("set-cogfx",false , 0xb7)
-            };
-        }
+        WindowsSMUCommands.Commands = new List<(string, bool, uint)>
+        {
+            // Store the commands
+            ("stapm-limit",true, 0x14), // Use MP1 address
+            //("stapm-limit",false , 0x31), // Use RSMU address
+            ("stapm-time",true , 0x18),
+            ("fast-limit",true , 0x15),
+            ("slow-limit",true , 0x16),
+            ("slow-time",true , 0x17),
+            ("tctl-temp",true , 0x19),
+            ("cHTC-temp",false , 0x37),
+            ("apu-skin-temp",true , 0x33),
+            ("vrm-current",true , 0x1a),
+            ("vrmmax-current",true , 0x1c),
+            ("vrmsoc-current",true , 0x1b),
+            ("vrmsocmax-current",true , 0x1d),
+            ("vrmgfx-current",true , 0x1e),
+            ("vrmgfxmax-current",true , 0x1f),
+            ("prochot-deassertion-ramp",true , 0x22),
+            ("gfx-clk",false , 0x89),
+            ("power-saving",true , 0x12),
+            ("max-performance",true , 0x11),
+            ("set-coall",true , 0x4c),
+            ("set-coall",false , 0x5d),
+            ("set-coper",true , 0x4b),
+            ("set-cogfx",false , 0xb7)
+        };
+    }
 
     private static void Socket_AM4_V1()
     {
@@ -287,7 +287,7 @@ static class Addresses
         Smu.PSMU_ADDR_RSP = 0X03B10568;
         Smu.PSMU_ADDR_ARG = 0X03B10590;
 
-        SMUCommands.Commands = new List<(string, bool, uint)>
+        WindowsSMUCommands.Commands = new List<(string, bool, uint)>
         {
             // Store the commands
             ("ppt-limit",false, 0x64), // Use RSMU address
@@ -314,7 +314,7 @@ static class Addresses
         Smu.PSMU_ADDR_RSP = 0x03B10570;
         Smu.PSMU_ADDR_ARG = 0x03B10A40;
 
-        SMUCommands.Commands = new List<(string, bool, uint)>
+        WindowsSMUCommands.Commands = new List<(string, bool, uint)>
         {
             // Store the commands
             ("ppt-limit",true, 0x3D), // Use MP1 address
@@ -352,7 +352,7 @@ static class Addresses
         Smu.PSMU_ADDR_RSP = 0x03B10570;
         Smu.PSMU_ADDR_ARG = 0x03B10A40;
 
-        SMUCommands.Commands = new List<(string, bool, uint)>
+        WindowsSMUCommands.Commands = new List<(string, bool, uint)>
         {
             // Store the commands
             ("stapm-limit",true, 0x4f),
@@ -378,15 +378,15 @@ static class Addresses
             ("set-coper", false, 0x6),
             ("enable-oc",false , 0x5d),
             ("disable-oc",false , 0x5e),
-            };
-        }
+        };
     }
+}
 
-static class SMUCommands
+public static class WindowsSMUCommands
 {
     public static List<(string, bool, uint)> Commands;
 
-    public static Smu RyzenAccess = new Smu();
+    internal static Smu RyzenAccess = new Smu();
 
     public static void ApplySettings(string commandName, uint value)
     {
@@ -410,7 +410,7 @@ static class SMUCommands
     }
 }
 
-class Smu
+internal class Smu
 {
     public enum Status
     {

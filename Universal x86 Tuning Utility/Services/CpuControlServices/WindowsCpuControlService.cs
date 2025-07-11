@@ -12,8 +12,8 @@ public class WindowsCpuControlService : ICpuControlService
     /// </summary>
     public int CurrentPowerLimit { get; private set; }
     
-    public string CpuCommand { get; private set; } = "";
-    public string CoCommand { get; private set; } = "";
+    public string CpuCommand { get; private set; } = string.Empty;
+    public string CoCommand { get; private set; } = string.Empty;
     
     private const int MinCurveOptimiserValue = 0; // CO
     private const int PowerLimitIncrement = 2; // watts
@@ -73,7 +73,7 @@ public class WindowsCpuControlService : ICpuControlService
                                 $"--tctl-temp={maxTemperature} --cHTC-temp={maxTemperature} --apu-skin-temp={maxTemperature} --stapm-limit={tdp}  --fast-limit={tdp} --stapm-time=64 --slow-limit={tdp} --slow-time=128 --vrm-current=300000 --vrmmax-current=300000 --vrmsoc-current=300000 --vrmsocmax-current=300000 ";
                             // Save new TDP to avoid unnecessary reapplies
                             _lastPowerLimit = _newPowerLimit;
-                            _amdApuControlService.CurrentPowerLimit = _newPowerLimit;
+                            _amdApuControlService.PowerLimit = _newPowerLimit;
                         }
                     }
                     else if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop)
@@ -95,6 +95,8 @@ public class WindowsCpuControlService : ICpuControlService
                 }
                 default: throw new ArgumentOutOfRangeException(nameof(_systemInfoService.Cpu.Manufacturer), _systemInfoService.Cpu.Manufacturer, "Unsupported cpu");
             }
+
+            CurrentPowerLimit = _newPowerLimit;
         }
     }
 

@@ -5,15 +5,15 @@ namespace Universal_x86_Tuning_Utility.Services.StressTestServices;
 
 public class WindowsStressTestService : IStressTestService
 {
-    private readonly string _executablePath = @".\Assets\Stress-Test\AVX2 Stress Test.exe";
+    private const string ExecutablePath = @".\Assets\Stress-Test\AVX2 Stress Test.exe";
     
     public void Start()
     {
-        if (File.Exists(_executablePath))
+        if (File.Exists(ExecutablePath))
         {
             using (var process = new Process())
             {
-                process.StartInfo.FileName = _executablePath;
+                process.StartInfo.FileName = ExecutablePath;
                 process.Start();
             }
         }

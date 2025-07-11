@@ -10,5 +10,5 @@ public interface INvidiaGpuService
 
     public int MaxGpuClock { get; set; }
     
-    public ReadOnlyCollection<CheckIsGpuOriginalResult> CheckIsGpusOriginal(); 
+    public IReadOnlyCollection<CheckIsGpuOriginalResult> CheckIsGpusOriginal(); 
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
+using ApplicationCore.Models.LaptopInfo;
 
 namespace Universal_x86_Tuning_Utility.Services.PresetServices;
 
@@ -35,14 +37,13 @@ public class PremadePresets : IPremadePresets
 
             if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Apu)
             {
-                var product = _systemInfoService.Product.ToLower();
+                var product = _systemInfoService.LaptopInfo;
 
-                if (product.Contains("laptop 16 (amd ryzen 7040") &&
-                    _systemInfoService.Manufacturer.ToLower().Contains("framework"))
+                if (product is FrameworkLaptopInfo { LaptopSeries: 16, CpuSeries: "7040"})
                 {
                     PrematePresetType = PrematePresetType.Laptop16;
                     // uri = new Uri("/Assets/Laptops/Framework/framework-laptop-16.png");
-                    bool has7700S = _systemInfoService.IsGPUPresent("AMD Radeon(TM) RX 7700S");
+                    bool has7700S = _systemInfoService.Gpus.Count(x => x.Name.Contains("RX 7700S")) != 0;
 
                     ecoPresetParameters
                         .WithTctlTemp(100)
@@ -92,8 +93,7 @@ public class PremadePresets : IPremadePresets
                         .WithVrmSoc(has7700S ? 200000 : 180000, has7700S ? 200000 : 180000)
                         .WithVrmGfx(has7700S ? 200000 : 180000);
                 }
-                else if (product.Contains("laptop 13 (amd ryzen 7040") &&
-                         _systemInfoService.Manufacturer.ToLower().Contains("framework"))
+                else if (product is FrameworkLaptopInfo { LaptopSeries: 13, CpuSeries: "7040"})
                 {
                     // uri = new Uri("/Assets/Laptops/Framework/framework-laptop-13.png");
 

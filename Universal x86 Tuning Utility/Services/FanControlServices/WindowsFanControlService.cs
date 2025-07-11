@@ -3,7 +3,7 @@ using System.IO;
 using System.Text.Json;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using Universal_x86_Tuning_Utility.Services.Amd;
+using Universal_x86_Tuning_Utility.Services.Amd.Windows;
 
 namespace Universal_x86_Tuning_Utility.Services.FanControlServices;
 
@@ -37,7 +37,7 @@ public class WindowsFanControlService : IFanControlService
 
     public void UpdateAddresses()
     {
-        string path = $@"\Fan Configs\{_systemInfoService.Manufacturer.ToUpper()}_{_systemInfoService.Product.ToUpper()}.json";
+        string path = $@"\Fan Configs\{_systemInfoService.Manufacturer.Value.ToUpper()}_{_systemInfoService.Product.Value.ToUpper()}.json";
 
         if (File.Exists(path))
         {

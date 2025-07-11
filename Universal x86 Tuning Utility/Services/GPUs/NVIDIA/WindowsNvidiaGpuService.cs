@@ -148,7 +148,7 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
         cmd.WaitForExit();
     }
 
-    public ReadOnlyCollection<CheckIsGpuOriginalResult> CheckIsGpusOriginal()
+    public IReadOnlyCollection<CheckIsGpuOriginalResult> CheckIsGpusOriginal()
     {
         var gpus = PhysicalGPU.GetPhysicalGPUs();
         

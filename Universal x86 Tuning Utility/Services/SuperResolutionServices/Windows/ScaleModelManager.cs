@@ -54,7 +54,7 @@ internal class ScaleModelManager
 
     private void LoadFromLocal()
     {
-        string json = "";
+        string json = string.Empty;
         if (File.Exists(ScaleModelsPath))
         {
             try
@@ -134,8 +134,8 @@ internal class ScaleModelManager
 
     public class ScaleModel
     {
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
-        public string Effects { get; set; } = "";
+        public string Effects { get; set; } = string.Empty;
     }
 }

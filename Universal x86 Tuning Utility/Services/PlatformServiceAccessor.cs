@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -10,7 +9,7 @@ using Universal_x86_Tuning_Utility.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.Services;
 
-public class DefaultPlatformServiceAccessor : IPlatformServiceAccessor
+public class PlatformServiceAccessor : IPlatformServiceAccessor
 {
     public IClipboard Clipboard => _desktop.MainWindow!.Clipboard!;
     public Screen? PrimaryScreen => _desktop.MainWindow!.Screens.Primary;
@@ -20,7 +19,7 @@ public class DefaultPlatformServiceAccessor : IPlatformServiceAccessor
 
     private readonly IClassicDesktopStyleApplicationLifetime _desktop;
 
-    public DefaultPlatformServiceAccessor(IClassicDesktopStyleApplicationLifetime desktop)
+    public PlatformServiceAccessor(IClassicDesktopStyleApplicationLifetime desktop)
     {
         _desktop = desktop;
         

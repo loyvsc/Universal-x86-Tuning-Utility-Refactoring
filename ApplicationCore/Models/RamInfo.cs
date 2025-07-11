@@ -11,5 +11,5 @@ public class RamInfo
     public double Speed { get; set; }
     public MemoryTimings Timings { get; set; }
     
-    public RamModule[] Modules { get; set; }
+    public ICollection<RamModule> Modules { get; set; }
 }

@@ -8,9 +8,9 @@ namespace Universal_x86_Tuning_Utility.Services.GameLauncherServices;
 
 public class LinuxGameLauncherService : IGameLauncherService
 {
-    public Lazy<List<GameLauncherItem>> InstalledGames { get; }
+    public Lazy<IReadOnlyCollection<GameLauncherItem>> InstalledGames { get; }
     
-    public List<GameLauncherItem> ReSearchGames(bool isAdaptive = false)
+    public IReadOnlyCollection<GameLauncherItem> ReSearchGames(bool isAdaptive = false)
     {
         throw new NotImplementedException();
     }

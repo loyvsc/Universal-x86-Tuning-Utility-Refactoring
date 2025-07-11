@@ -60,7 +60,7 @@ public class WindowsIntelManagementService : IIntelManagementService
 
     public async Task ChangeClockRatioOffset(int[] clockRatios)
     {
-        string hexValue = "";
+        string hexValue = string.Empty;
         foreach (var clockRatio in clockRatios)
         {
             hexValue += clockRatio.ToString("X2");

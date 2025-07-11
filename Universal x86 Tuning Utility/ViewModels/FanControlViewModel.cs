@@ -80,7 +80,7 @@ public class FanControlViewModel : NotifyPropertyChangedBase
         CopyCommand = ReactiveCommand.CreateFromTask(Copy);
 
         FanSpeed = 50;
-        ConfigName = $"{_systemInfoService.Manufacturer.ToUpper()}_{_systemInfoService.Product.ToUpper()}.json";
+        ConfigName = $"{_systemInfoService.Manufacturer.Value.ToUpper()}_{_systemInfoService.Product.Value.ToUpper()}.json";
         
         _timer = new DispatcherTimer
         {

@@ -32,11 +32,13 @@ public class WindowsUpdateInstallerService : IUpdateInstallerService
 
             await _updateService.DownloadNewestPackage(packageFileName);
             
-            var updaterProcess = new Process();
-            updaterProcess.StartInfo.FileName = "Updater.exe";
-            updaterProcess.StartInfo.Arguments = $"-p {packageFileName}";
-            updaterProcess.Start();
-            await updaterProcess.WaitForExitAsync();
+            using (var updaterProcess = new Process())
+            {
+                updaterProcess.StartInfo.FileName = "Updater.exe";
+                updaterProcess.StartInfo.Arguments = $"-p {packageFileName}";
+                updaterProcess.Start();
+                await updaterProcess.WaitForExitAsync();
+            }
         }
         catch (Exception ex)
         {

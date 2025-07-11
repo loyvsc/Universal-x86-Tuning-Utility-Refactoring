@@ -18,6 +18,7 @@ using Universal_x86_Tuning_Utility.Helpers;
 using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Services;
 using Universal_x86_Tuning_Utility.Services.Asus;
+using Universal_x86_Tuning_Utility.Services.BatteryServices;
 using Universal_x86_Tuning_Utility.Services.CliServices;
 using Universal_x86_Tuning_Utility.Services.CpuControlServices;
 using Universal_x86_Tuning_Utility.Services.DisplayInfoServices;
@@ -90,7 +91,8 @@ public class App : Application
             SplatRegistrations.RegisterLazySingleton<ISystemInfoService, WindowsSystemInfoService>();
             SplatRegistrations.RegisterLazySingleton<IUpdateService, UpdateService>();
             SplatRegistrations.RegisterLazySingleton<IUpdateInstallerService, WindowsUpdateInstallerService>();
-            SplatRegistrations.RegisterLazySingleton<IPlatformServiceAccessor, DefaultPlatformServiceAccessor>();
+            SplatRegistrations.RegisterLazySingleton<IPlatformServiceAccessor, PlatformServiceAccessor>();
+            SplatRegistrations.RegisterLazySingleton<IBatteryInfoService, WindowsBatteryInfoService>();
         }
 
         SplatRegistrations.SetupIOC();

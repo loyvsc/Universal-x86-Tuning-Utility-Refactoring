@@ -11,12 +11,12 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Universal_x86_Tuning_Utility.Services.Amd;
+namespace Universal_x86_Tuning_Utility.Services.Amd.Windows;
 
 public class Ols : IDisposable
 {
-    private protected string dllNameX64 = "WinRing0x64.dll";
-    private protected string dllName = "WinRing0.dll";
+    private protected string DllNameX64 = "WinRing0x64.dll";
+    private protected string DllName = "WinRing0.dll";
 
     // for this support library
     public enum Status : uint
@@ -98,7 +98,7 @@ public class Ols : IDisposable
 
     public Ols()
     {
-        var libraryFileName = IntPtr.Size == 8 ? dllNameX64 : dllName;
+        var libraryFileName = IntPtr.Size == 8 ? DllNameX64 : DllName;
         module = LoadLibrary(libraryFileName);
             
         if (module == IntPtr.Zero)

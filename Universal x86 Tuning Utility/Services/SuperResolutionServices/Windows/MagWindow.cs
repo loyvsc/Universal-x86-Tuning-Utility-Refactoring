@@ -35,7 +35,7 @@ public class MagWindow : IDisposable
     private class MagWindowParams
     {
         public volatile IntPtr hwndSrc;
-        public volatile string effectsJson = "";
+        public volatile string effectsJson = string.Empty;
         public volatile int logLevel;
         public volatile MagWindowCmd cmd = MagWindowCmd.None;
     }

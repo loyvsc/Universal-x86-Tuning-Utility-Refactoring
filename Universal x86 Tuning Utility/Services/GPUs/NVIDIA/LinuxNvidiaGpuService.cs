@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 
@@ -12,7 +12,8 @@ public class LinuxNvidiaGpuService : INvidiaGpuService
     }
 
     public int MaxGpuClock { get; set; }
-    public ReadOnlyCollection<CheckIsGpuOriginalResult> CheckIsGpusOriginal()
+    
+    public IReadOnlyCollection<CheckIsGpuOriginalResult> CheckIsGpusOriginal()
     {
         throw new System.NotImplementedException();
     }

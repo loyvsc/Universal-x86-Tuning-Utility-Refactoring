@@ -3,10 +3,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Enums;
+using ApplicationCore.Enums.Laptop;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models.LaptopInfo;
 using Microsoft.Extensions.Logging;
 using Universal_x86_Tuning_Utility.Properties;
-using Universal_x86_Tuning_Utility.Services.Amd;
+using Universal_x86_Tuning_Utility.Services.Amd.Windows;
 
 namespace Universal_x86_Tuning_Utility.Services.RyzenAdj;
 
@@ -87,7 +89,23 @@ public class RyzenAdjService : IRyzenAdjService
                         }
                         else if (ryzenAdjCommandString.Contains("Refresh-Rate"))
                         {
-                            _displayInfoService.ApplySettings(Convert.ToInt32(ryzenAdjCommandValueString));
+                            var values = ryzenAdjCommandValueString.Split(":::");
+                            if (values.Length == 2)
+                            {
+                                var targetDisplayIdentifier = values[0];
+
+                                if (int.TryParse(values[1], out var targetHz))
+                                {
+                                    try
+                                    {
+                                        _displayInfoService.ApplySettings(targetDisplayIdentifier, targetHz);
+                                    }
+                                    catch
+                                    {
+                                        // Ignored
+                                    }
+                                }
+                            }
                         }
                         else if (ryzenAdjCommandString.Contains("ADLX"))
                         {
@@ -171,11 +189,11 @@ public class RyzenAdjService : IRyzenAdjService
                             uint ryzenAdjCommandValue = Convert.ToUInt32(ryzenAdjCommandValueString);
                             if (ryzenAdjCommandValue <= 0 && !ryzenAdjCommandString.Contains("co"))
                             {
-                                SMUCommands.ApplySettings(ryzenAdjCommandString, 0x0);
+                                WindowsSMUCommands.ApplySettings(ryzenAdjCommandString, 0x0);
                             }
                             else
                             {
-                                SMUCommands.ApplySettings(ryzenAdjCommandString, ryzenAdjCommandValue);
+                                WindowsSMUCommands.ApplySettings(ryzenAdjCommandString, ryzenAdjCommandValue);
                             }
 
                             Task.Delay(50);
@@ -295,6 +313,7 @@ public class RyzenAdjService : IRyzenAdjService
     {
         try
         {
+            value = value.ToLower();
             switch (command)
             {
                 case "ASUS-Power":
@@ -325,27 +344,29 @@ public class RyzenAdjService : IRyzenAdjService
                 {
                     if (!_isUpdatingMux)
                     {
-                        var isGaming = _systemInfoService.Product.Contains("ROG") ||
-                                       _systemInfoService.Product.Contains("TUF");
-
-                        var device = isGaming ? AsusDevice.GpuMux : AsusDevice.GpuMuxVivo;
-
-                        int mux = _asusWmiService.DeviceGet(device);
-                        if (mux > 0 && value.ToLower() == "true")
+                        if (_systemInfoService.LaptopInfo is AsusLaptopInfo asusLaptopInfo)
                         {
-                            _isUpdatingMux = true;
-                            _logger.LogInformation("Set Mux = 0");
-                            _asusWmiService.DeviceSet(device, 0);
+                            var isGaming = asusLaptopInfo.LaptopSeries is AsusLaptopSeries.ROG or AsusLaptopSeries.TUF;
+
+                            var device = isGaming ? AsusDevice.GpuMux : AsusDevice.GpuMuxVivo;
+
+                            int mux = _asusWmiService.DeviceGet(device);
+                            if (mux > 0 && value == "true")
+                            {
+                                _isUpdatingMux = true;
+                                _logger.LogInformation("Set Mux = 0");
+                                _asusWmiService.DeviceSet(device, 0);
                             
-                            Process.Start("shutdown", "/r /t 1");
-                        }
-                        else if (mux is < 1 and > -1 && value.ToLower() == "false")
-                        {
-                            _isUpdatingMux = true;
-                            _logger.LogInformation("Set Mux = 1");
-                            _asusWmiService.DeviceSet(device, 1);
+                                Process.Start("shutdown", "/r /t 1");
+                            }
+                            else if (mux is < 1 and > -1 && value == "false")
+                            {
+                                _isUpdatingMux = true;
+                                _logger.LogInformation("Set Mux = 1");
+                                _asusWmiService.DeviceSet(device, 1);
                             
-                            Process.Start("shutdown", "/r /t 1");
+                                Process.Start("shutdown", "/r /t 1");
+                            }
                         }
                     }
 
@@ -361,6 +382,6 @@ public class RyzenAdjService : IRyzenAdjService
 
     public void Dispose()
     {
-        SMUCommands.RyzenAccess.Dispose();
+        WindowsSMUCommands.RyzenAccess.Dispose();
     }
 }

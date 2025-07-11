@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Runtime.Intrinsics.X86;
 using System.Threading;
 using ApplicationCore.Enums;
+using ApplicationCore.Enums.Laptop;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
+using ApplicationCore.Models.LaptopInfo;
+using DynamicData;
 using Microsoft.Extensions.Logging;
-using Universal_x86_Tuning_Utility.Services.Amd;
+using Universal_x86_Tuning_Utility.Services.Amd.Windows;
 using Ols = OpenLibSys_Mem.Ols;
 
 namespace Universal_x86_Tuning_Utility.Services.SystemInfoServices;
@@ -24,18 +26,17 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
     private readonly ManagementObjectSearcher _motherboardSearcher;
     private readonly ManagementObjectSearcher _systemInfoSearcher;
     private readonly ManagementObjectSearcher _processorInfoSearcher;
-    private readonly ManagementObjectSearcher _batteryInfoSearcher;
     private readonly ManagementObjectSearcher _memoryInfoSearcher;
     
     private readonly ManagementEventWatcher _installDeviceEventWatcher;
     private readonly ManagementEventWatcher _uninstallDeviceEventWatcher;
     
-    public int NvidiaGpuCount { get; private set; }
-    public int RadeonGpuCount { get; private set; }
     public CpuInfo Cpu { get; }
     public RamInfo Ram { get; }
-    public LaptopInfo? LaptopInfo { get; private set; }
-    public List<string> GpuNames { get; }
+    public LaptopInfoBase? LaptopInfo { get; private set; }
+    public IReadOnlyCollection<BasicGpuInfo> Gpus => _gpus;
+    
+    private readonly List<BasicGpuInfo> _gpus = new List<BasicGpuInfo>();
     
     public WindowsSystemInfoService(ILogger<WindowsSystemInfoService> logger,
                                     IIntelManagementService intelManagementService)
@@ -47,37 +48,73 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_MotherboardDevice");
         _systemInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_ComputerSystem");
         _processorInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
-        _batteryInfoSearcher = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM BatteryStatus");
         _memoryInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_PhysicalMemory");
         
         _installDeviceEventWatcher = new ManagementEventWatcher("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2");
         _installDeviceEventWatcher.EventArrived += OnNewDeviceInstalled;
-        _uninstallDeviceEventWatcher = new ManagementEventWatcher("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2");
+        _uninstallDeviceEventWatcher = new ManagementEventWatcher("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 3");
         _uninstallDeviceEventWatcher.EventArrived += OnDeviceUninstalled;
+
+        Manufacturer = new Lazy<string>(() =>
+        {
+            foreach (var queryObj in _baseboardSearcher.Get())
+            {
+                var manufacturerName = queryObj["Manufacturer"].ToString();
+                if (manufacturerName != null)
+                {
+                    return manufacturerName;
+                }
+            }
+
+            return string.Empty;
+        });
+
+        Product = new Lazy<string>(() =>
+        {
+            foreach (var queryObj in _systemInfoSearcher.Get())
+            {
+                var manufacturerName = queryObj["Name"].ToString();
+                if (manufacturerName != null)
+                {
+                    return manufacturerName;
+                }
+            }
+
+            return string.Empty;
+        });
+
+        SystemName = new Lazy<string>(() =>
+        {
+            foreach (var queryObj in _motherboardSearcher.Get())
+            {
+                var manufacturerName = queryObj["SystemName"].ToString();
+                if (manufacturerName != null)
+                {
+                    return manufacturerName;
+                }
+            }
+
+            return string.Empty;
+        });
         
         Cpu = new CpuInfo();
         Ram = new RamInfo();
-        GpuNames = new List<string>();
         
-        AnalyzeSystem();
+        ReAnalyzeSystem();
     }
 
     private void OnDeviceUninstalled(object sender, EventArrivedEventArgs e)
-    {
+    { 
         using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE PNPClass = 'DISPLAY'"))
-        {
+        { 
             foreach (var device in searcher.Get())
             {
                 if (device["Name"] is string name)
                 {
-                    GpuNames.Remove(name);
-                    if (name.Contains("Radeon"))
+                    var gpuToRemove = _gpus.FirstOrDefault(x => x.Name == name);
+                    if (gpuToRemove != null)
                     {
-                        RadeonGpuCount--;
-                    }
-                    else if (name.Contains("NVIDIA"))
-                    {
-                        NvidiaGpuCount--;
+                        _gpus.Remove(gpuToRemove);
                     }
                 }
             }
@@ -90,45 +127,54 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         {
             foreach (var device in searcher.Get())
             {
-                if (device["Name"] is string name)
+                if (device["Name"] is string name && _gpus.FirstOrDefault(x => x.Name == name) == null)
                 {
-                    GpuNames.Add(name);
-                    if (name.Contains("Radeon"))
+                    var gpuName = name.Split(' ');
+                    if (gpuName.Length != 0)
                     {
-                        RadeonGpuCount++;
-                    }
-                    else if (name.Contains("NVIDIA"))
-                    {
-                        NvidiaGpuCount++;
+                        if (Enum.TryParse<GpuManufacturer>(gpuName[0], true, out var gpuManufacturer))
+                        {
+                            _gpus.Add(new BasicGpuInfo(gpuManufacturer, name));
+                            continue;
+                        }
+                
+                        _gpus.Add(new BasicGpuInfo(GpuManufacturer.Unknown, name));
                     }
                 }
             }
         }
     }
 
-    public void AnalyzeSystem()
+    private void InitializeBasicGpuInfo()
     {
-        using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_VideoController"))
+        using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE PNPClass = 'DISPLAY'"))
         {
-            foreach (var videoController in searcher.Get())
+            foreach (var device in searcher.Get())
             {
-                if (videoController["Name"] is string name)
+                if (device["Name"] is string name)
                 {
-                    GpuNames.Add(name);
-                    if (name.Contains("Radeon"))
+                    var gpuName = name.Split(' ');
+                    if (gpuName.Length != 0)
                     {
-                        RadeonGpuCount++;
-                    }
-                    else if (name.Contains("NVIDIA"))
-                    {
-                        NvidiaGpuCount++;
+                        if (Enum.TryParse<GpuManufacturer>(gpuName[0], true, out var gpuManufacturer))
+                        {
+                            _gpus.Add(new BasicGpuInfo(gpuManufacturer, name));
+                            continue;
+                        }
+                
+                        _gpus.Add(new BasicGpuInfo(GpuManufacturer.Unknown, name));
                     }
                 }
             }
         }
+    }
 
+    public void ReAnalyzeSystem()
+    {
         try
         {
+            InitializeBasicGpuInfo();
+            
             var processorIdentifier = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER");
 
             var words = processorIdentifier.Split(' ');
@@ -143,56 +189,23 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             
             foreach (var cpuInfo in _processorInfoSearcher.Get())
             {
-                Cpu.Name = cpuInfo["Name"].ToString();
+                Cpu.Name = cpuInfo["Name"].ToString().Trim();
                 Cpu.Description = cpuInfo["Description"].ToString();
                 Cpu.CoresCount = Convert.ToInt32(cpuInfo["NumberOfCores"]);
                 Cpu.LogicalCoresCount = Convert.ToInt32(cpuInfo["NumberOfLogicalProcessors"]);
-                Cpu.L2Size = Convert.ToDouble(cpuInfo["L2CacheSize"]) / 1024;
-                Cpu.BaseClock = cpuInfo["MaxClockSpeed"].ToString();
+                if (int.TryParse(cpuInfo["MaxClockSpeed"].ToString(), out var baseClock))
+                {
+                    Cpu.BaseClock = baseClock;   
+                }
             }
 
-            var l3CacheInfo = GetCacheSize(ApplicationCore.Enums.CacheLevel.L3).FirstOrDefault();
-            Cpu.L3Size = Convert.ToDouble(l3CacheInfo);
+            Cpu.L1Size = GetCacheSize(ApplicationCore.Enums.CacheLevel.L1);
+            Cpu.L2Size = GetCacheSize(ApplicationCore.Enums.CacheLevel.L2);
+            Cpu.L3Size = GetCacheSize(ApplicationCore.Enums.CacheLevel.L3);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred when analyzing cpu information");
-        }
-
-        Cpu.CodeName = GetCodename();
-        
-        List<string> supportedInstructions = [];
-        if (IsMMXSupported()) supportedInstructions.Add("MMX");
-        if (Sse.IsSupported) supportedInstructions.Add("SSE");
-        if (Sse2.IsSupported) supportedInstructions.Add("SSE2");
-        if (Sse3.IsSupported) supportedInstructions.Add("SSE3");
-        if (Ssse3.IsSupported) supportedInstructions.Add("SSSE3");
-        if (Sse41.IsSupported) supportedInstructions.Add("SSE4.1");
-        if (Sse42.IsSupported) supportedInstructions.Add("SSE4.2");
-        if (IsEM64TSupported()) supportedInstructions.Add("EM64T");
-        if (Environment.Is64BitProcess) supportedInstructions.Add("x86-64");
-        if (IsVirtualizationEnabled())
-        {
-            supportedInstructions.Add(
-                Cpu.Manufacturer == ApplicationCore.Enums.Manufacturer.Intel 
-                ? "VT-x" 
-                : "AMD-V");
-        }
-        if (Aes.IsSupported) supportedInstructions.Add("AES");
-        if (Avx.IsSupported) supportedInstructions.Add("AVX");
-        if (Avx2.IsSupported) supportedInstructions.Add("AVX2");
-        if (CheckAVX512Support()) supportedInstructions.Add("AVX512");
-        if (Fma.IsSupported) supportedInstructions.Add("FMA3");
-
-        Cpu.SupportedInstructions = new ReadOnlyCollection<string>(supportedInstructions);
-
-        try
-        {
-            AnalyzeRam();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred when analyzing ram information");
         }
 
         if (Cpu.Name.Contains("Intel"))
@@ -217,8 +230,20 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             
             _intelManagementService.DetermineCpu();
         }
-        else
+        else if (Cpu.Name.Contains("AMD"))
         {
+            Cpu.Manufacturer = ApplicationCore.Enums.Manufacturer.AMD;
+
+            Cpu.RyzenSeries = GetRyzenSeries(Cpu.Name);
+
+            Cpu.RyzenGeneration = Cpu.Family switch
+            {
+                23 => RyzenGenerations.Zen1_2,
+                25 => RyzenGenerations.Zen3_4,
+                26 => RyzenGenerations.Zen5_6,
+                _ => RyzenGenerations.Unknown
+            };
+            
             switch (Cpu.RyzenGeneration)
             {
                 case RyzenGenerations.Zen1_2:
@@ -292,19 +317,120 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             Addresses.SetAddresses(Cpu);
         }
 
-        var product = Product.ToLower();
+        Cpu.SupportedInstructions = new ReadOnlyCollection<string>(GetSupportedInstructions());
+
+        Cpu.BigLITTLEInfo = GetBigLITTLE();
+
+        Cpu.CodeName = GetCodename();
+
+        try
+        {
+            AnalyzeRam();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred when analyzing ram information");
+        }
+
+        LaptopInfo = GetLaptopInfo(Manufacturer.Value.ToLower(), Product.Value.ToLower());
+    }
+
+    private LaptopInfoBase? GetLaptopInfo(string manufacturer, string product)
+    {
         if (product.Contains("laptop"))
         {
-            LaptopInfo = new LaptopInfo()
+            if (manufacturer.Contains("asus"))
             {
-                IsAsus = product.Contains("rog")
-                         || product.Contains("tuf")
-                         || product.Contains("ally")
-                         || product.Contains("flow")
-                         || product.Contains("vivobook")
-                         || product.Contains("zenbook")
-            };
+                if (product.Contains("rog"))
+                {
+                    var rogSeries = AsusRogSeries.Basic;
+                    if (product.Contains("ally"))
+                    {
+                        rogSeries = AsusRogSeries.Ally;
+                    }
+                    else if (product.Contains("flow"))
+                    {
+                        rogSeries = AsusRogSeries.Flow;
+                    }
+
+                    return new AsusRogLaptopInfo(rogSeries);
+                }
+
+                if (product.Contains("tuf"))
+                {
+                    return new AsusLaptopInfo(AsusLaptopSeries.TUF);
+                }
+                if (product.Contains("vivobook"))
+                {
+                    return new AsusLaptopInfo(AsusLaptopSeries.VivoBook);
+                }
+                if (product.Contains("zenbook"))
+                {
+                    return new AsusLaptopInfo(AsusLaptopSeries.ZenBook);
+                }
+            }
+            else if (manufacturer.Contains("framework") && FrameworkLaptopInfo.TryPrase(product, out var laptopInfo))
+            {
+                return laptopInfo;
+            }
+            
+            return new BasicLaptopInfo();
         }
+
+        return null;
+    }
+
+    private RyzenSeries GetRyzenSeries(string cpuName)
+    {
+        var cpuData = cpuName.ToLower().Split(' ');
+        var ryzenIndex = cpuData.IndexOf("ryzen");
+        
+        if (ryzenIndex != -1 && cpuData.Length >= 2)
+        {
+            var ryzenSeries = cpuData[ryzenIndex + 1];
+            if (int.TryParse(ryzenSeries, out var ryzenSeriesValue))
+            {
+                Cpu.RyzenSeries = ryzenSeriesValue switch
+                {
+                    3 => RyzenSeries.Ryzen3,
+                    5 => RyzenSeries.Ryzen5,
+                    7 => RyzenSeries.Ryzen7,
+                    9 => RyzenSeries.Ryzen9,
+                    _ => RyzenSeries.Unknown
+                };
+            }
+        }
+        
+        return RyzenSeries.Unknown;
+    }
+
+    private List<string> GetSupportedInstructions()
+    {
+        List<string> supportedInstructions = [];
+        
+        if (IsMMXSupported()) supportedInstructions.Add("MMX");
+        if (Sse.IsSupported) supportedInstructions.Add("SSE");
+        if (Sse2.IsSupported) supportedInstructions.Add("SSE2");
+        if (Sse3.IsSupported) supportedInstructions.Add("SSE3");
+        if (Ssse3.IsSupported) supportedInstructions.Add("SSSE3");
+        if (Sse41.IsSupported) supportedInstructions.Add("SSE4.1");
+        if (Sse42.IsSupported) supportedInstructions.Add("SSE4.2");
+        if (IsEM64TSupported()) supportedInstructions.Add("EM64T");
+        if (Environment.Is64BitProcess) supportedInstructions.Add("x86-64");
+        if (IsVirtualizationEnabled())
+        {
+            supportedInstructions.Add(
+                Cpu.Manufacturer == ApplicationCore.Enums.Manufacturer.Intel 
+                    ? "VT-x" 
+                    : "AMD-V");
+        }
+        if (Aes.IsSupported) supportedInstructions.Add("AES");
+        if (Avx.IsSupported) supportedInstructions.Add("AVX");
+        if (Avx2.IsSupported) supportedInstructions.Add("AVX2");
+        if (CheckAVX512Support()) supportedInstructions.Add("AVX512");
+        if (Fma.IsSupported) supportedInstructions.Add("FMA3");
+        
+        return supportedInstructions;
     }
 
     private bool IsVirtualizationEnabled()
@@ -1059,184 +1185,40 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         Thread.Sleep(delay);
         return ols.ReadPciConfigDword(0x00, 0xBC);
     }
-    
-    public bool IsGPUPresent(string gpuName)
-    {
-        using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_VideoController"))
-        {
-            foreach (var result in searcher.Get())
-            {
-                var name = result["Name"]?.ToString();
-                if (!string.IsNullOrEmpty(name) && name.Contains(gpuName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
-    }
 
-    public string Manufacturer
-    {
-        get
-        {
-            foreach (var queryObj in _baseboardSearcher.Get())
-            {
-                var manufacturerName = queryObj["Manufacturer"].ToString();
-                if (manufacturerName != null)
-                {
-                    return manufacturerName;
-                }
-            }
+    public Lazy<string> Manufacturer { get; }
 
-            return string.Empty;
-        }
-    }
+    public Lazy<string> Product { get; }
 
-    public string Product
-    {
-        get
-        {
-            foreach (var queryObj in _systemInfoSearcher.Get())
-            {
-                var manufacturerName = queryObj["Manufacturer"].ToString();
-                if (manufacturerName != null)
-                {
-                    return manufacturerName;
-                }
-            }
+    public Lazy<string> SystemName { get; }
 
-            return string.Empty;
-        }
-    }
-
-    public string SystemName
-    {
-        get
-        {
-            foreach (var queryObj in _motherboardSearcher.Get())
-            {
-                var manufacturerName = queryObj["SystemName"].ToString();
-                if (manufacturerName != null)
-                {
-                    return manufacturerName;
-                }
-            }
-
-            return string.Empty;
-        }
-    }
-
-    public decimal GetBatteryRate()
-    {
-        foreach (var obj in _batteryInfoSearcher.Get())
-        {
-            var chargeRate = Convert.ToDecimal(obj["ChargeRate"]);
-            var dischargeRate = Convert.ToDecimal(obj["DischargeRate"]);
-                
-            return chargeRate > 0 ? chargeRate : dischargeRate;
-        }
-        
-        return 0;
-    }
-    
-    public BatteryStatus GetBatteryStatus()
-    {
-        var batteryClass = new ManagementClass("Win32_Battery");
-        var batteries = batteryClass.GetInstances();
-        
-        foreach (var battery in batteries)
-        {
-            if (battery["BatteryStatus"] is ushort batteryStatus)
-            {
-                return batteryStatus switch
-                {
-                    1 => BatteryStatus.Discharging,
-                    3 => BatteryStatus.FullCharged,
-                    4 or 5 => BatteryStatus.Low,
-                    2 or 7 or 8 or 9 or 11 => BatteryStatus.Charging,
-                    _ => BatteryStatus.Unknown
-                };
-            }
-        }
-
-        return BatteryStatus.Unknown;
-    }
-
-    public decimal ReadFullChargeCapacity()
-    {
-        using (var searcher = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM BatteryFullChargedCapacity"))
-        {
-            foreach (var obj in searcher.Get().Cast<ManagementObject>())
-            { 
-                return Convert.ToDecimal(obj["FullChargedCapacity"]);
-            }
-        }
-
-        return 0;
-    }
-
-    public decimal ReadDesignCapacity()
-    {
-        using (var searcher = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM BatteryStaticData"))
-        {
-            foreach (var obj in searcher.Get().Cast<ManagementObject>())
-            {
-                return Convert.ToDecimal(obj["DesignedCapacity"]);
-            }
-        }
-
-        return 0;
-    }
-
-    public int GetBatteryCycle()
-    {
-        using (var searcher = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM BatteryCycleCount"))
-        {
-            foreach (var queryObj in searcher.Get())
-            {
-                return Convert.ToInt32(queryObj["CycleCount"]);
-            }
-        }
-
-        return 0;
-    }
-
-    public decimal GetBatteryHealth()
-    {
-        var designCap = ReadDesignCapacity();
-        var fullCap = ReadFullChargeCapacity();
-
-        var health = fullCap / designCap;
-
-        return health;
-    }
-
-    private enum CacheLevel : ushort
+    private enum CacheLevel
     {
         Level1 = 3,
         Level2 = 4,
-        Level3 = 5
+        Level3 = 5  
     }
 
-    private List<uint> GetCacheSize(ApplicationCore.Enums.CacheLevel level)
+    private uint GetCacheSize(ApplicationCore.Enums.CacheLevel level)
     {
         var searchLevel = level switch
         {
             ApplicationCore.Enums.CacheLevel.L1 => (ushort) CacheLevel.Level1,
             ApplicationCore.Enums.CacheLevel.L2 => (ushort) CacheLevel.Level2,
-            ApplicationCore.Enums.CacheLevel.L3 => (ushort)CacheLevel.Level3,
+            ApplicationCore.Enums.CacheLevel.L3 => (ushort) CacheLevel.Level3,
         };
         
-        var mc = new ManagementClass("Win32_CacheMemory");
-        var moc = mc.GetInstances();
-
-        return moc
-            .Cast<ManagementObject>()
-            .Where(p => (ushort)p.Properties["Level"].Value == searchLevel)
-            .Select(p => (uint)p.Properties["MaxCacheSize"].Value)
-            .ToList();
+        using (var mc = new ManagementClass("Win32_CacheMemory"))
+        {
+            using (var moc = mc.GetInstances())
+            {
+                return moc
+                    .Cast<ManagementObject>()
+                    .Where(p => (ushort)p.Properties["Level"].Value == searchLevel)
+                    .Select(p => (uint)p.Properties["MaxCacheSize"].Value)
+                    .FirstOrDefault();
+            }
+        }
     }
     
     private string GetCodename()
@@ -1245,12 +1227,12 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         {
             if (Cpu.Name.Contains("6th")) return "Skylake";
             if (Cpu.Name.Contains("7th")) return "Kaby Lake";
-            if (Cpu.Name.Contains("8th") && Cpu.Name.Contains("G")) return "Kaby Lake";
-            else if (Cpu.Name.Contains("8121U") || Cpu.Name.Contains("8114Y")) return "Cannon Lake";
-            else if (Cpu.Name.Contains("8th")) return "Coffee Lake";
+            if (Cpu.Name.Contains("8th") && Cpu.Name.Contains('G')) return "Kaby Lake";
+            if (Cpu.Name.Contains("8121U") || Cpu.Name.Contains("8114Y")) return "Cannon Lake";
+            if (Cpu.Name.Contains("8th")) return "Coffee Lake";
             if (Cpu.Name.Contains("9th")) return "Coffee Lake";
-            if (Cpu.Name.Contains("10th") && Cpu.Name.Contains("G")) return "Ice Lake";
-            else if (Cpu.Name.Contains("10th")) return "Comet Lake";
+            if (Cpu.Name.Contains("10th") && Cpu.Name.Contains('G')) return "Ice Lake";
+            if (Cpu.Name.Contains("10th")) return "Comet Lake";
             if (Cpu.Name.Contains("11th"))
             {
                 if (Cpu.Name.Contains('G') || Cpu.Name.Contains('U') || Cpu.Name.Contains('H') || Cpu.Name.Contains("KB"))
@@ -1298,17 +1280,17 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                 RyzenFamily.StrixPoint => "Strix Point",
                 RyzenFamily.StrixPoint2 => "Strix Point 2 / Kraken",
                 RyzenFamily.StrixHalo => "Strix Halo",
-                _ => ""
+                _ => string.Empty
             };
         }
 
-        return "";
+        return string.Empty;
     }
 
-    public string GetBigLITTLE()
+    private string? GetBigLITTLE()
     {
-        int bigCores = 0;
-        int smallCores = 0;
+        int bigCores;
+        int smallCores;
         if (Cpu.Manufacturer == ApplicationCore.Enums.Manufacturer.Intel)
         {
             //if (CPUName.Contains("12th") || CPUName.Contains("13th") || CPUName.Contains("14th") || CPUName.Contains("Core") && CPUName.Contains("1000") && !CPUName.Contains("i"))
@@ -1335,28 +1317,29 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             return $"{Cpu.CoresCount} ({bigCores} Prime Cores + {smallCores} Compact Cores)";
         }
             
-        return Cpu.CoresCount.ToString();
+        return null;
     }
     
     public void Dispose()
     {
+        _installDeviceEventWatcher.EventArrived += OnNewDeviceInstalled;
         _installDeviceEventWatcher.Stop();
         _installDeviceEventWatcher.Dispose();
+
+        _uninstallDeviceEventWatcher.EventArrived += OnDeviceUninstalled;
+        _uninstallDeviceEventWatcher.Stop();
+        _uninstallDeviceEventWatcher.Dispose();
+        
         _baseboardSearcher.Dispose();
         _motherboardSearcher.Dispose();
         _systemInfoSearcher.Dispose();
         _processorInfoSearcher.Dispose();
-        _batteryInfoSearcher.Dispose();
+        _memoryInfoSearcher.Dispose();
     }
 }
 
-public static class NativeMethods
+internal static class NativeMethods
 {
-    // Import the CPUID intrinsic (Intel x86 instruction)
-    [System.Runtime.InteropServices.DllImport("cpuid_x64.dll")]
-    public static extern void Cpuid(int leafNumber, int subleafNumber, ref int eax, ref int ebx, ref int ecx,
-        ref int edx);
-
     public const int PF_MMX_INSTRUCTIONS_AVAILABLE = 3;
     public const int PF_AVX512F_INSTRUCTIONS_AVAILABLE = 49;
 

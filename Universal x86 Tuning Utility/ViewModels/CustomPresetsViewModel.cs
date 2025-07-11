@@ -4,20 +4,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ApplicationCore.Enums;
+using ApplicationCore.Enums.Display;
+using ApplicationCore.Enums.Laptop;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
+using ApplicationCore.Models.LaptopInfo;
 using ApplicationCore.Utilities;
 using DesktopNotifications;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
+using Universal_x86_Tuning_Utility.Models;
 using Universal_x86_Tuning_Utility.Properties;
 using AmdPowerProfile = ApplicationCore.Models.AmdPowerProfile;
 using PowerMode = ApplicationCore.Models.PowerMode;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class CustomPresetsViewModel : NotifyPropertyChangedBase
+public class CustomPresetsViewModel : NotifyPropertyChangedBase, IDisposable
 {
     public ICommand ApplyPresetCommand { get; }
     public ICommand SavePresetCommand { get; }
@@ -64,10 +68,22 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         set => SetValue(ref _isChangeRefreshRateAvailable, value);
     }
 
-    public List<string> RefreshRates
+    public EnhancedObservableCollection<DisplayModel> AvailableDisplays
     {
-        get => _refreshRates;
-        set => SetValue(ref _refreshRates, value);
+        get => _availableDisplays;
+        set => SetValue(ref _availableDisplays, value);
+    }
+
+    public DisplayModel SelectedDisplay
+    {
+        get => _selectedDisplay;
+        set
+        {
+            if (SetValue(ref _selectedDisplay, value))
+            {
+                SelectedPreset.DisplayIdentifier = value.Identifier;
+            }
+        }
     }
 
     public bool IsIntelSettingsAvailable
@@ -236,7 +252,6 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     private AsusPowerProfile _selectedAsusPowerProfile;
     private Preset _currentPreset;
     private List<Preset> _availablePresets;
-    private List<string> _refreshRates;
     private bool _isUndoActionAvailable;
     private bool _isIntelSettingsAvailable;
     private bool _isAmdCpuTuneSettingAvailable;
@@ -266,16 +281,20 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     private readonly IPresetService _intelPresetService;
     private readonly ILogger<CustomPresetsViewModel> _logger;
     private readonly ISystemInfoService _systemInfoService;
+    private readonly IBatteryInfoService _batteryInfoService;
     private readonly INotificationManager _notificationManager;
     private readonly IRyzenAdjService _ryzenAdjService;
     private readonly IDisplayInfoService _displayInfoService;
     private readonly IIntelManagementService _intelManagementService;
     private readonly IASUSWmiService _asusWmiService;
+    private EnhancedObservableCollection<DisplayModel> _availableDisplays;
+    private DisplayModel _selectedDisplay;
 
     #endregion
 
     public CustomPresetsViewModel(ILogger<CustomPresetsViewModel> logger,
         ISystemInfoService systemInfoService,
+        IBatteryInfoService batteryInfoService,
         INotificationManager notificationManager,
         IRyzenAdjService ryzenAdjService,
         IDisplayInfoService displayInfoService,
@@ -285,6 +304,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
     {
         _logger = logger;
         _systemInfoService = systemInfoService;
+        _batteryInfoService = batteryInfoService;
         _notificationManager = notificationManager;
         _ryzenAdjService = ryzenAdjService;
         _displayInfoService = displayInfoService;
@@ -327,6 +347,23 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         };
 
         Initialize();
+        
+        _displayInfoService.DisplayAttached += DisplayInfoServiceOnDisplayAttached;
+        _displayInfoService.DisplayRemoved += DisplayInfoServiceOnDisplayRemoved;
+    }
+
+    private void DisplayInfoServiceOnDisplayRemoved(Display display)
+    {
+        var displayToRemove = AvailableDisplays.FirstOrDefault(x => x.Identifier == display.Identifier);
+        if (displayToRemove != null)
+        {
+            AvailableDisplays.Remove(displayToRemove);
+        }
+    }
+
+    private void DisplayInfoServiceOnDisplayAttached(Display display)
+    {
+        AvailableDisplays.Add(new DisplayModel(display));
     }
 
     private void Initialize()
@@ -364,16 +401,17 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             IntelBalGpu = 13,
         };
 
-        IsRadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
-        IsNvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
-
-        if (_displayInfoService.UniqueTargetRefreshRates.Count > 1)
+        IsRadeonGpuSettingsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) != 0;
+        IsNvidiaGpuSettingsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.Nvidia) != 0;
+        
+        if (_displayInfoService.Displays.Value.Any(x => x.SupportedRefreshRates.Count > 1))
         {
             IsChangeRefreshRateAvailable = true;
-
-            RefreshRates.Add("System Controlled");
-            foreach (var refreshRate in _displayInfoService.UniqueTargetRefreshRates)
-                RefreshRates.Add($"{refreshRate} Hz");
+            
+            AvailableDisplays = new EnhancedObservableCollection<DisplayModel>(_displayInfoService.Displays.Value.Select(x => new DisplayModel(x)));
+            SelectedDisplay =
+                AvailableDisplays.FirstOrDefault(x =>
+                    x.SupportedOutputTechnology == DisplayOutputTechnology.Internal) ?? AvailableDisplays[0];
         }
         else
         {
@@ -417,7 +455,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 IsAmdApuVrmSettingAvailable = true;
                 IsAmdPboSettingAvailable = !_systemInfoService.Cpu.Name.Contains('U') &&
                                            _systemInfoService.Cpu.RyzenFamily < RyzenFamily.Renoir;
-                IsAmdCpuTuneSettingAvailable = _systemInfoService.GetBatteryStatus() == BatteryStatus.NoSystemBattery;
+                IsAmdCpuTuneSettingAvailable = _batteryInfoService.GetBatteryStatus() == BatteryStatus.NoSystemBattery;
                 IsAmdSoftClockSettingAvailable = _systemInfoService.Cpu.RyzenFamily < RyzenFamily.Renoir;
                 IsAmdCOSettingAvailable = _systemInfoService.Cpu.RyzenFamily > RyzenFamily.Renoir &&
                                           _systemInfoService.Cpu.RyzenFamily != RyzenFamily.Mendocino;
@@ -438,7 +476,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                     RyzenFamily.HawkPoint;
 
                 IsAmdCCD2COSettingAvailable = _systemInfoService.Cpu.RyzenFamily == RyzenFamily.DragonRange &&
-                                              _systemInfoService.Cpu.Name.Contains("Ryzen 9");
+                                              _systemInfoService.Cpu.RyzenSeries == RyzenSeries.Ryzen9;
 
                 var apuPresets = _apuPresetService.GetPresets();
                 AvailablePresets = apuPresets.ToList();
@@ -448,21 +486,20 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                 IsAmdCpuThermalSettingsAvailable = true;
                 IsAmdCOSettingAvailable = _systemInfoService.Cpu.RyzenFamily >= RyzenFamily.Vermeer;
                 IsAmdCCD1COSettingAvailable = IsAmdCOSettingAvailable;
-                IsAmdCCD2COSettingAvailable = _systemInfoService.Cpu.Name.Contains("Ryzen 9");
+                IsAmdCCD2COSettingAvailable = _systemInfoService.Cpu.RyzenSeries == RyzenSeries.Ryzen9;
 
                 var desktopPresets = _amdDesktopPresetService.GetPresets();
                 AvailablePresets = desktopPresets.ToList();
             }
         }
 
-        if (_systemInfoService.LaptopInfo?.IsAsus == true)
+        if (_systemInfoService.LaptopInfo is AsusLaptopInfo asusLaptopInfo)
         {
             IsAsusPowerSettingsAvailable = true;
             IsAsusGpuUltimateSettingsAvailable = true;
             IsAsusGpuEcoModeSettingsAvailable = true;
 
-            var isGamingLaptop = _systemInfoService.Product.Contains("ROG")
-                                 || _systemInfoService.Product.Contains("TUF");
+            var isGamingLaptop = asusLaptopInfo.LaptopSeries is AsusLaptopSeries.ROG or AsusLaptopSeries.TUF;
 
             var device = isGamingLaptop ? AsusDevice.GpuMux : AsusDevice.GpuMuxVivo;
 
@@ -551,8 +588,8 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
                     "Your custom preset settings have been applied!");
             }
 
-            IsRadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
-            IsNvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
+            IsRadeonGpuSettingsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) != 0;
+            IsNvidiaGpuSettingsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.Nvidia) != 0;
         }
         catch (Exception ex)
         {
@@ -612,8 +649,8 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
 
                         _apuPresetService.SavePreset(SelectedPreset.Name, SelectedPreset);
 
-                        IsRadeonGpuSettingsAvailable = _systemInfoService.RadeonGpuCount > 0;
-                        IsNvidiaGpuSettingsAvailable = _systemInfoService.NvidiaGpuCount > 0;
+                        IsRadeonGpuSettingsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) != 0;
+                        IsNvidiaGpuSettingsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.Nvidia) != 0;
                     }
                     else if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop)
                     {
@@ -641,7 +678,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
             $"--UXTUSR={SelectedPreset.IsMag}-{SelectedPreset.IsVsync}-{SelectedPreset.Sharpness / 100}" +
             $"-{SelectedPreset.ResolutionScale.ResolutionScale}-{SelectedPreset.IsRecap}");
 
-        if (_systemInfoService.LaptopInfo?.IsAsus == true)
+        if (_systemInfoService.LaptopInfo?.Brand == LaptopBrand.ASUS)
         {
             if (SelectedAsusPowerProfile.PowerProfileMode != AsusMode.AcControlled)
                 commands.Add($"--ASUS-Power={(int)SelectedAsusPowerProfile.PowerProfileMode}");
@@ -653,7 +690,7 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
 
         if (IsChangeRefreshRateAvailable && SelectedPreset.DisplayHz > 0)
         {
-            commands.Add($"--Refresh-Rate={RefreshRates[SelectedPreset.DisplayHz - 1]}");
+            commands.Add($"--Refresh-Rate={SelectedPreset.DisplayIdentifier}:::{SelectedPreset.DisplayHz}");
         }
 
         if (SelectedPreset.PowerMode.PowerPlan != PowerPlan.SystemControlled)
@@ -948,5 +985,11 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase
         }
         
         return string.Join(' ', commands);
+    }
+
+    public void Dispose()
+    {
+        _displayInfoService.DisplayAttached -= DisplayInfoServiceOnDisplayAttached;
+        _displayInfoService.DisplayRemoved -= DisplayInfoServiceOnDisplayRemoved;
     }
 }

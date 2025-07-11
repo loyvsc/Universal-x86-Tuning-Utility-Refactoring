@@ -418,6 +418,7 @@ public class Preset : NotifyPropertyChangedBase
     }
 
     private List<AmdCcdCoreState> _ccd2States;
+    private string _displayIdentifier;
 
     public int NvMaxCoreClk
     {
@@ -824,6 +825,12 @@ public class Preset : NotifyPropertyChangedBase
     {
         get => _asusIGpu;
         set => SetValue(ref _asusIGpu, value);
+    }
+
+    public string DisplayIdentifier
+    {
+        get => _displayIdentifier;
+        set => SetValue(ref _displayIdentifier, value);
     }
 
     public int DisplayHz
