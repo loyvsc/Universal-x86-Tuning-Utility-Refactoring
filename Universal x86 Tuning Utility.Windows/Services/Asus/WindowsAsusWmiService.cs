@@ -139,13 +139,21 @@ public class WindowsAsusWmiService : IASUSWmiService
     #endregion
 
     private IntPtr _eventHandle;
-    private readonly IntPtr _handle;
+    private IntPtr _handle;
+    private readonly IntPtr _invalidCreateFileResult = new IntPtr(-1);
     private readonly ILogger<WindowsAsusWmiService> _logger;
     private readonly ManagementEventWatcher _eventWatcher;
     
     public WindowsAsusWmiService(ILogger<WindowsAsusWmiService> logger)
     {
         _logger = logger;
+        _eventWatcher = new ManagementEventWatcher("root\\wmi", "SELECT * FROM AsusAtkWmiEvent");
+    }
+    
+    private bool _isInitialized;
+
+    private void Initialize()
+    {
         _handle = CreateFile(
             FILE_NAME,
             GENERIC_READ | GENERIC_WRITE,
@@ -155,14 +163,11 @@ public class WindowsAsusWmiService : IASUSWmiService
             FILE_ATTRIBUTE_NORMAL,
             IntPtr.Zero
         );
-
-        if (_handle == new IntPtr(-1))
+        if (_handle == _invalidCreateFileResult)
         {
-            // todo: refactor
-            //throw new Exception("Can't connect to ACPI");
+            throw new Exception("Can't connect to ACPI");
         }
-        
-        _eventWatcher = new ManagementEventWatcher("root\\wmi", "SELECT * FROM AsusAtkWmiEvent");
+        _isInitialized = true;
     }
     
     // todo: still works only with asus optimization service on , if someone knows how to get ACPI events from asus without that - let me know
@@ -188,6 +193,8 @@ public class WindowsAsusWmiService : IASUSWmiService
 
     private void Control(uint dwIoControlCode, byte[] lpInBuffer, byte[] lpOutBuffer)
     {
+        Initialize();
+        
         uint lpBytesReturned = 0;
         DeviceIoControl(
             _handle,
@@ -587,7 +594,10 @@ public class WindowsAsusWmiService : IASUSWmiService
 
     public void Dispose()
     {
-        CloseHandle(_handle);
+        if (_handle != _invalidCreateFileResult)
+        {
+            CloseHandle(_handle);
+        }
         _eventWatcher.Stop();
         _eventWatcher.Dispose();
     }

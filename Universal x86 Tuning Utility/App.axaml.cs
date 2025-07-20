@@ -87,7 +87,6 @@ public class App : Application
     {
         try
         {
-            // todo: check logging service registration
             _logger = Locator.Current.GetService<ILogger<App>>()!;
 
             try
@@ -111,8 +110,7 @@ public class App : Application
                 File.Delete(filename);
                 Settings.Default.Reload();
             }
-
-            // todo: refact updatehelper to https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetgetconnectedstate
+            
             if (UpdateHelper.IsInternetAvailable() && Settings.Default.UpdateCheck)
             {
                 var updateManager = Locator.Current.GetService<IUpdateService>()!;
