@@ -35,9 +35,11 @@ public class WindowsFanControlService : IFanControlService
         _systemInfoService = systemInfoService;
     }
 
+    private const string FanConfigsFolderPath = @"\Assets\Fan Configs";
+
     public void UpdateAddresses()
     {
-        string path = $@"\Fan Configs\{_systemInfoService.Manufacturer.Value.ToUpper()}_{_systemInfoService.Product.Value.ToUpper()}.json";
+        string path = $@"{FanConfigsFolderPath}\{_systemInfoService.Manufacturer.Value.ToUpper()}_{_systemInfoService.Product.Value.ToUpper()}.json";
 
         if (File.Exists(path))
         {
