@@ -245,7 +245,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         
         CPUClock /= _systemInfoService.Cpu.CoresCount;
 
-        //CPUPower = (int)GetSensor.getCPUInfo(SensorType.Power, "Package");
+        CPUPower = (int)_sensorsService.GetCPUInfo(SensorType.Power, "Package");
 
         if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) == 0)
         {

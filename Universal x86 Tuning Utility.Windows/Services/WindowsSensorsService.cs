@@ -77,6 +77,7 @@ public class WindowsSensorsService : ISensorsService, IDisposable
             SensorType.Load => LibreHardwareMonitor.Hardware.SensorType.Load,
             SensorType.Clock => LibreHardwareMonitor.Hardware.SensorType.Clock,
             SensorType.Temperature => LibreHardwareMonitor.Hardware.SensorType.Temperature,
+            SensorType.Power => LibreHardwareMonitor.Hardware.SensorType.Power,
             _ => throw new ArgumentOutOfRangeException(nameof(sensorType))
         };
         
