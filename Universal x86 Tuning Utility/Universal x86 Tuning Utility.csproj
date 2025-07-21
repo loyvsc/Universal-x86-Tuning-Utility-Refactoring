@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
@@ -13,10 +13,9 @@
     <Authors>JamesCJ60</Authors>
     <SignAssembly>False</SignAssembly>
     <Copyright>© UXTU Team 2020 - 2025</Copyright>
-    <AssemblyVersion>2.4.4</AssemblyVersion>
-    <FileVersion>2.4.4</FileVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Version>2.4.4</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
