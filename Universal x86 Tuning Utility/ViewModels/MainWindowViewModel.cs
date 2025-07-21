@@ -16,7 +16,6 @@ using FluentAvalonia.FluentIcons;
 using FluentAvalonia.UI.Controls;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
-using RTSSSharedMemoryNET;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Navigation;
 using Universal_x86_Tuning_Utility.Properties;
@@ -390,10 +389,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
 
     private async Task ProcessGamePerformanceData(GameLauncherItem game)
     {
-        var appEntries = RTSSSharedMemoryNET.OSD.GetAppEntries()
-            .Where(app => (app.Flags & AppFlags.MASK) != AppFlags.None).ToArray();
-
-        foreach (var app in appEntries)
+        foreach (var app in _rtssService.GetApplicationRenderInfo())
         {
             if (!IsGameMatched(game, app.Name)) continue;
 
@@ -413,7 +409,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
                appName.Contains(game.Executable, StringComparison.OrdinalIgnoreCase);
     }
 
-    private void UpdateGamePerformanceData(AppEntry app, GameData gameData)
+    private void UpdateGamePerformanceData(ApplicationRenderInfo app, GameData gameData)
     {
         var fpsArray = ParseAndUpdateData(app.InstantaneousFrames, gameData.FpsAverageData, out var averageFps);
         var timeSpans = ParseAndUpdateData(app.InstantaneousFrameTime, gameData.MsAverageData, out var averageTimeSpan);

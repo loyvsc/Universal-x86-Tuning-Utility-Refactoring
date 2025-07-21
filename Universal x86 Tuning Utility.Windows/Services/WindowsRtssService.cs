@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
+using RTSSSharedMemoryNET;
 using Universal_x86_Tuning_Utility.Properties;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services;
@@ -180,6 +184,28 @@ public class WindowsRtssService : IRtssService
     private void UpdateSettings()
     {
         PostMessage(WM_RTSS_UPDATESETTINGS, IntPtr.Zero, IntPtr.Zero);
+    }
+
+    public IEnumerable<ApplicationRenderInfo> GetApplicationRenderInfo()
+    {
+        var list = new List<ApplicationRenderInfo>();
+        foreach (var appEntry in RTSSSharedMemoryNET.OSD.GetAppEntries().Where(app => (app.Flags & AppFlags.MASK) != AppFlags.None))
+        {
+            var renderInfo = new ApplicationRenderInfo(processId: appEntry.ProcessId, 
+                                                       name: appEntry.Name,
+                                                       instantaneousFrames: appEntry.InstantaneousFrames,
+                                                       totalFramesCount: appEntry.StatFrames,
+                                                       averageFramerate: appEntry.StatFramerateAvg,
+                                                       minFramerate: appEntry.StatFramerateMin,
+                                                       maxFramerate: appEntry.StatFramerateMax,
+                                                       minFrameTime: appEntry.StatFrameTimeMin,
+                                                       maxFrameTime: appEntry.StatFrameTimeMax,
+                                                       averageFrameTime: appEntry.StatFrameTimeAvg,
+                                                       instantaneousFrameTime: appEntry.InstantaneousFrameTime);
+            list.Add(renderInfo);
+        }
+        
+        return list;
     }
 }
 
