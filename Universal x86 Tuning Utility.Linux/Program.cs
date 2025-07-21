@@ -2,6 +2,7 @@
 using System;
 using ApplicationCore.Interfaces;
 using DAL.Services;
+using DesktopNotifications.Avalonia;
 using Splat;
 using Universal_x86_Tuning_Utility.Linux.Services;
 using Universal_x86_Tuning_Utility.Linux.Services.GPUs;
@@ -22,8 +23,10 @@ class Program
         => AppBuilder.Configure<App>()
             .UseX11()
             .UseSkia()
+            .SetupDesktopNotifications(out var notificationManager)
             .AfterSetup(_ =>
             {
+                SplatRegistrations.RegisterConstant(notificationManager!);
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, LinuxAsusWmiService>();
                 SplatRegistrations.RegisterLazySingleton<ICliService, LinuxCliService>();
                 SplatRegistrations.RegisterLazySingleton<ICpuControlService, LinuxCpuControlService>();

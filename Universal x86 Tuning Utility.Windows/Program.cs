@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using System;
 using ApplicationCore.Interfaces;
+using DesktopNotifications;
+using DesktopNotifications.Avalonia;
 using Splat;
 using Universal_x86_Tuning_Utility.Windows.Services;
 using Universal_x86_Tuning_Utility.Windows.Services.Asus;
@@ -23,8 +25,10 @@ class Program
         => AppBuilder.Configure<App>()
             .UseWin32()
             .WithInterFont()
+            .SetupDesktopNotifications(out var notificationManager)
             .AfterSetup(_ =>
             {
+                SplatRegistrations.RegisterConstant(notificationManager!);
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, WindowsAsusWmiService>(); 
                 SplatRegistrations.RegisterLazySingleton<ICliService, WindowsCliService>();
                 SplatRegistrations.RegisterLazySingleton<ICpuControlService, WindowsCpuControlService>();
