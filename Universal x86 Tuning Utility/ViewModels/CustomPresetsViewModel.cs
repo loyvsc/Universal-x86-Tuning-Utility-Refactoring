@@ -21,7 +21,7 @@ using PowerMode = ApplicationCore.Models.PowerMode;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class CustomPresetsViewModel : NotifyPropertyChangedBase, IDisposable
+public class CustomPresetsViewModel : ReactiveObject, IDisposable
 {
     public ICommand ApplyPresetCommand { get; }
     public ICommand SavePresetCommand { get; }
@@ -35,43 +35,43 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase, IDisposable
     public bool IsNvidiaGpuSettingsAvailable
     {
         get => _isNvidiaGpuSettingsAvailable;
-        set => SetValue(ref _isNvidiaGpuSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isNvidiaGpuSettingsAvailable, value);
     }
 
     public bool IsRadeonGpuSettingsAvailable
     {
         get => _isIsRadeonGpuSettingsAvailable;
-        set => SetValue(ref _isIsRadeonGpuSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isIsRadeonGpuSettingsAvailable, value);
     }
 
     public List<Preset> AvailablePresets
     {
         get => _availablePresets;
-        set => SetValue(ref _availablePresets, value);
+        set => this.RaiseAndSetIfChanged(ref _availablePresets, value);
     }
 
     public Preset CurrentPreset
     {
         get => _currentPreset;
-        set => SetValue(ref _currentPreset, value);
+        set => this.RaiseAndSetIfChanged(ref _currentPreset, value);
     }
 
     public bool UndoActionAvailable
     {
         get => _undoActionAvailable;
-        set => SetValue(ref _undoActionAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _undoActionAvailable, value);
     }
 
     public bool IsChangeRefreshRateAvailable
     {
         get => _isChangeRefreshRateAvailable;
-        set => SetValue(ref _isChangeRefreshRateAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isChangeRefreshRateAvailable, value);
     }
 
     public EnhancedObservableCollection<DisplayModel> AvailableDisplays
     {
         get => _availableDisplays;
-        set => SetValue(ref _availableDisplays, value);
+        set => this.RaiseAndSetIfChanged(ref _availableDisplays, value);
     }
 
     public DisplayModel SelectedDisplay
@@ -79,161 +79,159 @@ public class CustomPresetsViewModel : NotifyPropertyChangedBase, IDisposable
         get => _selectedDisplay;
         set
         {
-            if (SetValue(ref _selectedDisplay, value))
-            {
-                SelectedPreset.DisplayIdentifier = value.Identifier;
-            }
+            this.RaiseAndSetIfChanged(ref _selectedDisplay, value);
+            SelectedPreset.DisplayIdentifier = value.Identifier;
         }
     }
 
     public bool IsIntelSettingsAvailable
     {
         get => _isIntelSettingsAvailable;
-        set => SetValue(ref _isIntelSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isIntelSettingsAvailable, value);
     }
 
     public bool IsAmdApuSettingsAvailable
     {
         get => _isAmdApuSettingsAvailable;
-        set => SetValue(ref _isAmdApuSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdApuSettingsAvailable, value);
     }
 
     public bool IsAmdCpuSettingsAvailable
     {
         get => _isAmdCpuSettingsAvailable;
-        set => SetValue(ref _isAmdCpuSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdCpuSettingsAvailable, value);
     }
 
     public bool IsAmdPboSettingAvailable
     {
         get => _isAmdPboSettingAvailable;
-        set => SetValue(ref _isAmdPboSettingAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdPboSettingAvailable, value);
     }
 
     public bool IsAmdCpuTuneSettingAvailable
     {
         get => _isAmdCpuTuneSettingAvailable;
-        set => SetValue(ref _isAmdCpuTuneSettingAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdCpuTuneSettingAvailable, value);
     }
 
     public bool IsAmdSoftClockSettingAvailable
     {
         get => _isAmdSoftClockSettingAvailable;
-        set => SetValue(ref _isAmdSoftClockSettingAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdSoftClockSettingAvailable, value);
     }
 
     public bool IsAmdCOSettingAvailable
     {
         get => _isAmdCoSettingAvailable;
-        set => SetValue(ref _isAmdCoSettingAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdCoSettingAvailable, value);
     }
 
     public bool IsAmdPowerProfileSettingsAvailable
     {
         get => _isAmdPowerProfileSettingsAvailable;
-        set => SetValue(ref _isAmdPowerProfileSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdPowerProfileSettingsAvailable, value);
     }
 
     public bool IsAmdCCD1COSettingAvailable
     {
         get => _isAmdCCD1COSettingAvailable;
-        set => SetValue(ref _isAmdCCD1COSettingAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdCCD1COSettingAvailable, value);
     }
 
     public bool IsAmdCCD2COSettingAvailable
     {
         get => _isAmdCCD2COSettingAvailable;
-        set => SetValue(ref _isAmdCCD2COSettingAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdCCD2COSettingAvailable, value);
     }
 
     public bool IsAmdApuIGpuClockSettingAvailable
     {
         get => _isAmdApuIGpuClockSettingAvailable;
-        set => SetValue(ref _isAmdApuIGpuClockSettingAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdApuIGpuClockSettingAvailable, value);
     }
 
     public bool IsAmdApuVrmSettingAvailable
     {
         get => _isAmdApuVrmSettingAvailable;
-        set => SetValue(ref _isAmdApuVrmSettingAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdApuVrmSettingAvailable, value);
     }
 
     public bool IsUndoActionAvailable
     {
         get => _isUndoActionAvailable;
-        set => SetValue(ref _isUndoActionAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isUndoActionAvailable, value);
     }
 
     public bool IsAsusEcoMode
     {
         get => _isAsusEcoMode;
-        set => SetValue(ref _isAsusEcoMode, value);
+        set => this.RaiseAndSetIfChanged(ref _isAsusEcoMode, value);
     }
 
     public bool IsAsusEcoModeAvailable
     {
         get => _isAsusEcoModeAvailable;
-        set => SetValue(ref _isAsusEcoModeAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAsusEcoModeAvailable, value);
     }
 
     public bool IsAsusPowerSettingsAvailable
     {
         get => _isAsusPowerSettingsAvailable;
-        set => SetValue(ref _isAsusPowerSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAsusPowerSettingsAvailable, value);
     }
 
     public bool IsAsusGpuUltimateSettingsAvailable
     {
         get => _isAsusGpuUltimateSettingsAvailable;
-        set => SetValue(ref _isAsusGpuUltimateSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAsusGpuUltimateSettingsAvailable, value);
     }
 
     public bool IsAsusGpuEcoModeSettingsAvailable
     {
         get => _isAsusGpuEcoModeSettingsAvailable;
-        set => SetValue(ref _isAsusGpuEcoModeSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAsusGpuEcoModeSettingsAvailable, value);
     }
 
     public bool IsAmdCpuThermalSettingsAvailable
     {
         get => _isAsusGpuEcoModeSettingsAvailable;
-        set => SetValue(ref _isAsusGpuEcoModeSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAsusGpuEcoModeSettingsAvailable, value);
     }
 
     public List<AsusPowerProfile> AsusPowerProfiles
     {
         get => _asusPowerProfiles;
-        set => SetValue(ref _asusPowerProfiles, value);
+        set => this.RaiseAndSetIfChanged(ref _asusPowerProfiles, value);
     }
 
     public AsusPowerProfile SelectedAsusPowerProfile
     {
         get => _selectedAsusPowerProfile;
-        set => SetValue(ref _selectedAsusPowerProfile, value);
+        set => this.RaiseAndSetIfChanged(ref _selectedAsusPowerProfile, value);
     }
 
     public Preset SelectedPreset
     {
         get => _selectedPreset;
-        set => SetValue(ref _selectedPreset, value);
+        set => this.RaiseAndSetIfChanged(ref _selectedPreset, value);
     }
 
     public List<PowerMode> PowerModes
     {
         get => _powerModes;
-        set => SetValue(ref _powerModes, value);
+        set => this.RaiseAndSetIfChanged(ref _powerModes, value);
     }
 
     public List<AmdPowerProfile> AmdPowerProfiles
     {
         get => _amdPowerProfiles;
-        set => SetValue(ref _amdPowerProfiles, value);
+        set => this.RaiseAndSetIfChanged(ref _amdPowerProfiles, value);
     }
 
     public List<UXTUSuperResolutionScale> UXTUSuperResolutionScales
     {
         get => _uxtuSuperResolutionScales;
-        set => SetValue(ref _uxtuSuperResolutionScales, value);
+        set => this.RaiseAndSetIfChanged(ref _uxtuSuperResolutionScales, value);
     }
 
     #endregion

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
 using System.Windows.Input;
 using ApplicationCore.Interfaces;
-using ApplicationCore.Utilities;
 using DesktopNotifications;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
@@ -15,7 +12,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class SettingsViewModel : NotifyPropertyChangedBase
+public class SettingsViewModel : ReactiveObject
 {
     public ICommand CheckUpdateCommand { get; }
     public ICommand DownloadUpdateCommand { get; }
@@ -25,73 +22,73 @@ public class SettingsViewModel : NotifyPropertyChangedBase
     public int ReapplySecond
     {
         get => _reapplySecond;
-        set => SetValue(ref _reapplySecond, value);
+        set => this.RaiseAndSetIfChanged(ref _reapplySecond, value);
     }
     
     public string ApplicationVersion
     {
         get => _appVersion;
-        set => SetValue(ref _appVersion, value);
+        set => this.RaiseAndSetIfChanged(ref _appVersion, value);
     }
 
     public bool IsAutoStartEnabled
     {
         get => _isAutoStartEnabled;
-        set => SetValue(ref _isAutoStartEnabled, value);
+        set => this.RaiseAndSetIfChanged(ref _isAutoStartEnabled, value);
     }
 
     public bool IsStartMinimizedEnabled
     {
         get => _isStartMinimizedEnabled;
-        set => SetValue(ref _isStartMinimizedEnabled, value);
+        set => this.RaiseAndSetIfChanged(ref _isStartMinimizedEnabled, value);
     }
 
     public bool IsMinimizeOnClose
     {
         get => _isMinimizeOnClose;
-        set => SetValue(ref _isMinimizeOnClose, value);
+        set => this.RaiseAndSetIfChanged(ref _isMinimizeOnClose, value);
     }
 
     public bool IsReapplyOnStart
     {
         get => _isReapplyOnStart;
-        set => SetValue(ref _isReapplyOnStart, value);
+        set => this.RaiseAndSetIfChanged(ref _isReapplyOnStart, value);
     }
 
     public bool IsAutoReapply
     {
         get => _isIsAutoReapply;
-        set => SetValue(ref _isIsAutoReapply, value);
+        set => this.RaiseAndSetIfChanged(ref _isIsAutoReapply, value);
     }
 
     public bool IsAutoCheckUpdates
     {
         get => _isAutoCheckUpdates;
-        set => SetValue(ref _isAutoCheckUpdates, value);
+        set => this.RaiseAndSetIfChanged(ref _isAutoCheckUpdates, value);
     }
 
     public bool IsAutoStartAdaptiveMode
     {
         get => _isAutoStartAdaptiveMode;
-        set => SetValue(ref _isAutoStartAdaptiveMode, value);
+        set => this.RaiseAndSetIfChanged(ref _isAutoStartAdaptiveMode, value);
     }
 
     public bool IsAutoTrackGames
     {
         get => _isAutoTrackGames;
-        set => SetValue(ref _isAutoTrackGames, value);
+        set => this.RaiseAndSetIfChanged(ref _isAutoTrackGames, value);
     }
 
     public bool IsUpdateAvailable
     {
         get => _isUpdateAvailable;
-        set => SetValue(ref _isUpdateAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isUpdateAvailable, value);
     }
 
     public string UpdatesMessage
     {
         get => _updatesMessage;
-        set => SetValue(ref _updatesMessage, value);
+        set => this.RaiseAndSetIfChanged(ref _updatesMessage, value);
     }
     
     private readonly ILogger<SettingsViewModel> _logger;

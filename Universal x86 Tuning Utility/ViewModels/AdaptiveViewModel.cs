@@ -17,7 +17,7 @@ using Universal_x86_Tuning_Utility.Properties;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class AdaptiveViewModel : NotifyPropertyChangedBase
+public class AdaptiveViewModel : ReactiveObject
 {
     public ICommand ToggleAdaptiveModeCommand { get; }
     public ICommand SavePresetCommand { get; }
@@ -26,76 +26,78 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
     public bool IsAutoSwitchEnabled
     {
         get => _isAutoSwitchEnabled;
-        set => SetValue(ref _isAutoSwitchEnabled, value, () =>
+        set
         {
+            this.RaiseAndSetIfChanged(ref _isAutoSwitchEnabled, value);
             Settings.Default.autoSwitch = value;
-        });
+        }
     }
 
     public bool IsStart
     {
         get => _isStart;
-        set => SetValue(ref _isStart, value);
+        set => this.RaiseAndSetIfChanged(ref _isStart, value);
     }
 
     public AdaptivePreset CurrentPreset
     {
         get => _currentPreset;
-        set => SetValue(ref _currentPreset, value);
+        set => this.RaiseAndSetIfChanged(ref _currentPreset, value);
     }
 
     public EnhancedObservableCollection<AdaptivePreset> AvailablePresets
     {
         get => _availablePresets;
-        set => SetValue(ref _availablePresets, value);
+        set => this.RaiseAndSetIfChanged(ref _availablePresets, value);
     }
 
     public bool IsAsusPowerSettingsAvailable
     {
         get => _isAsusPowerSettingsAvailable;
-        set => SetValue(ref _isAsusPowerSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAsusPowerSettingsAvailable, value);
     }
 
     public bool IsAmdApuTurboBoostOverdriveSettingsAvailable
     {
         get => _isAmdApuTurboBoostOverdriveSettingsAvailable;
-        set => SetValue(ref _isAmdApuTurboBoostOverdriveSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdApuTurboBoostOverdriveSettingsAvailable, value);
     }
 
     public bool IsRadeonGraphicsOptionsAvailable
     {
         get => _isRadeonGraphicsOptionsAvailable;
-        set => SetValue(ref _isRadeonGraphicsOptionsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isRadeonGraphicsOptionsAvailable, value);
     }
 
     public bool IsNvidiaGraphicsOptionsAvailable
     {
         get => _isNvidiaGraphicsOptionsAvailable;
-        set => SetValue(ref _isNvidiaGraphicsOptionsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isNvidiaGraphicsOptionsAvailable, value);
     }
 
     public bool IsCurveOptimizerOptionsAvailable
     {
         get => _isCurveOptimizerOptionsAvailable;
-        set => SetValue(ref _isCurveOptimizerOptionsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isCurveOptimizerOptionsAvailable, value);
     }
 
     public double Polling
     {
         get => _polling;
-        set => SetValue(ref _polling, value, () =>
+        set
         {
+            this.RaiseAndSetIfChanged(ref _polling, value);
             Settings.Default.polling = value;
             var newInterval = TimeSpan.FromSeconds(value);
             _sensorsTimer.Interval = newInterval;
             _adaptiveModeTimer.Interval = newInterval;
-        });
+        }
     }
 
     public List<UXTUSuperResolutionScale> UXTUSuperResolutionScales
     {
         get => _UXTUSuperResolutionScales;
-        set => SetValue(ref _UXTUSuperResolutionScales, value);
+        set => this.RaiseAndSetIfChanged(ref _UXTUSuperResolutionScales, value);
     }
 
     private List<UXTUSuperResolutionScale> _UXTUSuperResolutionScales;

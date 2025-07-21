@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ApplicationCore.Interfaces;
-using ApplicationCore.Utilities;
 using Avalonia.Threading;
 using DesktopNotifications;
 using LibreHardwareMonitor.Hardware;
@@ -14,7 +13,7 @@ using Universal_x86_Tuning_Utility.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class FanControlViewModel : NotifyPropertyChangedBase
+public class FanControlViewModel : ReactiveObject
 {
     public ICommand EnableFanControlCommand { get; }
     public ICommand DisableFanControlCommand { get; }
@@ -26,25 +25,25 @@ public class FanControlViewModel : NotifyPropertyChangedBase
     public string ConfigName
     {
         get => _configName;
-        set => SetValue(ref _configName, value);
+        set => this.RaiseAndSetIfChanged(ref _configName, value);
     }
     
     public string Status
     {
         get => _status;
-        set => SetValue(ref _status, value);
+        set => this.RaiseAndSetIfChanged(ref _status, value);
     }
     
     public bool IsFanControlEnabled
     {
         get => _isFanControlEnabled;
-        set => SetValue(ref _isFanControlEnabled, value);
+        set => this.RaiseAndSetIfChanged(ref _isFanControlEnabled, value);
     }
 
     public decimal FanSpeed
     {
         get => _fanSpeed;
-        set => SetValue(ref _fanSpeed, value);
+        set => this.RaiseAndSetIfChanged(ref _fanSpeed, value);
     }
 
     private string _configName;

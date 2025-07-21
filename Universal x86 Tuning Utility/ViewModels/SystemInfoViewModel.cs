@@ -3,143 +3,143 @@ using System.Linq;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using ApplicationCore.Utilities;
 using Avalonia.Threading;
+using ReactiveUI;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class SystemInfoViewModel : NotifyPropertyChangedBase, IDisposable
+public class SystemInfoViewModel : ReactiveObject, IDisposable
 {
     public CpuInfo CpuInfo
     {
         get => _cpuInfoInfo;
-        set => SetValue(ref _cpuInfoInfo, value);
+        set => this.RaiseAndSetIfChanged(ref _cpuInfoInfo, value);
     }
 
     public string DeviceName
     {
         get => _deviceName;
-        set => SetValue(ref _deviceName, value);
+        set => this.RaiseAndSetIfChanged(ref _deviceName, value);
     }
 
     public string DeviceManufacturer
     {
         get => _deviceManufacturer;
-        set => SetValue(ref _deviceManufacturer, value);
+        set => this.RaiseAndSetIfChanged(ref _deviceManufacturer, value);
     }
 
     public string DeviceModel
     {
         get => _deviceModel;
-        set => SetValue(ref _deviceModel, value);
+        set => this.RaiseAndSetIfChanged(ref _deviceModel, value);
     }
 
     public string RamInfo
     {
         get => _ramInfo;
-        set => SetValue(ref _ramInfo, value);
+        set => this.RaiseAndSetIfChanged(ref _ramInfo, value);
     }
 
     public string RamProducer
     {
         get => _ramProducer;
-        set => SetValue(ref _ramProducer, value);
+        set => this.RaiseAndSetIfChanged(ref _ramProducer, value);
     }
 
     public string RamModel
     {
         get => _ramModel;
-        set => SetValue(ref _ramModel, value);
+        set => this.RaiseAndSetIfChanged(ref _ramModel, value);
     }
 
     public string RamWidth
     {
         get => _ramWidth;
-        set => SetValue(ref _ramWidth, value);
+        set => this.RaiseAndSetIfChanged(ref _ramWidth, value);
     }
 
     public string RamSlots
     {
         get => _ramSlots;
-        set => SetValue(ref _ramSlots, value);
+        set => this.RaiseAndSetIfChanged(ref _ramSlots, value);
     }
 
     public MemoryTimings RamTimings
     {
         get => _ramTimings;
-        set => SetValue(ref _ramTimings, value);
+        set => this.RaiseAndSetIfChanged(ref _ramTimings, value);
     }
 
     public bool IsBatteryInfoAvailable
     {
         get => _isBatteryInfoAvailable;
-        set => SetValue(ref _isBatteryInfoAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isBatteryInfoAvailable, value);
     }
 
     public string BatteryHealth
     {
         get => _batteryHealth;
-        set => SetValue(ref _batteryHealth, value);
+        set => this.RaiseAndSetIfChanged(ref _batteryHealth, value);
     }
 
     public string BatteryCycle
     {
         get => _batteryCycle;
-        set => SetValue(ref _batteryCycle, value);
+        set => this.RaiseAndSetIfChanged(ref _batteryCycle, value);
     }
 
     public string BatteryCapacity
     {
         get => _batteryCapacity;
-        set => SetValue(ref _batteryCapacity, value);
+        set => this.RaiseAndSetIfChanged(ref _batteryCapacity, value);
     }
 
     public string BatteryChargeRate
     {
         get => _batteryChargeRate;
-        set => SetValue(ref _batteryChargeRate, value);
+        set => this.RaiseAndSetIfChanged(ref _batteryChargeRate, value);
     }
 
     public string CpuCoresInfo
     {
         get => _cpuCoresInfo;
-        set => SetValue(ref _cpuCoresInfo, value);
+        set => this.RaiseAndSetIfChanged(ref _cpuCoresInfo, value);
     }
 
     public string CpuBaseClock
     {
         get => _cpuBaseClock;
-        set => SetValue(ref _cpuBaseClock, value);
+        set => this.RaiseAndSetIfChanged(ref _cpuBaseClock, value);
     }
 
     public string CpuInstructions
     {
         get => _cpuInstructions;
-        set => SetValue(ref _cpuInstructions, value);
+        set => this.RaiseAndSetIfChanged(ref _cpuInstructions, value);
     }
 
     public string CpuL1Cache
     {
         get => _cpuL1Cache;
-        set => SetValue(ref _cpuL1Cache, value);
+        set => this.RaiseAndSetIfChanged(ref _cpuL1Cache, value);
     }
 
     public string CpuL2Cache
     {
         get => _cpuL2Cache;
-        set => SetValue(ref _cpuL2Cache, value);
+        set => this.RaiseAndSetIfChanged(ref _cpuL2Cache, value);
     }
 
     public string CpuL3Cache
     {
         get => _cpuL3Cache;
-        set => SetValue(ref _cpuL3Cache, value);
+        set => this.RaiseAndSetIfChanged(ref _cpuL3Cache, value);
     }
 
     public string CpuL4Cache
     {
         get => _cpuL4Cache;
-        set => SetValue(ref _cpuL4Cache, value);
+        set => this.RaiseAndSetIfChanged(ref _cpuL4Cache, value);
     }
     
     private CpuInfo _cpuInfoInfo;

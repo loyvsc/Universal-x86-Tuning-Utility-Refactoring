@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,10 +8,8 @@ using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using ApplicationCore.Utilities;
 using Avalonia.Threading;
 using DesktopNotifications;
-using FluentAvalonia.UI.Controls;
 using FluentIcons.Common;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
@@ -22,7 +19,7 @@ using Universal_x86_Tuning_Utility.Extensions;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class GamesViewModel : NotifyPropertyChangedBase, IDisposable
+public class GamesViewModel : ReactiveObject, IDisposable
 {
     public ICommand ReloadGamesListCommand { get; }
     public ICommand AddGameCommand { get; }
@@ -31,19 +28,19 @@ public class GamesViewModel : NotifyPropertyChangedBase, IDisposable
     public ObservableCollection<GameLauncherItem> Games
     {
         get => _games;
-        set => SetValue(ref _games, value);
+        set => this.RaiseAndSetIfChanged(ref _games, value);
     }
 
     public bool GamesListUpdating
     {
         get => _gamesListUpdating;
-        set => SetValue(ref _gamesListUpdating, value);
+        set => this.RaiseAndSetIfChanged(ref _gamesListUpdating, value);
     }
 
     public bool IsActionsAvailable
     {
         get => _isActionsAvailable;
-        set => SetValue(ref _isActionsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isActionsAvailable, value);
     }
 
     private readonly ILogger<GamesViewModel> _logger;

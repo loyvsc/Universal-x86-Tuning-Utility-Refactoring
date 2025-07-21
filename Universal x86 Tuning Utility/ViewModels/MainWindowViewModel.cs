@@ -9,7 +9,6 @@ using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using ApplicationCore.Utilities;
 using Avalonia.Threading;
 using DesktopNotifications;
 using FluentAvalonia.FluentIcons;
@@ -25,7 +24,7 @@ using PowerModeChangedEventArgs = ApplicationCore.Events.PowerModeChangedEventAr
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class MainWindowViewModel : NotifyPropertyChangedBase
+public class MainWindowViewModel : ReactiveObject
 {
     private readonly ISystemInfoService _systemInfoService;
     private readonly IBatteryInfoService _batteryInfoService;
@@ -46,7 +45,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
     public string Title
     {
         get => _title;
-        set => SetValue(ref _title, value);
+        set => this.RaiseAndSetIfChanged(ref _title, value);
     }
 
     public string ProductManufacturer { get; }

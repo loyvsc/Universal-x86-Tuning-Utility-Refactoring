@@ -1,9 +1,9 @@
 using System;
-using ApplicationCore.Utilities;
+using ReactiveUI;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class NavigationViewModel : NotifyPropertyChangedBase
+public class NavigationViewModel : ReactiveObject
 {
     private bool _isInitializing;
     private object _iconSymbol;
@@ -13,19 +13,19 @@ public class NavigationViewModel : NotifyPropertyChangedBase
     public bool IsInitializing
     {
         get => _isInitializing;
-        set => SetValue(ref _isInitializing, value);
+        set => this.RaiseAndSetIfChanged(ref _isInitializing, value);
     }
 
     public string Title
     {
         get => _title;
-        set => SetValue(ref _title, value);
+        set => this.RaiseAndSetIfChanged(ref _title, value);
     }
 
     public object IconSymbol
     {
         get => _iconSymbol;
-        set => SetValue(ref _iconSymbol, value);
+        set => this.RaiseAndSetIfChanged(ref _iconSymbol, value);
     }
 
     public Type ViewModelType { get; set; }
@@ -33,6 +33,6 @@ public class NavigationViewModel : NotifyPropertyChangedBase
     public object? DataContext
     {
         get => _dataContext;
-        set => SetValue(ref _dataContext, value);
+        set => this.RaiseAndSetIfChanged(ref _dataContext, value);
     }
 }

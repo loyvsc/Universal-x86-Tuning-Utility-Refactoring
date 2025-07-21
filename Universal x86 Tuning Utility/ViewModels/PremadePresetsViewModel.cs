@@ -13,7 +13,7 @@ using Universal_x86_Tuning_Utility.Properties;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class PremadePresetsViewModel : NotifyPropertyChangedBase
+public class PremadePresetsViewModel : ReactiveObject
 {
     private readonly ILogger<PremadePresetsViewModel> _logger;
     private readonly IPremadePresets _premadePresets;
@@ -24,13 +24,13 @@ public class PremadePresetsViewModel : NotifyPropertyChangedBase
     public PremadePreset? CurrentPreset
     {
         get => _currentPreset;
-        set => SetValue(ref _currentPreset, value);
+        set => this.RaiseAndSetIfChanged(ref _currentPreset, value);
     }
 
     public EnhancedObservableCollection<PremadePreset> AvailablePresets
     {
         get => _availablePresets;
-        set => SetValue(ref _availablePresets, value);
+        set => this.RaiseAndSetIfChanged(ref _availablePresets, value);
     }
 
     private PremadePreset? _currentPreset;

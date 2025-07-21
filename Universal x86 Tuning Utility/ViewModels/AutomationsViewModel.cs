@@ -5,51 +5,53 @@ using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using ApplicationCore.Utilities;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Properties;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class AutomationsViewModel : NotifyPropertyChangedBase
+public class AutomationsViewModel : ReactiveObject
 {
     public ICommand ReloadPResetsCommand { get; }
 
     public Preset SelectedAcPreset
     {
         get => _selectedAcPreset;
-        set => SetValue(ref _selectedAcPreset, value, () =>
+        set
         {
+            this.RaiseAndSetIfChanged(ref _selectedAcPreset, value);
             Settings.Default.acPreset = value.Name;
             Settings.Default.acCommandString = value.CommandValue;
-        });
+        }
     }
 
     public Preset SelectedDcPreset
     {
         get => _selectedDcPreset;
-        set => SetValue(ref _selectedDcPreset, value, () =>
+        set
         {
+            this.RaiseAndSetIfChanged(ref _selectedDcPreset, value);
             Settings.Default.dcPreset = value.Name;
             Settings.Default.dcCommandString = value.CommandValue;
-        });
+        }
     }
 
     public Preset SelectedResumePreset
     {
         get => _selectedResumePreset;
-        set => SetValue(ref _selectedResumePreset, value, () =>
+        set
         {
+            this.RaiseAndSetIfChanged(ref _selectedResumePreset, value);
             Settings.Default.resumePreset = value.Name;
             Settings.Default.resumeCommandString = value.CommandValue;
-        });
+        }
     }
 
     public List<Preset> Presets
     {
         get => _presets;
-        set => SetValue(ref _presets, value);
+        set => this.RaiseAndSetIfChanged(ref _presets, value);
     }
     
     private List<Preset> _presets;

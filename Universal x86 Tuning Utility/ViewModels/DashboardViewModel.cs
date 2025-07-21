@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
-using ApplicationCore.Utilities;
 using Avalonia.Threading;
 using DesktopNotifications;
 using ReactiveUI;
@@ -12,7 +11,7 @@ using Settings = Universal_x86_Tuning_Utility.Properties.Settings;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public partial class DashboardViewModel : NotifyPropertyChangedBase
+public partial class DashboardViewModel : ReactiveObject
 {
     private readonly INotificationManager _notificationManager;
     private readonly INvidiaGpuService _nvidiaGpuService;
@@ -23,7 +22,7 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
     public bool IsAmdSettingsAvailable
     {
         get => _isAmdSettingsAvailable;
-        set => SetValue(ref _isAmdSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdSettingsAvailable, value);
     }
 
     private readonly DispatcherTimer _autoAdaptive = new();
