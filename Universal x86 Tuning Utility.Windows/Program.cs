@@ -39,7 +39,7 @@ class Program
                 SplatRegistrations.RegisterLazySingleton<INvidiaGpuService, WindowsNvidiaGpuService>();
                 SplatRegistrations.RegisterLazySingleton<IIntelManagementService, WindowsIntelManagementService>();
                 SplatRegistrations.RegisterLazySingleton<IPowerPlanService, WindowsPowerPlanService>();
-                SplatRegistrations.RegisterLazySingleton<IRyzenAdjService, RyzenAdjService>();
+                SplatRegistrations.RegisterLazySingleton<IRyzenAdjService, WindowsRyzenAdjService>();
                 SplatRegistrations.RegisterLazySingleton<ISensorsService, WindowsSensorsService>();
                 SplatRegistrations.RegisterLazySingleton<IRtssService, WindowsRtssService>();
                 SplatRegistrations.RegisterLazySingleton<IStressTestService, WindowsStressTestService>();

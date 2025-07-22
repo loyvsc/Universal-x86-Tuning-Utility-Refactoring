@@ -12,11 +12,11 @@ using Universal_x86_Tuning_Utility.Windows.Services.Amd.Windows;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services;
 
-public class RyzenAdjService : IRyzenAdjService
+public class WindowsRyzenAdjService : IRyzenAdjService
 {
     private bool _isUpdatingMux;
     
-    private readonly ILogger<RyzenAdjService> _logger;
+    private readonly ILogger<WindowsRyzenAdjService> _logger;
     private readonly IDisplayInfoService _displayInfoService;
     private readonly IIntelManagementService _intelManagementService;
     private readonly IAmdGpuService _amdGpuService;
@@ -25,14 +25,14 @@ public class RyzenAdjService : IRyzenAdjService
     private readonly IASUSWmiService _asusWmiService;
     private readonly IPowerPlanService _powerPlanService;
 
-    public RyzenAdjService(ILogger<RyzenAdjService> logger,
-                           IDisplayInfoService displayInfoService,
-                           IIntelManagementService intelManagementService,
-                           IAmdGpuService amdGpuService,
-                           INvidiaGpuService nvidiaGpuService,
-                           ISystemInfoService systemInfoService,
-                           IASUSWmiService asusWmiService,
-                           IPowerPlanService powerPlanService)
+    public WindowsRyzenAdjService(ILogger<WindowsRyzenAdjService> logger,
+                                  IDisplayInfoService displayInfoService,
+                                  IIntelManagementService intelManagementService,
+                                  IAmdGpuService amdGpuService,
+                                  INvidiaGpuService nvidiaGpuService,
+                                  ISystemInfoService systemInfoService,
+                                  IASUSWmiService asusWmiService,
+                                  IPowerPlanService powerPlanService)
     {
         _logger = logger;
         _displayInfoService = displayInfoService;
