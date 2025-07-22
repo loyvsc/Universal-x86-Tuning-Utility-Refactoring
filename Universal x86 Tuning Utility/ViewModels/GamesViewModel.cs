@@ -10,12 +10,12 @@ using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using Avalonia.Threading;
 using DesktopNotifications;
-using FluentIcons.Common;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
+using Universal_x86_Tuning_Utility.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
@@ -49,6 +49,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
     private readonly INotificationManager _toastNotificationsService;
     private readonly IImageService _imageService;
     private readonly IGameLauncherService _gameLauncherService;
+    private readonly IIconExtracter _iconExtracter;
     private ObservableCollection<GameLauncherItem> _games;
     private readonly DispatcherTimer _updateFps;
     private bool _gamesListUpdating;
@@ -59,7 +60,8 @@ public class GamesViewModel : ReactiveObject, IDisposable
                           IDialogService dialogService,
                           INotificationManager toastNotificationsService,
                           IImageService imageService,
-                          IGameLauncherService gameLauncherService)
+                          IGameLauncherService gameLauncherService,
+                          IIconExtracter iconExtracter)
     {
         _logger = logger;
         _gameDataService = gameDataService;
@@ -67,6 +69,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
         _toastNotificationsService = toastNotificationsService;
         _imageService = imageService;
         _gameLauncherService = gameLauncherService;
+        _iconExtracter = iconExtracter;
 
         RunGameCommand = ReactiveCommand.CreateFromTask((GameLauncherItem gameToRun) => RunGame(gameToRun));
         AddGameCommand = ReactiveCommand.CreateFromTask(AddCustomGame);
@@ -129,15 +132,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
             var filePath = openFileDialogResult.Path.ToString();
             var gameName = Path.GetFileNameWithoutExtension(filePath);
             
-            var icon = Icon.ExtractAssociatedIcon(filePath);
-            
-            string gameImagesDirectory = @"\Assets\GameImages\";
-            var iconPath = Path.Combine(gameImagesDirectory, gameName + ".ico");
-            await using (var fileStream = new FileStream(iconPath, FileMode.Create))
-            {
-                icon.Save(fileStream);
-                icon.Dispose();
-            }
+            const string gameImagesDirectory = @"\Assets\GameImages\";
             
             var game = new GameLauncherItem
             {
@@ -145,7 +140,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
                 GameType = GameType.Custom,
                 Path = Path.GetDirectoryName(filePath)!,
                 Executable = filePath,
-                IconPath = iconPath
+                IconPath = await _iconExtracter.ExtractIcon(filePath, gameImagesDirectory)
             };
             
             var preset = new GameData

@@ -2,8 +2,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
+using ApplicationCore.Models.LaptopInfo;
 using ApplicationCore.Utilities;
 using DesktopNotifications;
 using Microsoft.Extensions.Logging;
@@ -16,10 +18,23 @@ namespace Universal_x86_Tuning_Utility.ViewModels;
 public class PremadePresetsViewModel : ReactiveObject
 {
     private readonly ILogger<PremadePresetsViewModel> _logger;
+    private readonly ISystemInfoService _systemInfoService;
     private readonly IPremadePresets _premadePresets;
     private readonly IRyzenAdjService _ryzenAdjService;
     private readonly INotificationManager _notificationManager;
     public ICommand ApplyPresetCommand { get; }
+
+    public string Header
+    {
+        get => _header;
+        set => this.RaiseAndSetIfChanged(ref _header, value);
+    }
+
+    public bool IsCertifiedBadgeVisible
+    {
+        get => _isCertifiedBadgeVisible;
+        set => this.RaiseAndSetIfChanged(ref _isCertifiedBadgeVisible, value);
+    }
 
     public PremadePreset? CurrentPreset
     {
@@ -35,19 +50,25 @@ public class PremadePresetsViewModel : ReactiveObject
 
     private PremadePreset? _currentPreset;
     private EnhancedObservableCollection<PremadePreset> _availablePresets;
+    private string _header;
+    private bool _isCertifiedBadgeVisible;
 
     public PremadePresetsViewModel(ILogger<PremadePresetsViewModel> logger,
+                                   ISystemInfoService systemInfoService,
                                    IPremadePresets premadePresets,
                                    IRyzenAdjService ryzenAdjService,
                                    INotificationManager notificationManager)
     {
         _logger = logger;
+        _systemInfoService = systemInfoService;
         _premadePresets = premadePresets;
         _ryzenAdjService = ryzenAdjService;
         _notificationManager = notificationManager;
         
         AvailablePresets = new EnhancedObservableCollection<PremadePreset>(_premadePresets.PremadePresetsList);
         ApplyPresetCommand = ReactiveCommand.CreateFromTask(ApplyPreset);
+
+        Header = "Premade Presets";
     }
 
     private async Task ApplyPreset(CancellationToken cancellationToken)
@@ -55,7 +76,7 @@ public class PremadePresetsViewModel : ReactiveObject
         if (CurrentPreset == null) return;
         try
         {
-            //ReloadValue();
+            ReloadValue();
 
             await _ryzenAdjService.Translate(CurrentPreset.RyzenAdjParameters);
 
@@ -78,46 +99,41 @@ public class PremadePresetsViewModel : ReactiveObject
         }
     }
 
-    // private void ReloadValue()
-    // {
-    //     try
-    //     {
-    //         if (_systemInfoService.CpuInfo.AmdProcessorType is AmdProcessorType.Apu or AmdProcessorType.Desktop)
-    //         {
-    //             var cpuName = _systemInfoService.CpuInfo.Name.Replace("AMD", null)
-    //                                                          .Replace("with", null)
-    //                                                          .Replace("Mobile", null)
-    //                                                          .Replace("Ryzen", null)
-    //                                                          .Replace("Radeon", null)
-    //                                                          .Replace("Graphics", null)
-    //                                                          .Replace("Vega", null)
-    //                                                          .Replace("Gfx", null);
-    //
-    //             var productName = _systemInfoService.Product.ToLower();
-    //             var manufacturer = _systemInfoService.Manufacturer.ToLower();
-    //
-    //             if (productName.Contains("laptop 16 (amd ryzen 7040") &&
-    //                manufacturer.Contains("framework"))
-    //             {
-    //                 tbxMessage.Text = "Premade Presets - Framework Laptop 16 (AMD Ryzen 7040HS Series)";
-    //                 bdgCertified.Visibility = Visibility.Visible;
-    //             }
-    //             else if (productName.Contains("laptop 13 (amd ryzen 7040") &&
-    //                     manufacturer.Contains("framework"))
-    //             {
-    //                 tbxMessage.Text = "Premade Presets - Framework Laptop 13 (AMD Ryzen 7040U Series)";
-    //                 bdgCertified.Visibility = Visibility.Visible;
-    //             }
-    //             else bdgCertified.Visibility = Visibility.Collapsed;
-    //             
-    //             _premadePresets.InitializePremadePresets();
-    //
-    //             int selectedPreset = Settings.Default.premadePreset;
-    //         }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Failed to update Premade page");
-    //     }
-    // }
+    private void ReloadValue()
+    {
+        try
+        {
+            if (_systemInfoService.Cpu.ProcessorType is ProcessorType.Apu or ProcessorType.Desktop)
+            {
+                if (_systemInfoService.LaptopInfo is FrameworkLaptopInfo frameworkLaptopInfo)
+                {
+                    if (frameworkLaptopInfo.CpuSeries == "7040")
+                    {
+                        if (frameworkLaptopInfo.LaptopSeries == 16)
+                        {
+                            Header = "Premade Presets - Framework Laptop 16 (AMD Ryzen 7040HS Series)";
+                            IsCertifiedBadgeVisible = true;
+                        }
+                        else if (frameworkLaptopInfo.LaptopSeries == 13)
+                        {
+                            Header = "Premade Presets - Framework Laptop 13 (AMD Ryzen 7040U Series)";
+                            IsCertifiedBadgeVisible = true;
+                        }
+                    }
+                }
+                else
+                {
+                    IsCertifiedBadgeVisible = false;
+                }
+                
+                _premadePresets.InitializePremadePresets();
+    
+                int selectedPreset = Settings.Default.premadePreset;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update Premade page");
+        }
+    }
 }

@@ -46,7 +46,7 @@ public partial class DashboardViewModel : ReactiveObject
         NavigateCommand = ReactiveCommand.Create<string>(OnNavigate);
     }
 
-    private void AutoAdaptive_Tick(object sender, EventArgs e)
+    private void AutoAdaptive_Tick(object? sender, EventArgs e)
     {
         foreach (var checkResult in _nvidiaGpuService.CheckIsGpusOriginal())
         {

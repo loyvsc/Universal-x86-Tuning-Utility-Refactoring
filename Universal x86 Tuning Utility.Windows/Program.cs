@@ -1,9 +1,9 @@
 ﻿using Avalonia;
 using System;
 using ApplicationCore.Interfaces;
-using DesktopNotifications;
 using DesktopNotifications.Avalonia;
 using Splat;
+using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Windows.Services;
 using Universal_x86_Tuning_Utility.Windows.Services.Asus;
 using Universal_x86_Tuning_Utility.Windows.Services.GPUs;
@@ -47,6 +47,7 @@ class Program
                 SplatRegistrations.RegisterLazySingleton<ISystemInfoService, WindowsSystemInfoService>();
                 SplatRegistrations.RegisterLazySingleton<IUpdateInstallerService, WindowsUpdateInstallerService>();
                 SplatRegistrations.RegisterLazySingleton<IBatteryInfoService, WindowsBatteryInfoService>();
+                SplatRegistrations.RegisterLazySingleton<IIconExtracter, WindowsIconExtracter>();
         
                 SplatRegistrations.SetupIOC();
             })

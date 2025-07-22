@@ -185,10 +185,10 @@ public class SystemInfoViewModel : ReactiveObject, IDisposable
         var l1Size = _systemInfoService.Cpu.L1Size / 1024;
         CpuL1Cache = $"{l1Size.ToString("0.##")} MB";
         
-        var l2Size = _systemInfoService.Cpu.L2Size/ 1024;
+        var l2Size = _systemInfoService.Cpu.L2Size / 1024;
         CpuL2Cache = $"{l2Size.ToString("0.##")} MB";
 
-        var l3Size = _systemInfoService.Cpu.L3Size/ 1024;
+        var l3Size = _systemInfoService.Cpu.L3Size / 1024;
         CpuL3Cache = $"{l3Size:0.##} MB";
             
         CpuBaseClock = $"{_systemInfoService.Cpu.BaseClock} MHz";
@@ -216,7 +216,6 @@ public class SystemInfoViewModel : ReactiveObject, IDisposable
 
         if (_batteryInfoService.GetBatteryStatus() != BatteryStatus.NoSystemBattery)
         {
-            IsBatteryInfoAvailable = true;
             try
             {
                 BatteryHealth = _batteryInfoService.GetBatteryHealth().ToString("0.##%");
@@ -229,6 +228,7 @@ public class SystemInfoViewModel : ReactiveObject, IDisposable
                 BatteryChargeRate = (_batteryInfoService.GetBatteryRate() / 1000).ToString("0.##W");
                 _batteryInfoTimer.Tick += OnBatteryInfoTimerTick;
                 _batteryInfoTimer.Start();
+                IsBatteryInfoAvailable = true;
             }
             catch
             {

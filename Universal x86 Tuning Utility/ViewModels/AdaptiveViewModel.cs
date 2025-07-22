@@ -230,14 +230,7 @@ public class AdaptiveViewModel : ReactiveObject
 
     private void SensorsTimerTick(object? sender, EventArgs e)
     {
-        if (_systemInfoService.Cpu.Manufacturer == Manufacturer.Intel)
-        {
-            CPUTemp = (int)_sensorsService.GetCPUInfo(SensorType.Temperature, "Package");
-        }
-        else
-        {
-            CPUTemp = (int)_sensorsService.GetCPUInfo(SensorType.Temperature, "Core");
-        }
+        CPUTemp = (int)_sensorsService.GetCPUInfo(SensorType.Temperature, _systemInfoService.Cpu.Manufacturer == Manufacturer.Intel ? "Package" : "Core");
         CPULoad = (int)_sensorsService.GetCPUInfo(SensorType.Load, "Total");
 
         for (int i = 0; i < _systemInfoService.Cpu.CoresCount; i++)
@@ -256,31 +249,15 @@ public class AdaptiveViewModel : ReactiveObject
             GPUMemClock = _amdGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuMemClock);
         }
         
-        if (CPULoad < 100 / _systemInfoService.Cpu.CoresCount + 5)
-        {
-            newMinCPUClock = minCPUClock + 500;
-        }
-        else
-        {
-            newMinCPUClock = minCPUClock;
-        }
+        newMinCPUClock = CPULoad < 100 / _systemInfoService.Cpu.CoresCount + 5 ? minCPUClock + 500 : minCPUClock;
 
         if (AvailablePresets.Count > 0 && IsAutoSwitchEnabled)
         {
             var runningGameName = GetRunningGame() ?? "Default";
             if (CurrentPreset.Name != runningGameName)
             {
-                int selectedIndex = 0; // index to select if the search fails
-
-                for (var i = 0; i < _availablePresets.Count; i++)
-                {
-                    var item = _availablePresets[i];
-                    if (item.Name == runningGameName)
-                    {
-                        CurrentPreset = item;
-                        return;
-                    }
-                }
+                CurrentPreset = _availablePresets.FirstOrDefault(item => item.Name == runningGameName) ?? 
+                                _availablePresets[0]; // if the search fails
             }
         }
     }
@@ -350,10 +327,6 @@ public class AdaptiveViewModel : ReactiveObject
     {
         if (_adaptiveModeTickCount < 2)
         {
-            _cpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, CurrentPreset.Power,
-                CurrentPreset.Power - 5, CurrentPreset.Temp);
-            _cpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, CurrentPreset.Power,
-                CurrentPreset.Power - 5, CurrentPreset.Temp);
             _cpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, CurrentPreset.Power,
                 CurrentPreset.Power - 5, CurrentPreset.Temp);
             _adaptiveModeTickCount++;

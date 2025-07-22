@@ -80,8 +80,7 @@ public partial class MainWindow : Window, IDisposable
                     var displayCount = topLevel.Screens!.ScreenCount;
                     if (displayCount == 1)
                     {
-                        var maxHeight = topLevel.Screens.Primary!.Bounds.Height;
-                        MaxHeight = maxHeight;
+                        MaxHeight = topLevel.Screens.Primary!.Bounds.Height;
                         WindowState = WindowState.Maximized;
                     }
                 }
@@ -91,6 +90,8 @@ public partial class MainWindow : Window, IDisposable
     
     public void Dispose()
     {
+        Closing += UiWindow_Closing;
+        Loaded += MainWindowLoaded;
         PropertyChanged -= OnPropertyChanged;
     }
 }

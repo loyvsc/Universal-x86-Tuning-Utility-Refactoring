@@ -4,6 +4,7 @@ using ApplicationCore.Interfaces;
 using DAL.Services;
 using DesktopNotifications.Avalonia;
 using Splat;
+using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Linux.Services;
 using Universal_x86_Tuning_Utility.Linux.Services.GPUs;
 
@@ -45,6 +46,7 @@ class Program
                 SplatRegistrations.RegisterLazySingleton<IUpdateService, UpdateService>();
                 SplatRegistrations.RegisterLazySingleton<IUpdateInstallerService, LinuxUpdateInstallerService>();
                 SplatRegistrations.RegisterLazySingleton<IBatteryInfoService, LinuxBatteryInfoService>();
+                SplatRegistrations.RegisterLazySingleton<IIconExtracter, LinuxIconExtracter>();
         
                 SplatRegistrations.SetupIOC();
             })
