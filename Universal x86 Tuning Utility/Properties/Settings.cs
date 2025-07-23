@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
+using Accord;
+using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Universal_x86_Tuning_Utility.Properties;
@@ -11,7 +13,7 @@ public sealed partial class Settings
 {
     public static Settings Default = new Settings();
     
-    private readonly string __saveFileName = "props.dat";
+    private readonly string __saveFileName = "props.json";
     private Dictionary<string, object> _properties = new Dictionary<string, object>();
 
     public Settings()
@@ -23,8 +25,8 @@ public sealed partial class Settings
     {
         if (_properties.Count != 0)
         {
-            var value = CollectionsMarshal.GetValueRefOrNullRef(_properties, key);
-            return (T?)value;
+            ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(_properties, key, out _);
+            return (T?) Convert.ChangeType(value, typeof(T));
         }
         
         return default;
@@ -52,7 +54,7 @@ public sealed partial class Settings
             var serializedObject = System.IO.File.ReadAllText(__saveFileName);
             if (!string.IsNullOrWhiteSpace(serializedObject))
             {
-                _properties = JsonSerializer.Deserialize<Dictionary<string, object>>(serializedObject) ?? new Dictionary<string, object>();
+                _properties = JsonConvert.DeserializeObject<Dictionary<string, object>>(serializedObject) ?? new Dictionary<string, object>();
             }
         }
         else
@@ -74,13 +76,20 @@ public sealed partial class Settings
                     var name = setting.Attribute("name")?.Value;
                     var defaultValue = setting.Attribute("defaultValue")?.Value;
 
-                    if (name != null && defaultValue != null)
+                    if (name != null)
                     {
                         var property = settingsType.GetProperty(name);
                         if (property != null)
                         {
-                            object convertedValue = Convert.ChangeType(defaultValue, property.PropertyType, CultureInfo.InvariantCulture);
-                            property.SetValue(this, convertedValue);
+                            if (defaultValue != null)
+                            {
+                                object convertedValue = Convert.ChangeType(defaultValue, property.PropertyType, CultureInfo.InvariantCulture);
+                                property.SetValue(this, convertedValue);
+                            }
+                            else
+                            {
+                                property.SetValue(this, property.PropertyType.GetDefaultValue());
+                            }
                         }
                     }
                 }
