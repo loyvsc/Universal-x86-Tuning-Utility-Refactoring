@@ -11,17 +11,20 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Win32" Version="11.3.2" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2"/>
+        <PackageReference Include="DesktopNotificationsFixed.Avalonia" Version="1.0.0" />
+        <PackageReference Include="DesktopNotificationsFixed.Windows" Version="1.0.0" />
         <PackageReference Include="WindowsDisplayAPI" Version="1.3.0.13" />
         <PackageReference Include="hidlibrary" Version="3.3.40" />
         <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
         <PackageReference Include="NvAPIWrapper.Net" Version="0.8.1.101" />
         <PackageReference Include="GameLib.NET" Version="1.4.1" />
+        <PackageReference Include="TaskScheduler" Version="2.11.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Universal x86 Tuning Utility\Universal x86 Tuning Utility.csproj" />
+        <ProjectReference Include="..\Universal x86 Tuning Utility\Universal x86 Tuning Utility.csproj" />
     </ItemGroup>
 
     <ItemGroup>

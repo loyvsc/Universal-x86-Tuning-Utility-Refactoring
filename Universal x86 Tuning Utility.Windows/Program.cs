@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using System;
 using ApplicationCore.Interfaces;
+using Avalonia.ReactiveUI;
 using DesktopNotifications.Avalonia;
 using Splat;
 using Universal_x86_Tuning_Utility.Interfaces;
@@ -23,6 +24,7 @@ class Program
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
+            .UseSkia()
             .UseWin32()
             .WithInterFont()
             .SetupDesktopNotifications(out var notificationManager)
@@ -51,5 +53,6 @@ class Program
         
                 SplatRegistrations.SetupIOC();
             })
-            .LogToTrace();
+            .LogToTrace()
+            .UseReactiveUI();
 }

@@ -89,26 +89,17 @@ public class App : Application
         {
             _logger = Locator.Current.GetService<ILogger<App>>()!;
 
-            try
+            if (Settings.Default.SettingsUpgradeRequired)
             {
-                if (Settings.Default.SettingsUpgradeRequired)
+                try
                 {
-                    try
-                    {
-                        Settings.Default.SettingsUpgradeRequired = false;
-                        Settings.Default.Save();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to update settings on startup");
-                    }
+                    Settings.Default.SettingsUpgradeRequired = false;
+                    Settings.Default.Save();
                 }
-            }
-            catch (ConfigurationErrorsException ex)
-            {
-                string filename = ((ConfigurationErrorsException)ex.InnerException).Filename;
-                File.Delete(filename);
-                Settings.Default.Reload();
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to update settings on startup");
+                }
             }
             
             if (UpdateHelper.IsInternetAvailable() && Settings.Default.UpdateCheck)

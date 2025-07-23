@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="Avalonia.X11" Version="11.3.2" />
+      <PackageReference Include="DesktopNotificationsFixed.FreeDesktop" Version="1.0.0" />
     </ItemGroup>
 
     <ItemGroup>

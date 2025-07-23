@@ -1,8 +1,9 @@
 ﻿using Avalonia;
 using System;
 using ApplicationCore.Interfaces;
+using Avalonia.Controls.ApplicationLifetimes;
 using DAL.Services;
-using DesktopNotifications.Avalonia;
+using DesktopNotifications.FreeDesktop;
 using Splat;
 using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Linux.Services;
@@ -24,10 +25,21 @@ class Program
         => AppBuilder.Configure<App>()
             .UseX11()
             .UseSkia()
-            .SetupDesktopNotifications(out var notificationManager)
-            .AfterSetup(_ =>
+            .AfterSetup(builder =>
             {
-                SplatRegistrations.RegisterConstant(notificationManager!);
+                var context = FreeDesktopApplicationContext.FromCurrentProcess();
+                var manager = new FreeDesktopNotificationManager(context);
+                manager.Initialize().GetAwaiter().GetResult();
+
+                builder.AfterSetup(b =>
+                {
+                    if (b.Instance?.ApplicationLifetime is IControlledApplicationLifetime lifetime)
+                    {
+                        lifetime.Exit += (s, e) => { manager.Dispose(); };
+                    }
+                });
+                
+                SplatRegistrations.RegisterConstant(manager!);
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, LinuxAsusWmiService>();
                 SplatRegistrations.RegisterLazySingleton<ICliService, LinuxCliService>();
                 SplatRegistrations.RegisterLazySingleton<ICpuControlService, LinuxCpuControlService>();
