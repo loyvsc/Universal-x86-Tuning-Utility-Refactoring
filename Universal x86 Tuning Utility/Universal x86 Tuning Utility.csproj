@@ -32,7 +32,7 @@
     <PackageReference Include="Avalonia" Version="11.3.2" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.2" />
     <PackageReference Include="FluentAvalonia.FluentIcons" Version="1.1.201" />
-    <PackageReference Include="FluentAvaloniaUI" Version="2.3.0" />
+    <PackageReference Include="FluentAvaloniaUI" Version="2.4.0" />
     <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="1.1.303" />
     <PackageReference Include="FuzzyStrings.NetStandard" Version="1.0.1" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.1.0" />
@@ -40,15 +40,15 @@
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.1.0" />
     <PackageReference Include="MouseKeyHook" Version="5.7.1" />
     <PackageReference Include="SecretNest.SequentialScheduler" Version="1.1.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="Splat" Version="15.3.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Splat" Version="15.4.1" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.2.3"/>
-    <PackageReference Include="Splat.Microsoft.Extensions.Logging" Version="15.3.1" />
-    <PackageReference Include="Splat.Serilog" Version="15.3.1" />
-    <PackageReference Include="System.Management" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
+    <PackageReference Include="Splat.Microsoft.Extensions.Logging" Version="15.4.1" />
+    <PackageReference Include="Splat.Serilog" Version="15.4.1" />
+    <PackageReference Include="System.Management" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
   </ItemGroup>
 
   <ItemGroup>

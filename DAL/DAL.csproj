@@ -9,7 +9,7 @@
     <ItemGroup>
       <PackageReference Include="Accord.Math" Version="3.8.0" />
       <PackageReference Include="craftersmine.SteamGridDB.Net" Version="1.1.7" />
-      <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
       <PackageReference Include="Octokit" Version="14.0.0" />
     </ItemGroup>
 

@@ -20,7 +20,7 @@
         <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
         <PackageReference Include="NvAPIWrapper.Net" Version="0.8.1.101" />
         <PackageReference Include="GameLib.NET" Version="1.4.1" />
-        <PackageReference Include="TaskScheduler" Version="2.11.0" />
+        <PackageReference Include="TaskScheduler" Version="2.12.2" />
     </ItemGroup>
 
     <ItemGroup>
