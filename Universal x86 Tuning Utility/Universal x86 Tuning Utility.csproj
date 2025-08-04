@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Skia" Version="11.3.2" />
+    <PackageReference Include="CastelloBranco.AvaloniaMessageBox" Version="1.0.1" />
     <PackageReference Include="DesktopNotificationsFixed" Version="1.0.1" />
     <PackageReference Include="Avalonia" Version="11.3.2" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.2" />

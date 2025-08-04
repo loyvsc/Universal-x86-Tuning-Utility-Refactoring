@@ -1,13 +1,13 @@
 ﻿using System;
-using System.IO;
+using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
+using CastelloBranco.AvaloniaMessageBox;
 using DAL.Services;
-using DesktopNotifications;
 using Microsoft.Extensions.Logging;
+using ReactiveUI;
 using Serilog.Extensions.Logging;
 using Splat;
 using Splat.Microsoft.Extensions.Logging;
@@ -75,9 +75,41 @@ public class App : Application
                 DataContext = Locator.Current.GetService<MainWindowViewModel>()
             };
             _desktopApplicationLifetime.Startup += OnStartup;
+            _desktopApplicationLifetime.Exit += OnExit;
+            
+            TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
+
+            RxApp.DefaultExceptionHandler = new RxAppObservableExceptionHandler();
+
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
+    {
+        TaskScheduler.UnobservedTaskException -= TaskSchedulerOnUnobservedTaskException;
+        AppDomain.CurrentDomain.UnhandledException -= CurrentDomainOnUnhandledException;
+    }
+
+    private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs args)
+    {
+        var ex = (Exception) args.ExceptionObject;
+        
+        HandeUnhandledException(ex);
+    }
+
+    private void TaskSchedulerOnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
+    {
+        args.SetObserved();
+
+        HandeUnhandledException(args.Exception);
+    }
+
+    private async void HandeUnhandledException(Exception ex)
+    {
+        await ExceptionMessageBox.ShowExceptionDialogAsync(null, ex);
     }
 
     /// <summary>
@@ -131,15 +163,18 @@ public class App : Application
 
     private void OnTrayIconClicked(object? sender, EventArgs e)
     {
-        var mainWindow = _desktopApplicationLifetime.MainWindow!;
-        if (mainWindow.WindowState != WindowState.Minimized)
+        var mainWindow = _desktopApplicationLifetime.MainWindow;
+        if (mainWindow != null)
         {
-            mainWindow.WindowState = WindowState.Minimized;
-        }
-        else
-        {
-            mainWindow.Show();
-            mainWindow.WindowState = WindowState.Normal;
+            if (mainWindow.WindowState != WindowState.Minimized)
+            {
+                mainWindow.WindowState = WindowState.Minimized;
+            }
+            else
+            {
+                mainWindow.Show();
+                mainWindow.WindowState = WindowState.Normal;
+            }
         }
     }
 }
