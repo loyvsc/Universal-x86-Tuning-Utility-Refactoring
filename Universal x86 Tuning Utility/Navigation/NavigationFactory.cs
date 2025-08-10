@@ -11,11 +11,6 @@ namespace Universal_x86_Tuning_Utility.Navigation;
 
 public class NavigationFactory : INavigationPageFactory
 {
-    public NavigationFactory()
-    {
-        
-    }
-
     public Control GetPage(Type srcType)
     {
         return null;

@@ -29,6 +29,7 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
     public ICommand UndoCommand { get; }
     public ICommand ReloadPresetValuesCommand { get; }
     public ICommand AsusGpuUltimateModSwitchedCommand { get; }
+    public ICommand IdentificateMonitorsCommand { get; }
 
     #region Properties
 
@@ -80,7 +81,10 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         set
         {
             this.RaiseAndSetIfChanged(ref _selectedDisplay, value);
-            SelectedPreset.DisplayIdentifier = value.Identifier;
+            if (SelectedPreset != null)
+            {
+                SelectedPreset.DisplayIdentifier = value.Identifier;
+            }
         }
     }
 
@@ -210,7 +214,7 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _selectedAsusPowerProfile, value);
     }
 
-    public Preset SelectedPreset
+    public Preset? SelectedPreset
     {
         get => _selectedPreset;
         set => this.RaiseAndSetIfChanged(ref _selectedPreset, value);
@@ -239,7 +243,7 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
     #region Backing fields
 
     private List<UXTUSuperResolutionScale> _uxtuSuperResolutionScales;
-    private Preset _selectedPreset;
+    private Preset? _selectedPreset;
     private bool _isAsusMux;
     private bool _isAsusEcoMode;
     private bool _isAsusEcoModeAvailable;
@@ -318,6 +322,7 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         DeletePresetCommand = ReactiveCommand.CreateFromTask(DeleteCurrentPreset);
         UndoCommand = ReactiveCommand.CreateFromTask(Undo);
         SavePresetCommand = ReactiveCommand.CreateFromTask(SavePreset);
+        IdentificateMonitorsCommand = ReactiveCommand.CreateFromTask(IdentificateMonitors);
 
         PowerModes = new List<PowerMode>
         {
@@ -560,6 +565,11 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         {
             SelectedPreset = presetService.GetPreset(SelectedPreset.Name)!;
         }
+    }
+
+    private async Task IdentificateMonitors()
+    {
+        ScreenIdentification.Show();
     }
 
     private async Task Undo()

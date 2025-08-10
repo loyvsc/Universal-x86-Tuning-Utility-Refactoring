@@ -23,6 +23,7 @@ using Universal_x86_Tuning_Utility.Services.PresetServices;
 using Universal_x86_Tuning_Utility.ViewModels;
 using Universal_x86_Tuning_Utility.Views.Windows;
 using Application = Avalonia.Application;
+using ILogger = Splat.ILogger;
 using INotificationManager = DesktopNotifications.INotificationManager;
 
 namespace Universal_x86_Tuning_Utility;
@@ -35,9 +36,6 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-
-        Locator.CurrentMutable.UseSerilogFullLogger();
-        Locator.CurrentMutable.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(new SerilogLoggerFactory());
 
         //Viewmodels
         SplatRegistrations.RegisterLazySingleton<AdaptiveViewModel>();
@@ -63,6 +61,10 @@ public class App : Application
         SplatRegistrations.RegisterLazySingleton<IAmdApuControlService, AmdApuControlService>();
 
         SplatRegistrations.SetupIOC();
+
+        Locator.CurrentMutable.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(new SerilogLoggerFactory());
+        Locator.CurrentMutable.UseSerilogFullLogger();
+        Locator.CurrentMutable.RegisterLazySingleton<IAdaptivePresetService>(() => new AdaptivePresetService("/AdaptivePresets"));
     }
 
     public override void OnFrameworkInitializationCompleted()

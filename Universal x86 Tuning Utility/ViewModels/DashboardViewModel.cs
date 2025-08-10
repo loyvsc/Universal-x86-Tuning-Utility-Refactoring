@@ -77,23 +77,23 @@ public partial class DashboardViewModel : ReactiveObject
         switch (parameter)
         {
             case "premade":
-                _navigationService.Navigate(typeof(Views.Pages.PremadePage));
+                _navigationService.Navigate(typeof(PremadePresetsViewModel));
                 return;
 
             case "custom":
-                _navigationService.Navigate(typeof(Views.Pages.CustomPresetsPage));
+                _navigationService.Navigate(typeof(CustomPresetsViewModel));
                 return;
 
             case "adaptive":
-                _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));
+                _navigationService.Navigate(typeof(AdaptiveViewModel));
                 return;
 
             case "auto":
-                _navigationService.Navigate(typeof(Views.Pages.AutomationsPage));
+                _navigationService.Navigate(typeof(AutomationsViewModel));
                 return;
 
             case "info":
-                _navigationService.Navigate(typeof(Views.Pages.SystemInfoPage));
+                _navigationService.Navigate(typeof(SystemInfoViewModel));
                 return;
 
             case "help":
@@ -104,12 +104,12 @@ public partial class DashboardViewModel : ReactiveObject
                 Process.Start(new ProcessStartInfo("https://www.paypal.com/paypalme/JamesCJ60") { UseShellExecute = true });
                 Process.Start(new ProcessStartInfo("https://patreon.com/uxtusoftware") { UseShellExecute = true });
                 return;
+            
             case "games":
-                _navigationService.Navigate(typeof(Views.Pages.GamesPage));
+                _navigationService.Navigate(typeof(GamesViewModel));
                 return;
         }
     }
-
 
     private void OnOpenWindow(string parameter)
     {

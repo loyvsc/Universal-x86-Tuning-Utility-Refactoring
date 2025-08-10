@@ -4,17 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="using:FluentAvalonia.UI.Controls"
-             xmlns:ic="using:FluentAvalonia.FluentIcons"
              xmlns:viewmodels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
              xmlns:models="clr-namespace:ApplicationCore.Models;assembly=ApplicationCore"
              xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
+             xmlns:avalonia="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia"
              mc:Ignorable="d"
              d:DesignHeight="2500"
              d:DesignWidth="800"
              x:DataType="viewmodels:CustomPresetsViewModel">
     <Grid>
         <DockPanel>
-            <TextBlock FontSize="26"
+            <TextBlock FontSize="{StaticResource HeaderFontSize}"
                        FontWeight="Medium"
                        Text="Custom Presets"
                        DockPanel.Dock="Top"
@@ -118,7 +118,8 @@
                         <Expander.Header>
                             <StackPanel Grid.Column="0"
                                         VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Temperature20Regular}" />
+                                <avalonia:FluentIcon Icon="Temperature"
+                                                   FontSize="20"/>
                                 <TextBlock
                                     FontSize="14"
                                     FontWeight="Medium"
@@ -135,10 +136,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Temperature Limit (°C)" />
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the temperature limit at which the APU starts soft throttling"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the temperature limit at which the APU starts soft throttling"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *"
@@ -164,10 +166,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Skin Temperature Limit (°C)" />
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the laptop chassis temperature limit at which the APU starts throttling"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the laptop chassis temperature limit at which the APU starts throttling"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *"
                                       Margin="0,8,0,0">
@@ -197,7 +200,8 @@
                         <Expander.Header>
                             <StackPanel Grid.Column="0" 
                                         VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Temperature20Regular}" />
+                                <avalonia:FluentIcon Icon="Temperature"
+                                                     FontSize="20"/>
                                 <TextBlock
                                     FontSize="14"
                                     FontWeight="Medium"
@@ -214,10 +218,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Temperature Limit (°C)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   VerticalAlignment="Bottom"
-                                                   ToolTip.Tip="Controls the temperature limit at which the CPU starts hard throttling" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         VerticalAlignment="Bottom"
+                                                         ToolTip.Tip="Controls the temperature limit at which the CPU starts hard throttling"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" Margin="0,8,0,0">
@@ -247,7 +252,8 @@
                         <Expander.Header>
                             <StackPanel Grid.Column="0" 
                                         VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Power20Regular}" />
+                                <avalonia:FluentIcon Icon="Power"
+                                                     FontSize="20"/>
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="APU Power Tuning" />
@@ -262,10 +268,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="STAPM Power Limit (W)" />
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the APU's Skin Temperature Aware Power Management power limit"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the APU's Skin Temperature Aware Power Management power limit"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *"
                                       Margin="0,8,0,0">
@@ -291,10 +298,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Slow Power Limit (W)" />
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the APU's slow boost duration power limit. Within SmartShift enabled systems, this options controls the total power shared between the AMD CPU and AMD dGPU"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the APU's slow boost duration power limit. Within SmartShift enabled systems, this options controls the total power shared between the AMD CPU and AMD dGPU"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *" Margin="0,8,0,0">
                                     <CheckBox Grid.Column="0"
@@ -319,10 +327,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Slow Boost Duration (s)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   VerticalAlignment="Bottom"
-                                                   ToolTip.Tip="Controls how long the APU stays within the slow boost power limit" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls how long the APU stays within the slow boost power limit"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *" 
                                       Margin="0,8,0,0">
@@ -343,10 +352,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Fast Power Limit (W)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the APU's fast boost duration power limit. Within SmartShift enabled systems, this options controls the total power shared between the AMD CPU and AMD dGPU"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the APU's fast boost duration power limit. Within SmartShift enabled systems, this options controls the total power shared between the AMD CPU and AMD dGPU"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *"
                                       Margin="0,8,0,0">
@@ -372,9 +382,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Fast Boost Duration (s)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls how long the APU stays within the fast boost power limit"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls how long the APU stays within the fast boost power limit"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *"
                                       Margin="0,8,0,0">
@@ -405,7 +417,8 @@
                         IsVisible="{Binding IsAmdCpuSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <StackPanel VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Power20Regular}" />
+                                <avalonia:FluentIcon Icon="Power"
+                                                     FontSize="20"/>
                                 <TextBlock
                                     FontSize="14"
                                     FontWeight="Medium"
@@ -422,9 +435,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="PPT Limit (W)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the CPU's Package Power Tracking power limit"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the CPU's Package Power Tracking power limit"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *"
                                       Margin="0,8,0,0">
@@ -450,10 +465,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="EDC Limit (A)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the CPU's Electrical Design Current limit"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the CPU's Electrical Design Current limit"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *" 
                                       Margin="0,8,0,0">
@@ -479,9 +495,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="TDC Limit (A)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the CPU's Thermal Design Current limit"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the CPU's Thermal Design Current limit"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *" 
                                       Margin="0,8,0,0">
@@ -510,7 +528,8 @@
                               IsVisible="{Binding IsIntelSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <StackPanel VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Power20Regular}" />
+                                <avalonia:FluentIcon Icon="Power"
+                                                     FontSize="20"/>
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="CPU Power Tuning" />
@@ -525,9 +544,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Power Limit (W)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the CPU's total power limit"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the CPU's total power limit"
+                                                         VerticalAlignment="Bottom" />
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *" 
                                       Margin="0,8,0,0">
@@ -554,10 +575,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Power Limit 2 (W)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the CPU's short boost power limit"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the CPU's short boost power limit"
+                                                         VerticalAlignment="Bottom" />
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *" Margin="0,8,0,0">
                                     <CheckBox Grid.Column="0"
@@ -585,7 +607,8 @@
                               IsVisible="{Binding IsAmdApuVrmSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <StackPanel VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Flash20Regular}"/>
+                                <avalonia:FluentIcon Icon="Flash"
+                                                     FontSize="20" />
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="APU VRM Tuning" />
@@ -600,10 +623,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="CPU TDC Limit (A)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   VerticalAlignment="Bottom" 
-                                                   ToolTip.Tip="Controls the CPU's Thermal Design Current limit"/>
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         VerticalAlignment="Bottom" 
+                                                         ToolTip.Tip="Controls the CPU's Thermal Design Current limit" />
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *"
                                       Margin="0,8,0,0">
@@ -629,10 +653,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="CPU EDC Limit (A)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   VerticalAlignment="Bottom"
-                                                   ToolTip.Tip="Controls the CPU's Electrical Design Current limit" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         VerticalAlignment="Bottom" 
+                                                         ToolTip.Tip="Controls the CPU's Electrical Design Current limit" />
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33,150,*"
                                       Margin="0,8,0,0">
@@ -658,9 +683,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="SoC TDC Limit (A)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the SoC's Thermal Design Current limit"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         VerticalAlignment="Bottom" 
+                                                         ToolTip.Tip="Controls the SoC's Thermal Design Current limit" />
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33,150,*"
                                       Margin="0,8,0,0">
@@ -686,10 +713,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="SoC EDC Limit (A)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the SoC's Electrical Design Current limit"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         VerticalAlignment="Bottom" 
+                                                         ToolTip.Tip="Controls the SoC's Electrical Design Current limit"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33,150,*"
                                       Margin="0,8,0,0">
@@ -715,10 +743,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="GFX TDC Limit (A)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the iGPU's Thermal Design Current limit"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         VerticalAlignment="Bottom" 
+                                                         ToolTip.Tip="Controls the iGPU's Thermal Design Current limit"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33,150,*"
                                       Margin="0,8,0,0">
@@ -744,10 +773,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="GFX EDC Limit (A)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   VerticalAlignment="Bottom"
-                                                   ToolTip.Tip="Controls the iGPU's Electrical Design Current limit" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         VerticalAlignment="Bottom" 
+                                                         ToolTip.Tip="Controls the iGPU's Electrical Design Current limit"/>
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33,150,*"
                                       Margin="0,8,0,0" >
@@ -776,7 +806,8 @@
                               IsVisible="{Binding IsAmdApuIGpuClockSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <StackPanel VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Pulse20Regular}"/>
+                                <avalonia:FluentIcon Icon="Pulse"
+                                                     FontSize="20"/>
                                 <TextBlock
                                     FontSize="14"
                                     FontWeight="Medium"
@@ -793,9 +824,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="iGPU Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the static boost clock speed of the iGPU, requires either a system reboot or system sleep to revert back to normal."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the static boost clock speed of the iGPU, requires either a system reboot or system sleep to revert back to normal."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *"
@@ -825,7 +858,8 @@
                               IsVisible="{Binding IsAmdSoftClockSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <StackPanel VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Pulse20Regular}"/>
+                                <avalonia:FluentIcon Icon="Pulse"
+                                                     FontSize="20"/>
                                 <TextBlock
                                     FontSize="14"
                                     FontWeight="Medium"
@@ -842,10 +876,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Soft Minimum iGPU Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the minimum soft clock target of the iGPU. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the minimum soft clock target of the iGPU. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *"
@@ -872,10 +907,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Soft Maximum iGPU Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the maximum soft clock target of the iGPU. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the maximum soft clock target of the iGPU. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *"
@@ -902,10 +938,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Soft Minimum CPU Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the minimum soft clock target of the CPU. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the minimum soft clock target of the CPU. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -932,10 +969,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text=" Soft Maximum CPU Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the maximum soft clock target of the CPU. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the maximum soft clock target of the CPU. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -962,10 +1000,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Soft Minimum Data Launch Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the minimum soft clock target of the Data Launch Clock. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the minimum soft clock target of the Data Launch Clock. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -992,10 +1031,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Soft Maximum Data Launch Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the maximum soft clock target of the Data Launch Clock. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the maximum soft clock target of the Data Launch Clock. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1022,10 +1062,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Soft Minimum Infinity Fabric Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the minimum soft clock target of the Infinity Fabric. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the minimum soft clock target of the Infinity Fabric. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1052,10 +1093,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Soft Maximum Infinity Fabric Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the maximum soft clock target of the Infinity Fabric. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the maximum soft clock target of the Infinity Fabric. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1082,10 +1124,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Soft Minimum SoC Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the minimum soft clock target of the SoC. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the minimum soft clock target of the SoC. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1112,10 +1155,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Soft Maximum SoC Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the maximum soft clock target of the SoC. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the maximum soft clock target of the SoC. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1142,10 +1186,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Soft Minimum VCN Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the minimum soft clock target of the Video Core Next. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the minimum soft clock target of the Video Core Next. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1171,10 +1216,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Soft Maximum VCN Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the maximum soft clock target of the Video Core Next. This only works when within your APUs specification."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the maximum soft clock target of the Video Core Next. This only works when within your APUs specification."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1205,7 +1251,8 @@
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Grid.Column="0" 
                                             VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Image24Regular}"/>
+                                    <avalonia:FluentIcon Icon="Image"
+                                                         FontSize="24"/>
                                     <TextBlock FontSize="14"
                                                FontWeight="Medium"
                                                Text="UXTU Super Resolution" />
@@ -1226,10 +1273,11 @@
                                           FontWeight="DemiBold"
                                           Content="Enable VSync"
                                           IsChecked="{Binding SelectedPreset.IsVsync, UpdateSourceTrigger=PropertyChanged}" />
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                    Margin="6,0,0,-4"
-                                               ToolTip.Tip="Synchronises capture frame rate to display refresh rate."
-                                               VerticalAlignment="Center" />
+                                <avalonia:FluentIcon Icon="Info"
+                                                     FontSize="24"
+                                                     Margin="6,0,0,-2"
+                                                     ToolTip.Tip="Synchronises capture frame rate to display refresh rate."
+                                                     VerticalAlignment="Bottom"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox Width="130"
@@ -1237,10 +1285,11 @@
                                           FontWeight="DemiBold"
                                           Content="Auto Recapture"
                                           IsChecked="{Binding SelectedPreset.IsRecap, UpdateSourceTrigger=PropertyChanged}" />
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                    Margin="6,0,0,-4"
-                                               ToolTip.Tip="Auto recaptures the previous capture window after focus was lost and restored."
-                                               VerticalAlignment="Center" />
+                                <avalonia:FluentIcon Icon="Info"
+                                                     FontSize="24"
+                                                     Margin="6,0,0,-2"
+                                                     ToolTip.Tip="Auto recaptures the previous capture window after focus was lost and restored."
+                                                     VerticalAlignment="Bottom"/>
                             </StackPanel>
 
                             <StackPanel Margin="0,8,0,0">
@@ -1248,9 +1297,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Capture Sharpness (%)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls UXTU Super Resolution capture image sharpness."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls UXTU Super Resolution capture image sharpness."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1277,10 +1328,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Resolution Scale"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the resolution of the window being captured. Use application controlled if you do not want UXTU to override the window resolution. Not all applications will be compatible with this mode!"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the resolution of the window being captured. Use application controlled if you do not want UXTU to override the window resolution. Not all applications will be compatible with this mode!"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 <ComboBox Grid.Column="1"
                                           Margin="0,8,0,0"
@@ -1306,7 +1358,8 @@
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Grid.Column="0"
                                             VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Image24Regular}"/>
+                                    <avalonia:FluentIcon Icon="Image"
+                                                         FontSize="24"/>
                                     <TextBlock FontSize="14" 
                                                FontWeight="Medium"
                                                Text="Radeon™ Graphics Options" />
@@ -1327,20 +1380,22 @@
                                           FontWeight="DemiBold"
                                           Content="Radeon™ Anti-Lag"
                                           IsChecked="{Binding SelectedPreset.IsAntiLag, UpdateSourceTrigger=PropertyChanged}" />
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                               Margin="6,0,0,-4"
-                                               ToolTip.Tip="Enables AMD Radeon™ Anti-Lag within drivers on supported hardware."
-                                               VerticalAlignment="Center" />
+                                <avalonia:FluentIcon Icon="Info"
+                                                     FontSize="24"
+                                                     Margin="6,0,0,-4"
+                                                     ToolTip.Tip="Enables AMD Radeon™ Anti-Lag within drivers on supported hardware."
+                                                     VerticalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="Radeon™ Super Resolution (%)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Enables AMD Radeon™ Super Resolution within drivers on supported hardware. Also allows you to set a custom sharpness effect."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Enables AMD Radeon™ Super Resolution within drivers on supported hardware. Also allows you to set a custom sharpness effect."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1367,10 +1422,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Radeon™ Boost (%)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Enables AMD Radeon™ Boost within drivers on supported hardware. Also allows you to set a minimum resolution in %."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Enables AMD Radeon™ Boost within drivers on supported hardware. Also allows you to set a minimum resolution in %."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1397,10 +1453,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Radeon™ Image Sharpening (%)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Enables AMD Radeon™ Image Sharpening within drivers on supported hardware. Allows you to set a custom sharpness effect."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Enables AMD Radeon™ Image Sharpening within drivers on supported hardware. Allows you to set a custom sharpness effect."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1428,10 +1485,11 @@
                                           FontWeight="DemiBold" 
                                           Content="Enhanced Sync"
                                           IsChecked="{Binding SelectedPreset.IsSync, UpdateSourceTrigger=PropertyChanged}" />
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                               Margin="6,0,0,-4"
-                                               ToolTip.Tip="Enables AMD Enhanced Sync within drivers on supported hardware."
-                                               VerticalAlignment="Center" />
+                                <avalonia:FluentIcon Icon="Info"
+                                                     FontSize="24"
+                                                     Margin="6,0,0,-4"
+                                                     ToolTip.Tip="Enables AMD Enhanced Sync within drivers on supported hardware."
+                                                     VerticalAlignment="Center"/>
                             </StackPanel>
                         </StackPanel>
                     </Expander>
@@ -1443,7 +1501,8 @@
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Grid.Column="0"
                                             VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Pulse20Regular}"/>
+                                    <avalonia:FluentIcon Icon="Pulse"
+                                                         FontSize="20"/>
                                     <TextBlock FontSize="14"
                                                FontWeight="Medium"
                                                Text="NVIDIA GPU Tuning" />
@@ -1465,10 +1524,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="Frequency-Adjusted Voltage Limit (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows."
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows."
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
                                 
                                 <Grid ColumnDefinitions="150, *"
@@ -1493,10 +1553,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="GPU Core Clock Offset (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1521,9 +1582,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="GPU Memory Clock Offset (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's VRAM clock"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's VRAM clock"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1557,7 +1620,8 @@
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Grid.Column="0" 
                                             VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Scales20Regular}"/>
+                                    <avalonia:FluentIcon Icon="Scales"
+                                                         FontSize="20"/>
                                     <TextBlock FontSize="14"
                                                FontWeight="Medium"
                                                Text="Intel Power Balance" />
@@ -1579,7 +1643,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="CPU Balance"/>
-                                    <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" />-->
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"  
+                                                         ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." 
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1634,7 +1702,8 @@
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Grid.Column="0"
                                             VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Pulse20Regular}"/>
+                                    <avalonia:FluentIcon Icon="Pulse"
+                                                         FontSize="20"/>
                                     <TextBlock FontSize="14"
                                                FontWeight="Medium"
                                                Text="Intel Clock Ratio Control" />
@@ -1659,7 +1728,12 @@
                                             <TextBlock FontWeight="DemiBold"
                                                        FontSize="13"
                                                        Text="{Binding CoreGroupIndex, StringFormat={}Core Group {0}}" />
-                                            <!-- <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" /> -->
+                                            <avalonia:FluentIcon Icon="Info"
+                                                                 FontSize="20"
+                                                                 IconVariant="Regular"
+                                                                 Margin="6,0,0,-2"  
+                                                                 ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows."
+                                                                 VerticalAlignment="Bottom"/>
                                         </StackPanel>
 
                                         <Grid ColumnDefinitions="150, *"
@@ -1690,7 +1764,8 @@
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Grid.Column="0" 
                                             VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Pulse20Regular}"/>
+                                    <avalonia:FluentIcon Icon="Pulse"
+                                                         FontSize="20"/>
                                     <TextBlock FontSize="14"
                                                FontWeight="Medium"
                                                Text="Intel FIVR Tuning" />
@@ -1821,7 +1896,8 @@
                             <Grid ColumnDefinitions="*, Auto">
                                 <StackPanel Grid.Column="0"
                                             VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Pulse20Regular}" />
+                                    <avalonia:FluentIcon Icon="Pulse"
+                                                         FontSize="20"/>
                                     <TextBlock FontSize="14"
                                                FontWeight="Medium"
                                                Text="AMD Ryzen™ CPU Tuning" />
@@ -1843,10 +1919,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="CPU Clocks (MHz)" />
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Provides the ability to set a static CPU clock"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Provides the ability to set a static CPU clock"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1871,9 +1948,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="CPU VID (mV)"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the set voltage for the CPU"
-                                                   VerticalAlignment="Bottom" />
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         ToolTip.Tip="Controls the set voltage for the CPU"
+                                                         VerticalAlignment="Bottom"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="150, *"
@@ -1906,7 +1985,8 @@
                               IsVisible="{Binding IsAmdPboSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <StackPanel VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon TopSpeed20Regular}"/>
+                                <avalonia:FluentIcon Icon="TopSpeed"
+                                                     FontSize="20"/>
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="AMD Precision Boost Overdrive" />
@@ -1921,10 +2001,11 @@
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
                                                Text="PBO Scalar"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   VerticalAlignment="Bottom" 
-                                                   ToolTip.Tip="Allows control to change the PBO Scalar which adjusts the FIT/FITness/FailuresInTime limit by the set amount"/>
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         VerticalAlignment="Bottom" 
+                                                         ToolTip.Tip="Allows control to change the PBO Scalar which adjusts the FIT/FITness/FailuresInTime limit by the set amount"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1954,7 +2035,8 @@
                               IsVisible="{Binding IsAmdCOSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon TopSpeed20Regular}"/>
+                                <avalonia:FluentIcon Icon="TopSpeed"
+                                                     FontSize="20"/>
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="AMD Curve Optimiser" />
@@ -1969,10 +2051,11 @@
                                     <TextBlock FontWeight="DemiBold" 
                                                FontSize="13"
                                                Text="All Core Offset"/>
-                                    <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   VerticalAlignment="Bottom" 
-                                                   ToolTip.Tip="Allows control to change the all core Curve Optimiser Frequency/Voltage curve offset"/>
+                                    <avalonia:FluentIcon Icon="Info"
+                                                         FontSize="20"
+                                                         Margin="6,0,0,-2"
+                                                         VerticalAlignment="Bottom" 
+                                                         ToolTip.Tip="Allows control to change the all core Curve Optimiser Frequency/Voltage curve offset"/>
                                 </StackPanel>
 
                                 <Grid ColumnDefinitions="33, 150, *" 
@@ -1999,10 +2082,12 @@
                                         <TextBlock FontWeight="DemiBold" 
                                                    FontSize="13"
                                                    Text="iGPU Offset"/>
-                                        <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" 
-                                                       Margin="6,0,0,-2"
-                                                       ToolTip.Tip="Allows control to change the iGPU Curve Optimiser Frequency/Voltage curve offset"
-                                                       VerticalAlignment="Bottom" />
+                                        <avalonia:FluentIcon Icon="Info"
+                                                             FontSize="24"
+                                                             IconVariant="Regular"
+                                                             Margin="6,0,0,-2"
+                                                             VerticalAlignment="Bottom" 
+                                                             ToolTip.Tip="Allows control to change the iGPU Curve Optimiser Frequency/Voltage curve offset"/>
                                     </StackPanel>
                                     <Grid ColumnDefinitions="33,150,*" 
                                           Margin="0,8,0,0" >
@@ -2032,7 +2117,8 @@
                               IsVisible="{Binding IsAmdCCD1COSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <StackPanel VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon TopSpeed20Regular}" />
+                                <avalonia:FluentIcon Icon="TopSpeed"
+                                                     FontSize="20"/>
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="AMD Per-Core Curve Optimiser (CCD1)" />
@@ -2050,10 +2136,12 @@
                                             <TextBlock FontWeight="DemiBold"
                                                        FontSize="13"
                                                        Text="{Binding CoreIndex, StringFormat={}Core {0} Offset}" />
-                                            <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                           Margin="6,0,0,-2"
-                                                           ToolTip.Tip="{Binding CoreIndex, StringFormat={}Allows control to change the Curve Optimiser Frequency/Voltage curve offset for core {1}}"
-                                                           VerticalAlignment="Bottom" />
+                                            <avalonia:FluentIcon Icon="Info"
+                                                                 FontSize="24"
+                                                                 IconVariant="Regular"
+                                                                 Margin="6,0,0,-2"
+                                                                 ToolTip.Tip="{Binding CoreIndex, StringFormat={}Allows control to change the Curve Optimiser Frequency/Voltage curve offset for core {1}}"
+                                                                 VerticalAlignment="Bottom"/>
                                         </StackPanel>
 
                                         <Grid ColumnDefinitions="33, 150, *"
@@ -2086,7 +2174,8 @@
                               IsVisible="{Binding IsAmdCCD2COSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Expander.Header>
                             <StackPanel VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon TopSpeed20Regular}" />
+                                <avalonia:FluentIcon Icon="TopSpeed"
+                                                     FontSize="20"/>
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="AMD Per-Core Curve Optimiser (CCD2)" />
@@ -2104,10 +2193,12 @@
                                             <TextBlock FontWeight="DemiBold"
                                                        FontSize="13"
                                                        Text="{Binding CoreIndex, StringFormat={}Core {0} Offset}" />
-                                            <ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}"
-                                                           Margin="6,0,0,-2"
-                                                           ToolTip.Tip="{Binding CoreIndex, StringFormat={}Allows control to change the Curve Optimiser Frequency/Voltage curve offset for core {1}}"
-                                                           VerticalAlignment="Bottom" />
+                                            <avalonia:FluentIcon Icon="Info"
+                                                                 FontSize="24"
+                                                                 IconVariant="Regular"
+                                                                 Margin="6,0,0,-2"
+                                                                 ToolTip.Tip="{Binding CoreIndex, StringFormat={}Allows control to change the Curve Optimiser Frequency/Voltage curve offset for core {1}}"
+                                                                 VerticalAlignment="Bottom" />
                                         </StackPanel>
 
                                         <Grid ColumnDefinitions="33, 150, *"
@@ -2141,7 +2232,8 @@
                         <Grid ColumnDefinitions="*, Auto">
                             <StackPanel Grid.Column="0"
                                         VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon FastAcceleration20Regular}"/>
+                                <avalonia:FluentIcon Icon="FastAcceleration"
+                                                     FontSize="20" />
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="AMD Boost Profile" />
@@ -2162,7 +2254,8 @@
                                           IsVisible="{Binding IsChangeRefreshRateAvailable, UpdateSourceTrigger=PropertyChanged}">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Desktop20Regular}"/>
+                                <avalonia:FluentIcon Icon="Desktop"
+                                                     FontSize="20" />
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="Display Refresh Rate" />
@@ -2180,6 +2273,10 @@
                                           SelectedIndex="0"
                                           MinWidth="164"
                                           Height="37" />
+                                <Button Command="{Binding IdentificateMonitorsCommand}"
+                                        ToolTip.Tip="Identificate monitors">
+                                    <avalonia:FluentIcon Icon="Eye"/>
+                                </Button>
                                 <ComboBox ItemsSource="{Binding SelectedDisplay.SupportedRefreshRates, UpdateSourceTrigger=PropertyChanged}"
                                           SelectedValue="{Binding SelectedPreset.DisplayHz, UpdateSourceTrigger=PropertyChanged}"
                                           VerticalAlignment="Center"
@@ -2194,7 +2291,8 @@
                     <controls:CardControl Margin="0,8,15,0">
                         <Grid ColumnDefinitions="*, Auto">
                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Power20Regular}" />
+                                <avalonia:FluentIcon Icon="Power"
+                                                     FontSize="20" />
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text=" Power Mode" />
@@ -2204,6 +2302,7 @@
                             <ComboBox Grid.Column="1"
                                       VerticalAlignment="Center"
                                       ItemsSource="{Binding PowerModes}"
+                                      DisplayMemberBinding="{Binding Name}"
                                       SelectedIndex="{Binding SelectedPreset.PowerMode, UpdateSourceTrigger=PropertyChanged}"
                                       MinWidth="164"
                                       Height="37"/>
@@ -2217,7 +2316,8 @@
                         <Grid ColumnDefinitions="*, Auto">
                             <StackPanel Grid.Column="0"
                                         VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon Power20Regular}"/>
+                                <avalonia:FluentIcon Icon="Power"
+                                                     FontSize="20" />
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="ASUS Power Profile" />
@@ -2245,7 +2345,8 @@
                         <Grid ColumnDefinitions="*, Auto">
                             <StackPanel Grid.Column="0"
                                         VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon FastAcceleration20Regular}"/>
+                                <avalonia:FluentIcon Icon="FastAcceleration"
+                                                     FontSize="20" />
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="ASUS GPU Ultimate Mode" />
@@ -2268,7 +2369,8 @@
                         <Grid ColumnDefinitions="*, Auto">
                             <StackPanel Grid.Column="0"
                                         VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{ic:FluentIcon LeafTwo20Regular}"/>
+                                <avalonia:FluentIcon Icon="LeafTwo"
+                                                     FontSize="20" />
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
                                            Text="ASUS iGPU Only Mode" />

@@ -6,7 +6,7 @@
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
              xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             xmlns:icons="clr-namespace:FluentAvalonia.FluentIcons;assembly=FluentAvalonia.FluentIcons"
+             xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent"
              x:DataType="viewModels:AutomationsViewModel"
              mc:Ignorable="d"
              d:DesignHeight="450"
@@ -15,7 +15,7 @@
     <Grid>
         <DockPanel LastChildFill="False"
                    Margin="15,0,15,0">
-            <TextBlock FontSize="26"
+            <TextBlock FontSize="{StaticResource HeaderFontSize}"
                        FontWeight="Medium"
                        Text="Automations" 
                        DockPanel.Dock="Top" 
@@ -26,7 +26,8 @@
                 <Grid ColumnDefinitions="*, Auto">
                     <StackPanel Grid.Column="0" 
                                 VerticalAlignment="Center">
-                        <ui:SymbolIcon Symbol="{icons:FluentIcon BatteryCharge20Regular}"/>
+                        <fluent:FluentIcon Icon="BatteryCharge"
+                                             FontSize="20"/>
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
                                    Text="Preset on Battery Charge" />
@@ -48,8 +49,8 @@
                                 DockPanel.Dock="Bottom" 
                                 ToolTip.Tip="Updates dropdown list with current presets"
                                 Command="{Binding ReloadPResetsCommand}">
-                            <ui:SymbolIcon Symbol="{icons:FluentIcon ArrowSync20Regular}"
-                                           FontSize="24" />
+                            <fluent:FluentIcon Icon="ArrowSync"
+                                               FontSize="20" />
                         </Button>
                     </StackPanel>
 
@@ -60,7 +61,8 @@
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Grid.Column="0" 
                                 VerticalAlignment="Center">
-                        <ui:SymbolIcon Symbol="{icons:FluentIcon Battery720Regular}"/>
+                        <fluent:FluentIcon Icon="Battery7"
+                                           FontSize="20"/>
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
                                    Text="Preset on Battery Discharge" />
@@ -84,8 +86,8 @@
                                 ToolTip.Tip="Updates dropdown list with current presets"
                                 Margin="9,0,0,0"
                                 Command="{Binding ReloadPResetsCommand}">
-                            <ui:SymbolIcon Symbol="{icons:FluentIcon ArrowSync20Regular}"
-                                           FontSize="24" />
+                            <fluent:FluentIcon Icon="ArrowSync"
+                                               FontSize="24"/>
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -95,7 +97,8 @@
                                   DockPanel.Dock="Top">
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <ui:SymbolIcon Symbol="{icons:FluentIcon Sleep20Regular}"/>
+                        <fluent:FluentIcon Icon="Sleep"
+                                           FontSize="20"/>
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
                                    Text="Preset on System Resume" />
@@ -118,8 +121,8 @@
                                 ToolTip.Tip="Updates dropdown list with current presets"
                                 Margin="9,0,0,0"
                                 Command="{Binding ReloadPResetsCommand}">
-                            <ui:SymbolIcon Symbol="{icons:FluentIcon ArrowSync20Regular}"
-                                           FontSize="24" />
+                            <fluent:FluentIcon Icon="ArrowSync"
+                                               FontSize="24" />
                         </Button>
                     </StackPanel>
                 </Grid>

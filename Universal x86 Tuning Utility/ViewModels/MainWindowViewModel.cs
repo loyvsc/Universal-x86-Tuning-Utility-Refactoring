@@ -11,8 +11,8 @@ using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using Avalonia.Threading;
 using DesktopNotifications;
-using FluentAvalonia.FluentIcons;
 using FluentAvalonia.UI.Controls;
+using FluentIcons.Common;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
@@ -34,12 +34,17 @@ public class MainWindowViewModel : ReactiveObject
     private readonly IPowerPlanService _powerPlanService;
     private readonly IGameLauncherService _gameLauncherService;
     private readonly IImageService _imageService;
-    private readonly IFanControlService _fanControlService;
     private readonly IPremadePresets _premadePresets;
-    private readonly IGameDataService _gameDataService;
     private string _lastAppliedState = "";
 
     public ObservableCollection<NavigationViewModel> NavigationItems { get; set; }
+
+    public NavigationViewModel SelectedNavigationItem
+    {
+        get => _selectedNavigationItem;
+        set => this.RaiseAndSetIfChanged(ref _selectedNavigationItem, value);
+    }
+
     public INavigationPageFactory NavigationPageFactory { get; set; }
 
     public string Title
@@ -57,6 +62,7 @@ public class MainWindowViewModel : ReactiveObject
     private string _title;
     private bool _firstRun = true;
     private IReadOnlyCollection<GameLauncherItem> _gamesList;
+    private NavigationViewModel _selectedNavigationItem;
 
     public MainWindowViewModel(ILogger<MainWindowViewModel> logger,
         ISystemInfoService systemInfoService,
@@ -79,9 +85,7 @@ public class MainWindowViewModel : ReactiveObject
         _powerPlanService = powerPlanService;
         _gameLauncherService = gameLauncherService;
         _imageService = imageService;
-        _fanControlService = fanControlService;
         _premadePresets = premadePresets;
-        _gameDataService = gameDataService;
         _powerPlanService.PowerModeChanged += OnPowerModeChange;
 
         ProductManufacturer = _systemInfoService.Manufacturer.Value;
@@ -262,79 +266,79 @@ public class MainWindowViewModel : ReactiveObject
             new NavigationViewModel()
             {
                 Title = "Home",
-                //Tag = "dashboard",    
-                IconSymbol = FluentIconSymbol.Home20Regular,
+                // Tag = "dashboard",    
+                IconSymbol = Icon.Home,
                 ViewModelType = typeof(DashboardViewModel)
             },
-            // new NavigationViewItem()
-            // {
-            //     Content = "Premade",
-            //     Tag = "premade",
-            //     Icon = SymbolRegular.Predictions20,
-            //     PageType = typeof(Views.Pages.PremadePage),
-            //     IsVisible = _systemInfoService.Cpu.Manufacturer == Manufacturer.AMD
-            // },
-            // new NavigationViewItemBase()
-            // {
-            //     Content = "Custom",
-            //     Tag = "custom",
-            //     Icon = SymbolRegular.Book20,
-            //     PageType = typeof(Views.Pages.CustomPresetsPage)
-            // },
-            // new NavigationViewItemBase()
-            // {
-            //     Content = "Adaptive",
-            //     Tag = "adaptive",
-            //     Icon = SymbolRegular.Radar20,
-            //     PageType = typeof(Views.Pages.AdaptivePage)
-            // },
-            // new NavigationViewItemBase()
-            // {
-            //     Content = "Games",
-            //     Tag = "games",
-            //     Icon = SymbolRegular.Games20,
-            //     PageType = typeof(Views.Pages.GamesPage)
-            // },
-            // new NavigationViewItemBase()
-            // {
-            //     Content = "Auto",
-            //     Tag = "auto",
-            //     Icon = SymbolRegular.Transmission20,
-            //     PageType = typeof(Views.Pages.AutomationsPage)
-            // },
+            new NavigationViewModel()
+            {
+                Title = "Premade",
+                // Tag = "premade",
+                IconSymbol = Icon.Predictions,
+                ViewModelType = typeof(PremadePresetsViewModel),
+                // IsVisible = _systemInfoService.Cpu.Manufacturer == Manufacturer.AMD
+            },
+            new NavigationViewModel()
+            {
+                Title = "Custom",
+                // Tag = "custom",
+                IconSymbol = Icon.Book,
+                ViewModelType = typeof(CustomPresetsViewModel)
+            },
+            new NavigationViewModel()
+            {
+                Title = "Adaptive",
+                // Tag = "adaptive",
+                IconSymbol = Icon.Radar,
+                ViewModelType = typeof(AdaptiveViewModel)
+            },
+            new NavigationViewModel()
+            {
+                Title = "Games",
+                // Tag = "games",
+                IconSymbol = Icon.Games,
+                ViewModelType = typeof(GamesViewModel)
+            },
+            new NavigationViewModel()
+            {
+                Title = "Auto",
+                // Tag = "auto",
+                IconSymbol = Icon.Transmission,
+                ViewModelType = typeof(AutomationsViewModel)
+            },
             // // todo: remove this todos later
-            // //new NavigationViewItemBase()
+            // //new NavigationViewModel()
             // //{
-            // //    Content = "Fan",
-            // //    Tag = "fan",
-            // //    Icon = SymbolRegular.WeatherDuststorm20,
-            // //    PageType = typeof(Views.Pages.FanControl)
+            // //    Title = "Fan",
+            // //    // Tag = "fan",
+            // //    IconSymbol = Icon.WeatherDuststorm20,
+            // //    ViewModelType = typeof(Views.Pages.FanControl)
             // //},
             // // todo: remove later
-            // // new NavigationViewItemBase()
+            // // new NavigationViewModel()
             // //{
-            // //    Content = "Magpie",
-            // //    Tag = "magpie",
-            // //    Icon = SymbolRegular.FullScreenMaximize20,
-            // //    PageType = typeof(Views.Pages.DataPage)
+            // //    Title = "Magpie",
+            // //    // Tag = "magpie",
+            // //    IconSymbol = Icon.FullScreenMaximize20,
+            // //    ViewModelType = typeof(Views.Pages.DataPage)
             // //},
-            // new NavigationViewItemBase()
-            // {
-            //     Content = "Info",
-            //     Tag = "info",
-            //     Icon = SymbolRegular.Info20,
-            //     PageType = typeof(Views.Pages.SystemInfoPage)
-            // }
+            new NavigationViewModel()
+            {
+                Title = "Info",
+                // Tag = "info",
+                IconSymbol = Icon.Info,
+                ViewModelType = typeof(SystemInfoViewModel)
+            }
         };
 
         // NavigationFooter = new ObservableCollection<INavigationControl>
         // {
-        //     new NavigationViewItemBase()
+        //     new NavigationViewModel()
         //     {
-        //         Content = "Settings",
-        //         Tag = "settings",
-        //         Icon = SymbolRegular.Settings20,
-        //         PageType = typeof(Views.Pages.SettingsPage)
+        //         Title = "Settings",
+        //         // Tag = "settings",
+        //         IconSymbol = Icon.Settings20,
+        //         ViewModelType = typeof(Views.Pages.SettingsPage)
         //     }
         // };
         //
@@ -343,7 +347,7 @@ public class MainWindowViewModel : ReactiveObject
         //     new MenuItem
         //     {
         //         Header = "Home",
-        //         Tag = "tray_home"
+        //         // Tag = "tray_home"
         //     }
         // };
     }

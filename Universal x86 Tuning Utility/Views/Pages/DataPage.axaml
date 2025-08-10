@@ -6,7 +6,7 @@
              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:models="clr-namespace:Universal_x86_Tuning_Utility.Models"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
-             xmlns:ic="using:FluentAvalonia.FluentIcons"
+             xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent"
              x:DataType="viewModels:DataViewModel"
              mc:Ignorable="d"
              d:DesignHeight="450"
@@ -24,7 +24,8 @@
                             VerticalAlignment="Stretch"
                             Background="{Binding Color, Mode=OneWay}"
                             FontSize="25">
-                        <controls:SymbolIcon Symbol="{ic:FluentIcon Fluent20Regular}" />
+                        <fluent:FluentIcon Icon="Fluent"
+                                           FontSize="20" />
                     </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

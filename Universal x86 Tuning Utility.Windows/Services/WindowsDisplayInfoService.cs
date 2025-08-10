@@ -130,10 +130,11 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
                             };
                     
                             displays.Add(new Display(identifier, 
+                                name: displayDevice.DisplayName,
                                 supportedResolutions, 
                                 currentResolution: supportedResolutions.First(x => x.Width == currentWidth && x.Height == currentHeight), 
                                 supportedRefreshRates, 
-                                currentRefreshRate: currentRefreshRate,
+                                currentRefreshRate: currentRefreshRate + 1,
                                 outputTechnology: outputTechnology));
                         }
                     }

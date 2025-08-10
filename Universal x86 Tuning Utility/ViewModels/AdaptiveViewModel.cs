@@ -185,6 +185,10 @@ public class AdaptiveViewModel : ReactiveObject
     
     private void ReloadGamesList()
     {
+        if (AvailablePresets == null)
+        {
+            AvailablePresets = new EnhancedObservableCollection<AdaptivePreset>();
+        }
         AvailablePresets.Clear();
         var defaultPreset = _adaptivePresetService.GetPreset("Default");
         if (defaultPreset == null)
@@ -413,26 +417,28 @@ public class AdaptiveViewModel : ReactiveObject
 
             await _ryzenAdjService.Translate(commandString);
         }
+        // && CurrentPreset.IsStaticFpsLimit
+        if (_rtssService.IsRTSSRunning())
+        {
+            // _rtssService.FpsLimit = CurrentPreset.StaticFpsLimit;
+        }
 
-        // if (_rtssService.IsRTSSRunning() && tsRTSS.IsChecked == true)
-        //     _rtssService.FpsLimit = nudRTSS.Value;
-
-        //if (RTSS.RTSSRunning())
-        //{
-        //    int i = 0;
-        //    bool found = false;
-        //    do
-        //    {
-        //        AppFlags appFlag = RunningGames.appFlags[i];
-        //        var appEntries = OSD.GetAppEntries(appFlag);
-        //        foreach (var app in appEntries)
-        //        {
-        //            found = true;
-        //            osd.Update($"{RunningGames.appFlags[i]} {app.InstantaneousFrames}FPS {app.InstantaneousFrameTime.Milliseconds}ms");
-        //        }
-        //        i++;
-        //    } while (i < RunningGames.appFlags.Count && found == false);
-        //}
+        if (_rtssService.IsRTSSRunning())
+        {
+            // int i = 0;
+            // bool found = false;
+            // do
+            // {
+            //     AppFlags appFlag = RunningGames.appFlags[i];
+            //     var appEntries = OSD.GetAppEntries(appFlag);
+            //     foreach (var app in appEntries)
+            //     {
+            //         found = true;
+            //         osd.Update($"{RunningGames.appFlags[i]} {app.InstantaneousFrames}FPS {app.InstantaneousFrameTime.Milliseconds}ms");
+            //     }
+            //     i++;
+            // } while (i < RunningGames.appFlags.Count && found == false);
+        }
     }
 
     private void Initialize()

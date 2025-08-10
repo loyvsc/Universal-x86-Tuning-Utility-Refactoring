@@ -5,12 +5,22 @@
              RequestedThemeVariant="Dark">
     
     <Application.Styles>
+        <StyleInclude Source="Resources/ControlsStyles.axaml"/>
         <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
     </Application.Styles>
     
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="/Resources/DefaultValues.axaml"/>
+                <MergeResourceInclude Source="/Resources/ControlThemes.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+    
     <TrayIcon.Icons>
         <TrayIcons>
-            <TrayIcon Icon="/Assets/applicationIcon-256.png" 
+            <TrayIcon Icon="/Assets/applicationIcon-1024.png" 
                       ToolTipText="Universal x86 Tuning Utility"
                       Clicked="OnTrayIconClicked">
                 <TrayIcon.Menu>

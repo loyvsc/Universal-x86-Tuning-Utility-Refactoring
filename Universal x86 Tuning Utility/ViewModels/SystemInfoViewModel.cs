@@ -5,6 +5,7 @@ using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using Avalonia.Threading;
 using ReactiveUI;
+using Universal_x86_Tuning_Utility.Helpers;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
@@ -180,36 +181,51 @@ public class SystemInfoViewModel : ReactiveObject, IDisposable
 
         CpuInfo = _systemInfoService.Cpu;
 
+        DeviceName = _systemInfoService.SystemName.Value;
+        DeviceManufacturer = _systemInfoService.Manufacturer.Value;
+        DeviceModel = _systemInfoService.Product.Value;
+
         CpuCoresInfo = CpuInfo.BigLITTLEInfo ?? CpuInfo.CoresCount.ToString();
             
-        var l1Size = _systemInfoService.Cpu.L1Size / 1024;
-        CpuL1Cache = $"{l1Size.ToString("0.##")} MB";
-        
-        var l2Size = _systemInfoService.Cpu.L2Size / 1024;
-        CpuL2Cache = $"{l2Size.ToString("0.##")} MB";
-
-        var l3Size = _systemInfoService.Cpu.L3Size / 1024;
-        CpuL3Cache = $"{l3Size:0.##} MB";
+        CpuL1Cache = SizesConverter.ToString(_systemInfoService.Cpu.L1Size);
+        CpuL2Cache = SizesConverter.ToString(_systemInfoService.Cpu.L2Size);
+        CpuL3Cache = SizesConverter.ToString(_systemInfoService.Cpu.L3Size);
             
         CpuBaseClock = $"{_systemInfoService.Cpu.BaseClock} MHz";
         CpuInstructions = string.Join(", ", CpuInfo.SupportedInstructions);
 
-        var ramCapacityAsGigabytes = _systemInfoService.Ram.Capacity / 1024 / 1024 / 1024;
-        RamInfo = $"{ramCapacityAsGigabytes} GB {_systemInfoService.Ram.Type.ToString()} @ {_systemInfoService.Ram.Speed} MT/s";
+        RamInfo = $"{_systemInfoService.Ram.Capacity} GB {_systemInfoService.Ram.Type.ToString()} @ {_systemInfoService.Ram.Speed} MT/s";
         
-        if (_systemInfoService.Ram.Modules.Count > 1 &&
-            _systemInfoService.Ram.Modules
-                .All(module => module.Producer == _systemInfoService.Ram.Modules.ElementAt(0).Producer))
+        if (_systemInfoService.Ram.Modules.Count > 1)
         {
-            RamProducer = _systemInfoService.Ram.Modules.ElementAt(0).Producer;
+            if (_systemInfoService.Ram.Modules
+                .All(module => module.Producer == _systemInfoService.Ram.Modules.ElementAt(0).Producer))
+            {
+                RamProducer = _systemInfoService.Ram.Modules.ElementAt(0).Producer;
+            }
+            else
+            {
+                RamProducer = string.Join(" / ", _systemInfoService.Ram.Modules.Select(module => module.Producer));
+            }
+            
+            if (_systemInfoService.Ram.Modules
+                .All(module => module.Model == _systemInfoService.Ram.Modules.ElementAt(0).Model))
+            {
+                RamModel = _systemInfoService.Ram.Modules.ElementAt(0).Model;
+            }
+            else
+            {
+                RamModel = string.Join(" / ", _systemInfoService.Ram.Modules.Select(module => module.Model));
+            }
         }
         else
         {
-            RamProducer = string.Join('/', _systemInfoService.Ram.Modules.Select(module => module.Producer));
+            RamProducer = _systemInfoService.Ram.Modules.ElementAt(0).Producer;
+            RamModel = _systemInfoService.Ram.Modules.ElementAt(0).Model;
         }
-
-        RamModel = string.Join('/', _systemInfoService.Ram.Modules.Select(module => module.Model));
+        
         RamWidth = $"{_systemInfoService.Ram.Width} bit";
+        RamTimings = _systemInfoService.Ram.Timings;
 
         int modulesCount = _systemInfoService.Ram.Modules.Count;
         RamSlots = $"{modulesCount} * {_systemInfoService.Ram.Width / modulesCount} bit";

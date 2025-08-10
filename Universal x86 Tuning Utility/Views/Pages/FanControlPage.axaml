@@ -11,7 +11,7 @@
 
     <Grid Margin="18,10,0,0">
         <DockPanel LastChildFill="False">
-            <TextBlock FontSize="26"
+            <TextBlock FontSize="{StaticResource HeaderFontSize}"
                        FontWeight="Medium"
                        Text="Fan Control Test"
                        DockPanel.Dock="Top" />

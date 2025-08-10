@@ -48,10 +48,12 @@ public class WindowsRtssService : IRtssService
 
     public WindowsRtssService()
     {
-        _rtssProcess = new Process();
-        _rtssProcess.StartInfo = new ProcessStartInfo()
+        _rtssProcess = new Process()
         {
-            FileName = _rtssExecutableFilePath
+            StartInfo = new ProcessStartInfo()
+            {
+                FileName = _rtssExecutableFilePath
+            }
         };
     }
     

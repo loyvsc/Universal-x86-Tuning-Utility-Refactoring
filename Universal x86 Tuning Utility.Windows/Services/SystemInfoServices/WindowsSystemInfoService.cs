@@ -497,11 +497,10 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             var module = new RamModule()
             {
                 Producer = queryObj["Manufacturer"].ToString()!,
-                Model = queryObj["PartNumber"].ToString()!,
-                Capacity = Convert.ToDouble(queryObj["Capacity"]),
+                Model = queryObj["PartNumber"].ToString()?.Trim(),
+                Capacity = Convert.ToDouble(queryObj["Capacity"]) / 1073741824, // 1073741824 - gigabyte in bytes
                 Speed = Convert.ToInt32(queryObj["ConfiguredClockSpeed"])
             };
-            
             modules.Add(module);
             type = Convert.ToInt32(queryObj["SMBIOSMemoryType"]);
             width += Convert.ToInt32(queryObj["DataWidth"]);
@@ -535,8 +534,13 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
             }
         }
 
-        Ram.Modules = modules.ToArray();
-        Ram.Capacity = modules.Sum(module => module.Capacity);
+        if (modules.Count != 0)
+        {
+            Ram.Speed = modules[0].Speed;
+            Ram.Modules = modules.ToArray();
+            Ram.Capacity = modules.Sum(module => module.Capacity);
+        }
+        
         Ram.Width = width;
 
         Ram.Timings = Cpu.Manufacturer == ApplicationCore.Enums.Manufacturer.AMD 
@@ -561,9 +565,9 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         var intelTimings = new IntelMemoryTimings();
         int SMUDelay = 10;
     
-        var ols = new OpenLibSys_Mem.Ols();
-        if (ols.Status != OpenLibSys_Mem.Ols.OlsStatus.NO_ERROR || ols.DllStatus != OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_NO_ERROR) 
-            throw new ApplicationException("Ols initialization error.");
+        var ols = new Ols();
+        if (ols.Status != Ols.OlsStatus.NO_ERROR || ols.DllStatus != Ols.OlsDllStatus.OLS_DLL_NO_ERROR) 
+            throw new ApplicationException($"Ols initialization error. OlsStatus={ols.Status.ToString()}; DllStatus={ols.DllStatus.ToString()}");
     
         uint someOffset = ReadDword(0x50200, ols, SMUDelay) == 0x300 ? 0x100000u : 0u;
         
@@ -652,7 +656,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
     
         Ols ols = new Ols();
         if (ols.Status != Ols.OlsStatus.NO_ERROR || ols.DllStatus != Ols.OlsDllStatus.OLS_DLL_NO_ERROR)
-                throw new ApplicationException("Ols initialization error.");
+            throw new ApplicationException($"Ols initialization error. OlsStatus={ols.Status.ToString()}; DllStatus={ols.DllStatus.ToString()}");
     
         uint eax = 0, ebx = 0, ecx = 0, edx = 0;
         ols.CpuidPx(0x80000001, ref eax, ref ebx, ref ecx, ref edx, (UIntPtr)0x01);

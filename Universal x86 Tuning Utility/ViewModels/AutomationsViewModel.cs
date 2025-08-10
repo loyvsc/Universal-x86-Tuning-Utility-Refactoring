@@ -69,11 +69,7 @@ public class AutomationsViewModel : ReactiveObject
         _systemInfoService = systemInfoService;
         _premadePresets = premadePresets;
 
-        var presetService = _systemInfoService.Cpu.Manufacturer == Manufacturer.AMD
-            ? _systemInfoService.Cpu.ProcessorType == ProcessorType.Apu
-                ? presetServiceFactory.GetAmdApuPresetService()
-                : presetServiceFactory.GetAmdDesktopPresetService()
-            : presetServiceFactory.GetAmdDesktopPresetService();
+        var presetService = presetServiceFactory.GetPlatformDetectPresetService();
         
         ReloadPResetsCommand = ReactiveCommand.CreateFromTask(ReloadPresets);
         

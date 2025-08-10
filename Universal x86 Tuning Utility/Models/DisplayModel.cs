@@ -16,7 +16,7 @@ public class DisplayModel : ReactiveObject
         _display = display;
         SupportedRefreshRates = new ObservableCollection<int>(_display.SupportedRefreshRates);
 
-        Name = display.OutputTechnology == DisplayOutputTechnology.Internal ? "Internal" : display.Identifier;
+        Name = display.OutputTechnology == DisplayOutputTechnology.Internal ? "Internal" : display.Name;
         Identifier = display.Identifier;
         SupportedOutputTechnology = _display.OutputTechnology;
     }

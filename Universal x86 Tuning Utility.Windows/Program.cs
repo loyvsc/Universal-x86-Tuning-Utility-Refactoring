@@ -3,7 +3,10 @@ using System;
 using ApplicationCore.Interfaces;
 using Avalonia.ReactiveUI;
 using DesktopNotifications.Avalonia;
+using Serilog.Extensions.Logging;
 using Splat;
+using Splat.Microsoft.Extensions.Logging;
+using Splat.Serilog;
 using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Windows.Services;
 using Universal_x86_Tuning_Utility.Windows.Services.Asus;
@@ -24,12 +27,24 @@ class Program
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
-            .UseSkia()
+            .With(() => new SkiaOptions()
+            {
+                MaxGpuResourceSizeBytes = 256_000_000
+            })
+            .With(() => new Win32PlatformOptions()
+            {
+                CompositionMode = new [] { Win32CompositionMode.DirectComposition },
+                RenderingMode = new [] { Win32RenderingMode.AngleEgl }
+            })
             .UseWin32()
+            .UseSkia()
             .WithInterFont()
             .SetupDesktopNotifications(out var notificationManager)
-            .AfterSetup(_ =>
+            .AfterPlatformServicesSetup(_ =>
             {
+                Locator.CurrentMutable.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(new SerilogLoggerFactory());
+                Locator.CurrentMutable.UseSerilogFullLogger();
+                
                 SplatRegistrations.RegisterConstant(notificationManager!);
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, WindowsAsusWmiService>(); 
                 SplatRegistrations.RegisterLazySingleton<ICliService, WindowsCliService>();
