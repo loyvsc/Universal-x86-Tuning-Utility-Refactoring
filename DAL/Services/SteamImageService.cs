@@ -9,7 +9,7 @@ public class ImageService : IImageService
 {
     public async Task<string> GetIconImageUrl(string gameName)
     {
-        string filePath = $@"\Assets\GameImages\{CleanFileName(gameName)}.jpeg";
+        string filePath = $@"Assets\GameImages\{CleanFileName(gameName)}.jpeg";
         try
         {
             var client = new SteamGridDb("33006ae9737e547251b1cff96e9e6ec9");
@@ -135,7 +135,7 @@ public class ImageService : IImageService
             response.EnsureSuccessStatusCode();
             await using (var stream = await response.Content.ReadAsStreamAsync())
             {
-                await using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                await using (var fileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write))
                 {
                     await stream.CopyToAsync(fileStream);
                 }

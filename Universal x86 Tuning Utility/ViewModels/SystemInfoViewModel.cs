@@ -1,11 +1,14 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
+using ApplicationCore.Utilities;
 using Avalonia.Threading;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Helpers;
+using Universal_x86_Tuning_Utility.Models;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
@@ -77,28 +80,10 @@ public class SystemInfoViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _isBatteryInfoAvailable, value);
     }
 
-    public string BatteryHealth
+    public ObservableCollection<BatteryModel> Batteries
     {
-        get => _batteryHealth;
-        set => this.RaiseAndSetIfChanged(ref _batteryHealth, value);
-    }
-
-    public string BatteryCycle
-    {
-        get => _batteryCycle;
-        set => this.RaiseAndSetIfChanged(ref _batteryCycle, value);
-    }
-
-    public string BatteryCapacity
-    {
-        get => _batteryCapacity;
-        set => this.RaiseAndSetIfChanged(ref _batteryCapacity, value);
-    }
-
-    public string BatteryChargeRate
-    {
-        get => _batteryChargeRate;
-        set => this.RaiseAndSetIfChanged(ref _batteryChargeRate, value);
+        get => _batteries;
+        set => this.RaiseAndSetIfChanged(ref _batteries, value);
     }
 
     public string CpuCoresInfo
@@ -153,10 +138,6 @@ public class SystemInfoViewModel : ReactiveObject, IDisposable
     private string _ramWidth;
     private MemoryTimings _ramTimings;
     private string _ramSlots;
-    private string _batteryHealth;
-    private string _batteryCycle;
-    private string _batteryCapacity;
-    private string _batteryChargeRate;
     private string _cpuCoresInfo;
     private string _cpuBaseClock;
     private string _cpuInstructions;
@@ -169,7 +150,8 @@ public class SystemInfoViewModel : ReactiveObject, IDisposable
     private readonly ISystemInfoService _systemInfoService;
     private readonly IBatteryInfoService _batteryInfoService;
     private readonly DispatcherTimer _batteryInfoTimer;
-    
+    private ObservableCollection<BatteryModel> _batteries = new ObservableCollection<BatteryModel>();
+
     public SystemInfoViewModel(ISystemInfoService systemInfoService, IBatteryInfoService batteryInfoService)
     {
         _systemInfoService = systemInfoService;
@@ -234,17 +216,13 @@ public class SystemInfoViewModel : ReactiveObject, IDisposable
         {
             try
             {
-                BatteryHealth = _batteryInfoService.GetBatteryHealth().ToString("0.##%");
-                BatteryCycle = _batteryInfoService.GetBatteryCycle().ToString();
-
-                var fullChargeCapacity = _batteryInfoService.ReadFullChargeCapacity();
-                var designCapacity = _batteryInfoService.ReadDesignCapacity();
-                BatteryCapacity = $"Full Charge: {fullChargeCapacity} mAh | Design: {designCapacity} mAh";
-
-                BatteryChargeRate = (_batteryInfoService.GetBatteryRate() / 1000).ToString("0.##W");
+                InitializeBatteryInfo();
+                
                 _batteryInfoTimer.Tick += OnBatteryInfoTimerTick;
                 _batteryInfoTimer.Start();
                 IsBatteryInfoAvailable = true;
+                
+                _batteryInfoService.BatteryCountChanged += OnBatteryCountChanged;
             }
             catch
             {
@@ -253,14 +231,51 @@ public class SystemInfoViewModel : ReactiveObject, IDisposable
         }
     }
 
+    private void OnBatteryCountChanged()
+    {
+        Batteries.Clear();
+        InitializeBatteryInfo();
+    }
+
+    private void InitializeBatteryInfo()
+    {
+        for (int i = 0; i < _batteryInfoService.Batteries.Count; i++)
+        {
+            var batteryInfo = _batteryInfoService.Batteries.ElementAt(i);
+            var battery = new BatteryModel()
+            {
+                Index = i + 1,
+                DeviceId = batteryInfo.DeviceId,
+                BatteryHealth = batteryInfo.Health.Value.ToString("0.##%"),
+                BatteryCycle = batteryInfo.CycleCount.Value.ToString(),
+                BatteryCapacity = $"Full Charge: {batteryInfo.FullChargeCapacity.Value} mAh | Design: {batteryInfo.DesignCapacity.Value} mAh",
+                BatteryChargeRate = (batteryInfo.Rate.Value / 1000).ToString("0.##W")
+            };
+            Batteries.Add(battery);
+        }
+    }
+
     private void OnBatteryInfoTimerTick(object? sender, EventArgs e)
     {
-        var batteryRate = _batteryInfoService.GetBatteryRate() / 1000;
-        BatteryChargeRate = batteryRate.ToString("0.##W");
+        foreach (var battery in Batteries)
+        {
+            battery.BatteryChargeRate = (_batteryInfoService.GetBatteryRate(battery.DeviceId) / 1000).ToString("0.##W");
+            battery.BatteryHealth = _batteryInfoService.GetBatteryHealth(battery.DeviceId).ToString("0.##%");
+            battery.BatteryCycle = _batteryInfoService.GetBatteryCycle(battery.DeviceId).ToString();
+
+            var fullChargeCapacity = _batteryInfoService.GetFullChargeCapacity(battery.DeviceId);
+            var designCapacity = _batteryInfoService.GetDesignCapacity(battery.DeviceId);
+            battery.BatteryCapacity = $"Full Charge: {fullChargeCapacity} mAh | Design: {designCapacity} mAh";
+        }
     }
 
     public void Dispose()
     {
+        if (IsBatteryInfoAvailable)
+        {
+            _batteryInfoService.BatteryCountChanged -= OnBatteryCountChanged;
+        }
+        
         _batteryInfoTimer.Stop();
     }
 }

@@ -1,79 +1,78 @@
 ﻿<UserControl x:Class="Universal_x86_Tuning_Utility.Views.Pages.FanControlPage"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
-             x:DataType="viewModels:FanControlViewModel"
-             mc:Ignorable="d"
              d:DesignHeight="450"
-             d:DesignWidth="800">
+             d:DesignWidth="800"
+             x:DataType="viewModels:FanControlViewModel"
+             mc:Ignorable="d">
 
-    <Grid Margin="18,10,0,0">
-        <DockPanel LastChildFill="False">
-            <TextBlock FontSize="{StaticResource HeaderFontSize}"
-                       FontWeight="Medium"
-                       Text="Fan Control Test"
-                       DockPanel.Dock="Top" />
+    <DockPanel Margin="18,10,0,0" LastChildFill="False">
+        <TextBlock DockPanel.Dock="Top"
+                   FontSize="{StaticResource HeaderFontSize}"
+                   FontWeight="Medium"
+                   Text="Fan Control Test" />
 
-            <StackPanel Orientation="Horizontal"
-                        DockPanel.Dock="Bottom"
-                        Margin="0,9,9,9"
-                        HorizontalAlignment="Right">
-                <Button Width="145"
-                        Command="{Binding ReloadCommand}"
-                        Content="Reload Config" />
-                <Button Width="145"
-                        Margin="9,0,0,0"
-                        Content="Test Fan Curve"
-                        Command="{Binding TestFanCurveCommand}" />
-                <Button Width="145"
-                        Margin="9,0,0,0"
-                        Content="Update Fan Speed"
-                        Command="{Binding SetFanSpeedCommand}" />
-                <Button Width="145"
-                        Margin="9,0,0,0"
-                        Content="Enable Fan Control"
-                        Command="{Binding EnableFanControlCommand}" />
-                <Button Margin="9,0,0,0"
-                        Width="145"
-                        Content="Disable Fan Control"
-                        Command="{Binding DisableFanControlCommand}" />
-            </StackPanel>
+        <StackPanel Margin="0,9,9,9"
+                    HorizontalAlignment="Right"
+                    DockPanel.Dock="Bottom"
+                    Orientation="Horizontal">
+            <Button Width="145"
+                    Command="{Binding ReloadCommand}"
+                    Content="Reload Config" />
+            <Button Width="145"
+                    Margin="9,0,0,0"
+                    Command="{Binding TestFanCurveCommand}"
+                    Content="Test Fan Curve" />
+            <Button Width="145"
+                    Margin="9,0,0,0"
+                    Command="{Binding SetFanSpeedCommand}"
+                    Content="Update Fan Speed" />
+            <Button Width="145"
+                    Margin="9,0,0,0"
+                    Command="{Binding EnableFanControlCommand}"
+                    Content="Enable Fan Control" />
+            <Button Width="145"
+                    Margin="9,0,0,0"
+                    Command="{Binding DisableFanControlCommand}"
+                    Content="Disable Fan Control" />
+        </StackPanel>
 
-            <StackPanel DockPanel.Dock="Top" Margin="0,12,18,0" Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center"
-                           FontSize="16"
-                           FontWeight="DemiBold"
-                           Text="Fan Config Name:" />
-                <TextBlock VerticalAlignment="Center"
-                           FontSize="16"
-                           Margin="9,0,0,0"
-                           Text="{Binding ConfigName, UpdateSourceTrigger=PropertyChanged}" />
-                <Button Margin="9,0,0,0"
-                        Content="Copy"
-                        Command="{Binding CopyCommand}" />
-            </StackPanel>
+        <StackPanel Margin="0,12,18,0"
+                    DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center"
+                       FontSize="16"
+                       FontWeight="DemiBold"
+                       Text="Fan Config Name:" />
+            <TextBlock Margin="9,0,0,0"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Text="{Binding ConfigName, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Margin="9,0,0,0"
+                    Command="{Binding CopyCommand}"
+                    Content="Copy" />
+        </StackPanel>
 
-            <StackPanel DockPanel.Dock="Top"
-                        Margin="0,12,18,0"
-                        Orientation="Horizontal">
-                <TextBlock FontSize="16"
-                           FontWeight="DemiBold"
-                           Text="Fan Curve Test:" />
-                <TextBlock FontSize="16"
-                           Margin="9,0,0,0"
-                           Text="{Binding Status, UpdateSourceTrigger=PropertyChanged}" />
-            </StackPanel>
+        <StackPanel Margin="0,12,18,0"
+                    DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <TextBlock FontSize="16"
+                       FontWeight="DemiBold"
+                       Text="Fan Curve Test:" />
+            <TextBlock Margin="9,0,0,0"
+                       FontSize="16"
+                       Text="{Binding Status, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
 
-            <StackPanel DockPanel.Dock="Top" Margin="0,12,18,0">
-                <TextBlock FontSize="16"
-                           Text="Fan Speed (%)" />
-                <NumericUpDown Maximum="100"
-                               Minimum="0"
-                               Value="{Binding FanSpeed, UpdateSourceTrigger=PropertyChanged}"
-                               Margin="0,9,0,0" />
-            </StackPanel>
-        </DockPanel>
-    </Grid>
+        <StackPanel Margin="0,12,18,0" DockPanel.Dock="Top">
+            <TextBlock FontSize="16" Text="Fan Speed (%)" />
+            <NumericUpDown Margin="0,9,0,0"
+                           Maximum="100"
+                           Minimum="0"
+                           Value="{Binding FanSpeed, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+    </DockPanel>
 </UserControl>

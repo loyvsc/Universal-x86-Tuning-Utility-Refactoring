@@ -196,7 +196,7 @@ public class AdaptiveViewModel : ReactiveObject
             defaultPreset = new AdaptivePreset();
         
             if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop ||
-                _systemInfoService.Cpu.RyzenFamily == RyzenFamily.DragonRange)
+                _systemInfoService.Cpu is RyzenCpuInfo { RyzenFamily: RyzenFamily.DragonRange })
             {
                 defaultPreset.Power = 86;
             }
@@ -211,7 +211,7 @@ public class AdaptiveViewModel : ReactiveObject
             defaultPreset.MinCpuClock = 1500;
             defaultPreset.NvMaxCoreClock = 4000;
             _adaptivePresetService.SavePreset("Default", defaultPreset);
-        }
+        } 
         AvailablePresets.Add(defaultPreset);
         
         _gameLauncherService.ReSearchGames(true);

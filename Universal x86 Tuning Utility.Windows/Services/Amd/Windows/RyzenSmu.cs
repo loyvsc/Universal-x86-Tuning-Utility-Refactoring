@@ -12,72 +12,75 @@ namespace Universal_x86_Tuning_Utility.Windows.Services.Amd.Windows;
 
 public static class Addresses
 {
-    private static CpuInfo _cpuInfo;
+    private static RyzenCpuInfo _cpuInfo;
     
     public static void SetAddresses(CpuInfo cpuInfo)
     {
-        _cpuInfo = cpuInfo;
-        
-        Smu.SMU_PCI_ADDR = 0x00000000;
-        Smu.SMU_OFFSET_ADDR = 0xB8;
-        Smu.SMU_OFFSET_DATA = 0xBC;
-
-        switch (cpuInfo.RyzenFamily)
+        if (cpuInfo is RyzenCpuInfo ryzenCpuInfo)
         {
-            case RyzenFamily.SummitRidge or RyzenFamily.PinnacleRidge:
+            _cpuInfo = ryzenCpuInfo;
+        
+            Smu.SMU_PCI_ADDR = 0x00000000;
+            Smu.SMU_OFFSET_ADDR = 0xB8;
+            Smu.SMU_OFFSET_DATA = 0xBC;
+            
+            switch (ryzenCpuInfo.RyzenFamily)
             {
-                Socket_AM4_V1();
-                break;
+                case RyzenFamily.SummitRidge or RyzenFamily.PinnacleRidge:
+                {
+                    Socket_AM4_V1();
+                    break;
+                }
+                case RyzenFamily.RavenRidge 
+                    or RyzenFamily.Picasso 
+                    or RyzenFamily.Dali 
+                    or RyzenFamily.Pollock 
+                    or RyzenFamily.FireFlight:
+                {
+                    Socket_FT5_FP5_AM4();
+                    break;
+                }
+                case RyzenFamily.Matisse or RyzenFamily.Vermeer:
+                {
+                    Socket_AM4_V2();
+                    break;
+                }
+                case RyzenFamily.Renoir
+                    or RyzenFamily.Lucienne
+                    or RyzenFamily.Cezanne
+                    or RyzenFamily.Barcelo:
+                {
+                    Socket_FP6_AM4();
+                    break;
+                }
+                case RyzenFamily.VanGogh:
+                {
+                    Socket_FF3();
+                    break;
+                }
+                case RyzenFamily.Mendocino
+                    or RyzenFamily.Rembrandt
+                    or RyzenFamily.PhoenixPoint
+                    or RyzenFamily.PhoenixPoint2
+                    or RyzenFamily.HawkPoint
+                    or RyzenFamily.StrixPoint
+                    or RyzenFamily.StrixPoint2 
+                    or RyzenFamily.StrixHalo:
+                {
+                    Socket_FT6_FP7_FP8();
+                    break;
+                }
+                case RyzenFamily.Raphael
+                    or RyzenFamily.DragonRange
+                    or RyzenFamily.GraniteRidge:
+                {
+                    Socket_AM5_V1();
+                    break;
+                }
             }
-            case RyzenFamily.RavenRidge 
-                or RyzenFamily.Picasso 
-                or RyzenFamily.Dali 
-                or RyzenFamily.Pollock 
-                or RyzenFamily.FireFlight:
-            {
-                Socket_FT5_FP5_AM4();
-                break;
-            }
-            case RyzenFamily.Matisse or RyzenFamily.Vermeer:
-            {
-                Socket_AM4_V2();
-                break;
-            }
-            case RyzenFamily.Renoir
-                or RyzenFamily.Lucienne
-                or RyzenFamily.Cezanne
-                or RyzenFamily.Barcelo:
-            {
-                Socket_FP6_AM4();
-                break;
-            }
-            case RyzenFamily.VanGogh:
-            {
-                Socket_FF3();
-                break;
-            }
-            case RyzenFamily.Mendocino
-                or RyzenFamily.Rembrandt
-                or RyzenFamily.PhoenixPoint
-                or RyzenFamily.PhoenixPoint2
-                or RyzenFamily.HawkPoint
-                or RyzenFamily.StrixPoint
-                or RyzenFamily.StrixPoint2 
-                or RyzenFamily.StrixHalo:
-            {
-                Socket_FT6_FP7_FP8();
-                break;
-            }
-            case RyzenFamily.Raphael
-                or RyzenFamily.DragonRange
-                or RyzenFamily.GraniteRidge:
-            {
-                Socket_AM5_V1();
-                break;
-            }
+            
+            WindowsSMUCommands.RyzenAccess.Initialize();
         }
-
-        WindowsSMUCommands.RyzenAccess.Initialize();
     }
 
     private static void Socket_FT5_FP5_AM4()

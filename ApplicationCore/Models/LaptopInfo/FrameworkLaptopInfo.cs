@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using ApplicationCore.Enums.Laptop;
 
 namespace ApplicationCore.Models.LaptopInfo;
 
@@ -17,6 +18,7 @@ public partial class FrameworkLaptopInfo : LaptopInfoBase
     {
         LaptopSeries = laptopSeries;
         CpuSeries = cpuSeries;
+        Brand = LaptopBrand.Framework;
     }
 
     public static FrameworkLaptopInfo Parse(string productInfo)

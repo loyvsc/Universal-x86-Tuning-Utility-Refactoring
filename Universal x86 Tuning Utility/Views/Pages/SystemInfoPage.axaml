@@ -936,22 +936,40 @@
                                        IsVisible="{Binding IsBatteryInfoAvailable, UpdateSourceTrigger=PropertyChanged}">
 
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <StackPanel Width="80"
-                                        Margin="24,0,12,0"
-                                        Spacing="8">
-                                <TextBlock FontWeight="DemiBold" Text="Health" />
-                                <TextBlock FontWeight="DemiBold" Text="Cycles" />
-                                <TextBlock FontWeight="DemiBold" Text="Capacity" />
-                                <TextBlock FontWeight="DemiBold" Text="Charge Rate" />
-                            </StackPanel>
-                            <StackPanel Spacing="8">
-                                <TextBlock Text="{Binding BatteryHealth, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBlock Text="{Binding BatteryCycle, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBlock Text="{Binding BatteryCapacity, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBlock Text="{Binding BatteryChargeRate, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding Batteries}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"
+                                                Spacing="12"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid RowDefinitions="Auto, *">
+                                        <TextBlock Grid.Row="0"
+                                                   Text="{Binding Index, StringFormat={}#{0}}"/>
+                                        
+                                        <StackPanel Grid.Row="1"
+                                                    Orientation="Horizontal">
+                                            <StackPanel Width="80"
+                                                        Margin="24,0,12,0"
+                                                        Spacing="8">
+                                                <TextBlock FontWeight="DemiBold" Text="Health" />
+                                                <TextBlock FontWeight="DemiBold" Text="Cycles" />
+                                                <TextBlock FontWeight="DemiBold" Text="Capacity" />
+                                                <TextBlock FontWeight="DemiBold" Text="Charge Rate" />
+                                            </StackPanel>
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Text="{Binding BatteryHealth, UpdateSourceTrigger=PropertyChanged}" />
+                                                <TextBlock Text="{Binding BatteryCycle, UpdateSourceTrigger=PropertyChanged}" />
+                                                <TextBlock Text="{Binding BatteryCapacity, UpdateSourceTrigger=PropertyChanged}" />
+                                                <TextBlock Text="{Binding BatteryChargeRate, UpdateSourceTrigger=PropertyChanged}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </controls:IconExpander>
             </StackPanel>

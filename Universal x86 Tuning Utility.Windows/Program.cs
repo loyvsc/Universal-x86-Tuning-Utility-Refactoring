@@ -3,11 +3,9 @@ using System;
 using ApplicationCore.Interfaces;
 using Avalonia.ReactiveUI;
 using DesktopNotifications.Avalonia;
-using Serilog.Extensions.Logging;
 using Splat;
-using Splat.Microsoft.Extensions.Logging;
-using Splat.Serilog;
 using Universal_x86_Tuning_Utility.Interfaces;
+using Universal_x86_Tuning_Utility.Windows.Interfaces;
 using Universal_x86_Tuning_Utility.Windows.Services;
 using Universal_x86_Tuning_Utility.Windows.Services.Asus;
 using Universal_x86_Tuning_Utility.Windows.Services.GPUs;
@@ -42,9 +40,6 @@ class Program
             .SetupDesktopNotifications(out var notificationManager)
             .AfterPlatformServicesSetup(_ =>
             {
-                Locator.CurrentMutable.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(new SerilogLoggerFactory());
-                Locator.CurrentMutable.UseSerilogFullLogger();
-                
                 SplatRegistrations.RegisterConstant(notificationManager!);
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, WindowsAsusWmiService>(); 
                 SplatRegistrations.RegisterLazySingleton<ICliService, WindowsCliService>();
@@ -65,6 +60,8 @@ class Program
                 SplatRegistrations.RegisterLazySingleton<IUpdateInstallerService, WindowsUpdateInstallerService>();
                 SplatRegistrations.RegisterLazySingleton<IBatteryInfoService, WindowsBatteryInfoService>();
                 SplatRegistrations.RegisterLazySingleton<IIconExtracter, WindowsIconExtracter>();
+                SplatRegistrations.RegisterLazySingleton<IXgMobileConnectionService, XgMobileConnectionService>();
+                SplatRegistrations.RegisterLazySingleton<IManagementEventService, ManagementEventService>();
         
                 SplatRegistrations.SetupIOC();
             })

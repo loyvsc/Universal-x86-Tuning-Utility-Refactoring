@@ -27,7 +27,7 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
     private const int MinMemoryOffset = -900;
     private const int MaxMemoryOffset = 4000;
     
-    private readonly ILogger<WindowsNvidiaGpuService> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly Lazy<Dictionary<string, int>> _ropCountDictionary = new Lazy<Dictionary<string, int>>(() =>
     {
         var data = File.ReadAllText(@"./Assets/nvidiaGpusData.json");
@@ -35,7 +35,7 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
         return deserializedData ?? new Dictionary<string, int>();
     });
     
-    public WindowsNvidiaGpuService(ILogger<WindowsNvidiaGpuService> logger)
+    public WindowsNvidiaGpuService(Serilog.ILogger logger)
     {
         _logger = logger;
     }
@@ -87,7 +87,7 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to set clocks");
+            _logger.Error(ex, "Failed to set clocks");
             throw new AggregateException("Failed to set clocks");
         }
     }

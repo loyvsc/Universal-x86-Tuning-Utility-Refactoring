@@ -2,6 +2,7 @@
 using System;
 using ApplicationCore.Interfaces;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Dialogs;
 using DAL.Services;
 using DesktopNotifications.FreeDesktop;
 using Splat;

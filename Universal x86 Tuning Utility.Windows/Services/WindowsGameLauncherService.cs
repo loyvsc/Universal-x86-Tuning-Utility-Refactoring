@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -11,7 +12,15 @@ using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using GameLib;
+using GameLib.Plugin.BattleNet;
+using GameLib.Plugin.Epic;
+using GameLib.Plugin.Gog;
+using GameLib.Plugin.Origin;
+using GameLib.Plugin.Steam;
+using GameLib.Plugin.Steam.Model;
 using Microsoft.Extensions.Logging;
+using Universal_x86_Tuning_Utility.Interfaces;
+using WinRT;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services;
 
@@ -19,14 +28,17 @@ public class WindowsGameLauncherService : IGameLauncherService
 {
     public Lazy<IReadOnlyCollection<GameLauncherItem>> InstalledGames { get; }
     
-    private readonly ILogger<WindowsGameLauncherService> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly ICliService _cliService;
+    private readonly IIconExtracter _iconExtracter;
 
-    public WindowsGameLauncherService(ILogger<WindowsGameLauncherService> logger,
-                                      ICliService cliService)
+    public WindowsGameLauncherService(Serilog.ILogger logger,
+                                      ICliService cliService,
+                                      IIconExtracter iconExtracter)
     {
         _logger = logger;
         _cliService = cliService;
+        _iconExtracter = iconExtracter;
 
         InstalledGames = new Lazy<IReadOnlyCollection<GameLauncherItem>>(() => ReSearchGames());
     }
@@ -43,9 +55,9 @@ public class WindowsGameLauncherService : IGameLauncherService
             
         foreach (var launcher in gameLauncher.GetLaunchers())
         {
-            switch (launcher.Name)
+            switch (launcher)
             {
-                case "Steam":
+                case SteamLauncher:
                 {
                     foreach (var game in launcher.Games)
                     {
@@ -53,13 +65,15 @@ public class WindowsGameLauncherService : IGameLauncherService
                             && !game.Name.Contains("SteamVR") 
                             && !game.Name.Contains("Google Earth")
                             && !game.Name.Contains("Wallpaper Engine") 
-                            && !game.Name.Contains("tModLoader") 
-                            && !game.Name.Contains("- Original Soundtrack"))
+                            && !game.Name.Contains("ModLoader") 
+                            && !game.Name.Contains("Soundtrack"))
                         {
                             var launcherItem = new GameLauncherItem
                             {
                                 GameName = game.Name,
-                                GameId = game.Id
+                                GameId = game.Id,
+                                GameType = GameType.Steam,
+                                Path = game.InstallDir
                             };
                             // launcherItem.iconPath = game.ExecutableIcon;
 
@@ -110,51 +124,47 @@ public class WindowsGameLauncherService : IGameLauncherService
                     }
                     break;
                 }
-                case "Battle.net":
+                case BattleNetLauncher:
                 {
                     foreach (var game in launcher.Games)
                     {
                         var launcherItem = new GameLauncherItem
                         {
                             GameName = game.Name,
-                            GameId = game.Id
+                            GameId = game.Id,
+                            GameType = GameType.BattleNet
                         };
                             
                         switch (game.Name)
                         {
                             case "Call of Duty Black Ops Cold War":
+                            {
                                 launcherItem.Path = game.InstallDir;
                                 launcherItem.Executable = "BlackOpsColdWar";
                                 break;
+                            }
 
                             default:
+                            {
                                 launcherItem.Path = game.InstallDir;
                                 launcherItem.Executable = Path.GetFileNameWithoutExtension(launcherItem.Path);
                                 break;
+                            }
                         }
                             
                         list.Add(launcherItem);
                     }
                     break;
                 }
-                case "Epic Games":
-                {
-                    foreach (var game in launcher.Games)
-                    {
-                        GameLauncherItem launcherItem = new GameLauncherItem
-                        {
-                            GameName = game.Name,
-                            GameId = game.Id,
-                            Path = game.InstallDir,
-                            Executable = Path.GetFileNameWithoutExtension(game.InstallDir),
-                            GameType = GameType.EpicGamesStore
-                        };
-                        list.Add(launcherItem);
-                    }
-                    break;
-                }
                 default:
                 {
+                    var gameType = launcher switch
+                    {
+                        EpicLauncher => GameType.EpicGamesStore,
+                        OriginLauncher => GameType.Origin,
+                        GogLauncher => GameType.Gog,
+                        _ => GameType.Custom
+                    };
                     foreach (var game in launcher.Games)
                     {
                         var launcherItem = new GameLauncherItem()
@@ -162,7 +172,8 @@ public class WindowsGameLauncherService : IGameLauncherService
                             GameName = game.Name,
                             GameId = game.Id,
                             Path = game.InstallDir,
-                            Executable = Path.GetFileNameWithoutExtension(game.InstallDir)
+                            Executable = Path.GetFileNameWithoutExtension(game.InstallDir),
+                            GameType = gameType
                         };
                         list.Add(launcherItem);
                     }
@@ -218,40 +229,9 @@ public class WindowsGameLauncherService : IGameLauncherService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred when checking for Microsoft Store games");
+                _logger.Error(ex, "Exception occurred when checking for Microsoft Store games");
             }
         }
-
-        list = list.OrderBy(item => item.GameName).ToList();
-
-        // we don't know where is 
-        // if (isAdaptive)
-        // {
-        //     extraApps = new GameLauncherItem();
-        //     extraApps.GameName = "Yuzu";
-        //     extraApps.Path = "yuzu.exe";
-        //     list.Add(extraApps);
-        //
-        //     extraApps = new GameLauncherItem();
-        //     extraApps.GameName = "RPCS3";
-        //     extraApps.Path = "rpcs3.exe";
-        //     list.Add(extraApps);
-        //
-        //     extraApps = new GameLauncherItem();
-        //     extraApps.GameName = "Cemu";
-        //     extraApps.Path = "cemu.exe";
-        //     list.Add(extraApps);
-        //
-        //     extraApps = new GameLauncherItem();
-        //     extraApps.GameName = "Dolphin";
-        //     extraApps.Path = "Dolphin.exe";
-        //     list.Add(extraApps);
-        //
-        //     extraApps = new GameLauncherItem();
-        //     extraApps.GameName = "Citra";
-        //     extraApps.Path = "Citra.exe";
-        //     list.Add(extraApps);
-        // }
         
         return list.Distinct(new GameLauncherItemEqualityComparer()).ToList();
     }

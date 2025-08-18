@@ -1,5 +1,6 @@
 using System.Text;
 using ApplicationCore.Enums;
+using ApplicationCore.Utilities;
 
 namespace ApplicationCore.Models;
 
@@ -148,84 +149,117 @@ public class RyzenAdjParameters
 
         public string BuildParamtersString()
         {
-            var parametersList = new List<string>();
+            var sb = StringBuilderPool.Rent();
 
             if (_parameters.TctlTemp != null)
             {
-                parametersList.Add($"--tctl-temp={_parameters.TctlTemp}");
+                sb.Append("--tctl-temp=");
+                sb.Append(_parameters.TctlTemp);
+                sb.Append(' ');
             }
 
             if (_parameters.CHTCTemp != null)
             {
-                parametersList.Add($"--cHTC-temp={_parameters.CHTCTemp}");
+                sb.Append("--cHTC-temp=");
+                sb.Append(_parameters.CHTCTemp);
+                sb.Append(' ');
             }
 
             if (_parameters.ApuSkinTemp != null)
             {
-                parametersList.Add($"--apu-skin-temp={_parameters.ApuSkinTemp}");
+                sb.Append("--apu-skin-temp=");
+                sb.Append(_parameters.ApuSkinTemp);
+                sb.Append(' ');
             }
 
             if (_parameters.StampLimit != null)
             {
-                parametersList.Add($"--stapm-limit={_parameters.StampLimit}");
+                sb.Append("--stapm-limit=");
+                sb.Append(_parameters.StampLimit);
+                sb.Append(' ');
             }
 
             if (_parameters.FastLimit != null)
             {
-                parametersList.Add($"--fast-limit={_parameters.FastLimit}");
+                sb.Append("--fast-limit=");
+                sb.Append(_parameters.FastLimit);
+                sb.Append(' ');
             }
 
             if (_parameters.SlowLimit != null)
             {
-                parametersList.Add($"--slow-limit={_parameters.SlowLimit}");
+                sb.Append("--slow-limit=");
+                sb.Append(_parameters.SlowLimit);
+                sb.Append(' ');
             }
 
             if (_parameters.VrmCurrent != null)
             {
-                parametersList.Add($"--vrm-current={_parameters.VrmCurrent}");
+                sb.Append("--vrm-current=");
+                sb.Append(_parameters.VrmCurrent);
+                sb.Append(' ');
             }
 
             if (_parameters.VrmMaxCurrent != null)
             {
-                parametersList.Add($"--vrmmax-current={_parameters.VrmMaxCurrent}");
+                sb.Append("--vrmmax-current=");
+                sb.Append(_parameters.VrmMaxCurrent);
+                sb.Append(' ');
             }
 
             if (_parameters.VrmSocCurrent != null)
             {
-                parametersList.Add($"--vrmsoc-current={_parameters.VrmSocCurrent}");
+                sb.Append("--vrmsoc-current=");
+                sb.Append(_parameters.VrmSocCurrent);
+                sb.Append(' ');
             }
 
             if (_parameters.VrmSocMaxCurrent != null)
             {
-                parametersList.Add($"--vrmsocmax-current={_parameters.VrmSocMaxCurrent}");
+                sb.Append("--vrmsocmax-current=");
+                sb.Append(_parameters.VrmSocMaxCurrent);
+                sb.Append(' ');
             }
 
             if (_parameters.VrmGfxCurrent != null)
             {
-                parametersList.Add($"--vrmgfx-current={_parameters.VrmGfxCurrent}");
+                sb.Append("--vrmgfx-current=");
+                sb.Append(_parameters.VrmGfxCurrent);
+                sb.Append(' ');
             }
 
             if (_parameters.WinPower != null)
             {
-                parametersList.Add($"--Power-Plan={_parameters.WinPower}");
+                sb.Append("--Power-Plan=");
+                sb.Append(_parameters.WinPower);
+                sb.Append(' ');
             }
 
             if (_parameters.PptLimit != null)
             {
-                parametersList.Add($"--ppt-limit={_parameters.PptLimit}");
+                sb.Append("--ppt-limit=");
+                sb.Append(_parameters.PptLimit);
+                sb.Append(' ');
             }
 
             if (_parameters.EdcLimit != null)
             {
-                parametersList.Add($"--edc-limit={_parameters.EdcLimit}");
+                sb.Append("--edc-limit=");
+                sb.Append(_parameters.EdcLimit);
+                sb.Append(' ');
             }
 
             if (_parameters.TdcLimit != null)
             {
-                parametersList.Add($"--tdc-limit={_parameters.TdcLimit}");
+                sb.Append("--tdc-limit=");
+                sb.Append(_parameters.TdcLimit);
             }
             
-            return string.Join(" ", parametersList);
+            var paramStr = sb.ToString();
+            
+            StringBuilderPool.Return(sb);
+            
+            return paramStr;
         }
     }
 }

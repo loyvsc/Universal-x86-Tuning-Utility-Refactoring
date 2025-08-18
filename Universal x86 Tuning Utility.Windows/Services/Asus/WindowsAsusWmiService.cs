@@ -9,6 +9,7 @@ using System.Threading;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using Microsoft.Extensions.Logging;
+using Universal_x86_Tuning_Utility.Windows.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services.Asus;
 
@@ -138,16 +139,18 @@ public class WindowsAsusWmiService : IASUSWmiService
 
     #endregion
 
+    private const IntPtr INVALID_CREATE_FILE_RESULT = -1;
     private IntPtr _eventHandle;
     private IntPtr _handle;
-    private readonly IntPtr _invalidCreateFileResult = new IntPtr(-1);
-    private readonly ILogger<WindowsAsusWmiService> _logger;
-    private readonly ManagementEventWatcher _eventWatcher;
+    private readonly Serilog.ILogger _logger;
+    private readonly IManagementEventService _managementEventService;
+    private readonly List<IDisposable> _asusAtkWmiEventSubscriptions;
     
-    public WindowsAsusWmiService(ILogger<WindowsAsusWmiService> logger)
+    public WindowsAsusWmiService(Serilog.ILogger logger, IManagementEventService managementEventService)
     {
         _logger = logger;
-        _eventWatcher = new ManagementEventWatcher("root\\wmi", "SELECT * FROM AsusAtkWmiEvent");
+        _managementEventService = managementEventService;
+        _asusAtkWmiEventSubscriptions = new List<IDisposable>();
     }
     
     private bool _isInitialized;
@@ -163,7 +166,7 @@ public class WindowsAsusWmiService : IASUSWmiService
             FILE_ATTRIBUTE_NORMAL,
             IntPtr.Zero
         );
-        if (_handle == _invalidCreateFileResult)
+        if (_handle == INVALID_CREATE_FILE_RESULT)
         {
             throw new Exception("Can't connect to ACPI");
         }
@@ -245,7 +248,7 @@ public class WindowsAsusWmiService : IASUSWmiService
             _ => throw new ArgumentOutOfRangeException(nameof(device), device, null)
         };
         
-        _logger.LogInformation($"Set value of {device.ToString()}", newValue);
+        _logger.Information($"Set value of {device.ToString()}", newValue);
 
         return DeviceSet(deviceId: deviceId, newValue);
     }
@@ -279,7 +282,7 @@ public class WindowsAsusWmiService : IASUSWmiService
             _ => throw new ArgumentOutOfRangeException(nameof(device), device, null)
         };
         
-        _logger.LogInformation($"Set values of {device.ToString()}", values);
+        _logger.Information($"Set values of {device.ToString()}", values);
 
         return DeviceSet(deviceId: deviceId, Params: values);
     }
@@ -313,7 +316,7 @@ public class WindowsAsusWmiService : IASUSWmiService
             _ => throw new ArgumentOutOfRangeException(nameof(device), device, null)
         };
         
-        _logger.LogInformation($"Getting status of {device.ToString()}", device);
+        _logger.Information($"Getting status of {device.ToString()}", device);
 
         return DeviceGet(deviceId: deviceId);
     }
@@ -587,18 +590,21 @@ public class WindowsAsusWmiService : IASUSWmiService
         DeviceSet(TUF_KB_STATE, state);
     }
 
-    public void SubscribeToEvents(Action<object, EventArgs> eventHandler)
+    public void SubscribeToEvents(Action<EventArgs> eventHandler)
     {
-        _eventWatcher.EventArrived += new EventArrivedEventHandler(eventHandler);
+        _asusAtkWmiEventSubscriptions.Add(_managementEventService.SubscribeToQuery("SELECT * FROM AsusAtkWmiEvent").Subscribe(eventHandler));
     }
 
     public void Dispose()
     {
-        if (_handle != _invalidCreateFileResult)
+        foreach (var subscription in _asusAtkWmiEventSubscriptions)
+        {
+            subscription.Dispose();
+        }
+        
+        if (_handle != INVALID_CREATE_FILE_RESULT)
         {
             CloseHandle(_handle);
         }
-        _eventWatcher.Stop();
-        _eventWatcher.Dispose();
     }
 }

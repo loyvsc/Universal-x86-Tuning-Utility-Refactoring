@@ -17,7 +17,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels;
 
 public class PremadePresetsViewModel : ReactiveObject
 {
-    private readonly ILogger<PremadePresetsViewModel> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly ISystemInfoService _systemInfoService;
     private readonly IPremadePresets _premadePresets;
     private readonly IRyzenAdjService _ryzenAdjService;
@@ -53,7 +53,7 @@ public class PremadePresetsViewModel : ReactiveObject
     private string _header;
     private bool _isCertifiedBadgeVisible;
 
-    public PremadePresetsViewModel(ILogger<PremadePresetsViewModel> logger,
+    public PremadePresetsViewModel(Serilog.ILogger logger,
                                    ISystemInfoService systemInfoService,
                                    IPremadePresets premadePresets,
                                    IRyzenAdjService ryzenAdjService,
@@ -95,7 +95,7 @@ public class PremadePresetsViewModel : ReactiveObject
                                                             text: "Error occured while applying preset",
                                                             notificationType: NotificationManagerExtensions.NotificationType.Error,
                                                             cancellationToken: cancellationToken);
-            _logger.LogError(ex, "Error while applying preset");
+            _logger.Error(ex, "Error while applying preset");
         }
     }
 
@@ -133,7 +133,7 @@ public class PremadePresetsViewModel : ReactiveObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to update Premade page");
+            _logger.Error(ex, "Failed to update Premade page");
         }
     }
 }

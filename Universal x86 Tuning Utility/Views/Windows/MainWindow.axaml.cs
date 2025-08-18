@@ -77,16 +77,12 @@ public partial class MainWindow : AppWindow, IDisposable
             }
             else
             {
-                var manufacturer = viewModel.ProductManufacturer.ToUpper();
-                if (manufacturer.Contains("AYANEO") ||
-                    manufacturer.Contains("GPD") ||
-                    manufacturer.Contains("ONEXPLAYER"))
+                if (viewModel.IsPortableConsole)
                 {
-                    var topLevel = GetTopLevel(this)!;
-                    var displayCount = topLevel.Screens!.ScreenCount;
-                    if (displayCount == 1)
+                    var topLevel = GetTopLevel(this);
+                    var display = topLevel?.Screens?.ScreenFromWindow(this);
+                    if (display?.IsPrimary == true)
                     {
-                        MaxHeight = topLevel.Screens.Primary!.Bounds.Height;
                         WindowState = WindowState.Maximized;
                     }
                 }

@@ -117,7 +117,8 @@
                                 <TextBlock FontSize="12" Text="Enable this preset for automatic switching. Can be used to exclude games/apps from auto switch." />
                             </StackPanel>
                         </StackPanel>
-                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding CurrentPreset.IsAutoSwitch, UpdateSourceTrigger=PropertyChanged}" />
+                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding CurrentPreset.IsAutoSwitch, UpdateSourceTrigger=PropertyChanged}"
+                                      VerticalAlignment="Center"/>
                     </Grid>
                 </controls:CardControl>
 
@@ -428,7 +429,8 @@
                 </controls:IconExpander>
 
                 <!--  Radeon™ Graphics Options  -->
-                <controls:IconExpander Icon="Image">
+                <controls:IconExpander Icon="Image"
+                                       IsVisible="{Binding IsRadeonGraphicsOptionsAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" VerticalAlignment="Center">

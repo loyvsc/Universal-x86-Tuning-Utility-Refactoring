@@ -9,10 +9,10 @@ namespace Universal_x86_Tuning_Utility.Windows.Services;
 
 public class WindowsUpdateInstallerService : IUpdateInstallerService
 {
-    private readonly ILogger<WindowsUpdateInstallerService> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly IUpdateService _updateService;
 
-    public WindowsUpdateInstallerService(ILogger<WindowsUpdateInstallerService> logger,
+    public WindowsUpdateInstallerService(Serilog.ILogger logger,
                                          IUpdateService updateService)
     {
         _logger = logger;
@@ -42,7 +42,7 @@ public class WindowsUpdateInstallerService : IUpdateInstallerService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred when download last update");
+            _logger.Error(ex, "Exception occurred when download last update");
             throw new AggregateException("Failed to download newest update");
         }
     }

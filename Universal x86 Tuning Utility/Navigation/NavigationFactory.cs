@@ -18,11 +18,6 @@ public class NavigationFactory : INavigationPageFactory
 
     public Control GetPageFromObject(object target)
     {
-        if (target is NavigationViewModel navigationViewModel)
-        {
-            navigationViewModel.DataContext = Locator.Current.GetService(navigationViewModel.ViewModelType)!;
-            target = navigationViewModel.DataContext;
-        }
         return target switch
         {
             DashboardViewModel => new DashboardPage() { DataContext = target },

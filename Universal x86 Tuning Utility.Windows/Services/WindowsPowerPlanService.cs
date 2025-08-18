@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
-using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using PowerModeChangedEventArgs = ApplicationCore.Events.PowerModeChangedEventArgs;
 using PowerModeChangedEventHandler = ApplicationCore.Events.PowerModeChangedEventHandler;
@@ -11,7 +10,7 @@ namespace Universal_x86_Tuning_Utility.Windows.Services;
 
 public class WindowsPowerPlanService : IPowerPlanService
 {
-    private readonly ILogger<WindowsPowerPlanService> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly IBatteryInfoService _batteryInfoService;
     public event PowerModeChangedEventHandler PowerModeChanged;
     
@@ -49,7 +48,7 @@ public class WindowsPowerPlanService : IPowerPlanService
     private readonly Guid _highPerformancePowerSchemeGuid = new Guid("DED574B5-45A0-4F42-8737-46345C09C238");
     private readonly Guid _powerSavePowerSchemeGuid = new Guid("961CC777-2547-4F9D-8174-7D86181b8A7A");
 
-    public WindowsPowerPlanService(ILogger<WindowsPowerPlanService> logger, IBatteryInfoService batteryInfoService)
+    public WindowsPowerPlanService(Serilog.ILogger logger, IBatteryInfoService batteryInfoService)
     {
         _logger = logger;
         _batteryInfoService = batteryInfoService;
@@ -73,7 +72,7 @@ public class WindowsPowerPlanService : IPowerPlanService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred when handling power mode changed");
+            _logger.Error(ex, "Error occurred when handling power mode changed");
         }
     }
 

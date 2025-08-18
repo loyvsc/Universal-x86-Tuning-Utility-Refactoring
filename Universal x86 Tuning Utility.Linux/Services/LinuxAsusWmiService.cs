@@ -107,7 +107,7 @@ public class LinuxAsusWmiService : IASUSWmiService
         throw new NotImplementedException();
     }
 
-    public void SubscribeToEvents(Action<object, EventArgs> eventHandler)
+    public void SubscribeToEvents(Action<EventArgs> eventHandler)
     {
         throw new NotImplementedException();
     }

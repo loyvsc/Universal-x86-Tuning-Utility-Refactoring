@@ -91,7 +91,7 @@ public class SettingsViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _updatesMessage, value);
     }
     
-    private readonly ILogger<SettingsViewModel> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly IUpdateService _updateService;
     private readonly IUpdateInstallerService _updateInstallerService;
     private readonly INotificationManager _toastNotificationsManager;
@@ -111,7 +111,7 @@ public class SettingsViewModel : ReactiveObject
     private bool _isMinimizeOnClose;
     private bool _isAutoCheckUpdates;
 
-    public SettingsViewModel(ILogger<SettingsViewModel> logger,
+    public SettingsViewModel(Serilog.ILogger logger,
                              IUpdateService updateService,
                              IUpdateInstallerService updateInstallerService,
                              INotificationManager toastNotificationsManager,
@@ -175,7 +175,7 @@ public class SettingsViewModel : ReactiveObject
         catch (Exception ex)
         {
             // log error or display error message to user
-            _logger.LogError(ex, "Error occurred at downloading or installing update");
+            _logger.Error(ex, "Error occurred at downloading or installing update");
             await _toastNotificationsManager.ShowTextNotification(title: "Error",
                 text: "Error occurred at downloading or installing update",
                 notificationType: NotificationManagerExtensions.NotificationType.Error);

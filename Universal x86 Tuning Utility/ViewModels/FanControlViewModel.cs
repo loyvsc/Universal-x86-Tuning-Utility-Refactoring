@@ -6,7 +6,6 @@ using ApplicationCore.Interfaces;
 using Avalonia.Threading;
 using DesktopNotifications;
 using LibreHardwareMonitor.Hardware;
-using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Interfaces;
@@ -53,13 +52,13 @@ public class FanControlViewModel : ReactiveObject
     
     private readonly DispatcherTimer _timer;
     
-    private readonly ILogger<FanControlViewModel> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly IFanControlService _fanControlService;
     private readonly ISystemInfoService _systemInfoService;
     private readonly INotificationManager _notificationManager;
     private readonly IPlatformServiceAccessor _platformServiceAccessor;
 
-    public FanControlViewModel(ILogger<FanControlViewModel> logger,
+    public FanControlViewModel(Serilog.ILogger logger,
                                IFanControlService fanControlService,
                                ISystemInfoService systemInfoService,
                                INotificationManager notificationManager,
@@ -108,7 +107,7 @@ public class FanControlViewModel : ReactiveObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to enable FanControl");
+            _logger.Error(ex, "Failed to enable FanControl");
             await _notificationManager.ShowTextNotification("Failed to enable FanControl", $"Failed to enable FanControl: {ex.Message}");
         }
     }
@@ -124,7 +123,7 @@ public class FanControlViewModel : ReactiveObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to disable FanControl");
+            _logger.Error(ex, "Failed to disable FanControl");
             await _notificationManager.ShowTextNotification("Failed to disable FanControl", $"Failed to disable FanControl: {ex.Message}");
         }
     }
@@ -137,7 +136,7 @@ public class FanControlViewModel : ReactiveObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to reload");
+            _logger.Error(ex, "Failed to reload");
             await _notificationManager.ShowTextNotification("Failed to reload", $"Failed to reload: {ex.Message}");
         }
     }
@@ -193,7 +192,7 @@ public class FanControlViewModel : ReactiveObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to get cpu temperature");
+            _logger.Error(ex, "Failed to get cpu temperature");
             await _notificationManager.ShowTextNotification("Error occurred", "Failed to get cpu temperature", NotificationManagerExtensions.NotificationType.Error);
         }
     }
@@ -221,7 +220,7 @@ public class FanControlViewModel : ReactiveObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to get cpu temperature");
+            _logger.Error(ex, "Failed to get cpu temperature");
             await _notificationManager.ShowTextNotification("Error occurred", "Failed to get cpu temperature", NotificationManagerExtensions.NotificationType.Error);
             return 0;
         }

@@ -29,8 +29,4 @@ public class CpuInfo
     public double L3Size { get; set; }
 
     public IReadOnlyCollection<string> SupportedInstructions { get; set; } = ReadOnlyCollection<string>.Empty;
-    
-    public RyzenFamily RyzenFamily { get; set; } = RyzenFamily.Unknown;
-    public RyzenGenerations RyzenGeneration { get; set; } = RyzenGenerations.Unknown;
-    public RyzenSeries RyzenSeries { get; set; } = RyzenSeries.Unknown;
 }

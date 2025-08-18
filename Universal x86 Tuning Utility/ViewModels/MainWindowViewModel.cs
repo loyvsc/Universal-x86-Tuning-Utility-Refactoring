@@ -9,11 +9,11 @@ using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
+using ApplicationCore.Models.LaptopInfo;
 using Avalonia.Threading;
 using DesktopNotifications;
 using FluentAvalonia.UI.Controls;
 using FluentIcons.Common;
-using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Navigation;
@@ -26,6 +26,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels;
 
 public class MainWindowViewModel : ReactiveObject
 {
+    private readonly Serilog.ILogger _logger;
     private readonly ISystemInfoService _systemInfoService;
     private readonly IBatteryInfoService _batteryInfoService;
     private readonly INotificationManager _toastNotificationManager;
@@ -52,8 +53,8 @@ public class MainWindowViewModel : ReactiveObject
         get => _title;
         set => this.RaiseAndSetIfChanged(ref _title, value);
     }
-
-    public string ProductManufacturer { get; }
+    
+    public bool IsPortableConsole { get; }
 
     private readonly DispatcherTimer _miscTimer;
     private readonly DispatcherTimer _autoReapplyTimer;
@@ -64,7 +65,7 @@ public class MainWindowViewModel : ReactiveObject
     private IReadOnlyCollection<GameLauncherItem> _gamesList;
     private NavigationViewModel _selectedNavigationItem;
 
-    public MainWindowViewModel(ILogger<MainWindowViewModel> logger,
+    public MainWindowViewModel(Serilog.ILogger logger,
         ISystemInfoService systemInfoService,
         IBatteryInfoService batteryInfoService,
         INotificationManager toastNotificationManager,
@@ -77,6 +78,7 @@ public class MainWindowViewModel : ReactiveObject
         IPremadePresets premadePresets,
         IGameDataService gameDataService)
     {
+        _logger = logger;
         _systemInfoService = systemInfoService;
         _batteryInfoService = batteryInfoService;
         _toastNotificationManager = toastNotificationManager;
@@ -88,7 +90,7 @@ public class MainWindowViewModel : ReactiveObject
         _premadePresets = premadePresets;
         _powerPlanService.PowerModeChanged += OnPowerModeChange;
 
-        ProductManufacturer = _systemInfoService.Manufacturer.Value;
+        IsPortableConsole = _systemInfoService.LaptopInfo is PortableConsoleInfo;
 
         _miscTimer = CreateTimer(1, (s, e) => HandleMiscellaneousTasks(s, e));
         _autoReapplyTimer = CreateTimer(Settings.Default.AutoReapplyTime, (s, e) => AutoReapplySettings(s, e));

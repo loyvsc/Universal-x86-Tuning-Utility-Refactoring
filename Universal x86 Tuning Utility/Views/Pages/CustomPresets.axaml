@@ -2274,7 +2274,8 @@
                                           MinWidth="164"
                                           Height="37" />
                                 <Button Command="{Binding IdentificateMonitorsCommand}"
-                                        ToolTip.Tip="Identificate monitors">
+                                        ToolTip.Tip="Identificate monitors"
+                                        Height="37">
                                     <avalonia:FluentIcon Icon="Eye"/>
                                 </Button>
                                 <ComboBox ItemsSource="{Binding SelectedDisplay.SupportedRefreshRates, UpdateSourceTrigger=PropertyChanged}"

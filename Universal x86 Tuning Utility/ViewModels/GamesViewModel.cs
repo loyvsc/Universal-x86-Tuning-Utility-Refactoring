@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ApplicationCore.Enums;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Interfaces;
+using ILogger = Serilog.ILogger;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
@@ -43,7 +45,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _isActionsAvailable, value);
     }
 
-    private readonly ILogger<GamesViewModel> _logger;
+    private readonly ILogger _logger;
     private readonly IGameDataService _gameDataService;
     private readonly IDialogService _dialogService;
     private readonly INotificationManager _toastNotificationsService;
@@ -55,7 +57,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
     private bool _gamesListUpdating;
     private bool _isActionsAvailable;
 
-    public GamesViewModel(ILogger<GamesViewModel> logger, 
+    public GamesViewModel(ILogger logger, 
                           IGameDataService gameDataService,
                           IDialogService dialogService,
                           INotificationManager toastNotificationsService,
@@ -80,10 +82,18 @@ public class GamesViewModel : ReactiveObject, IDisposable
             Interval = TimeSpan.FromSeconds(2)
         };
         _updateFps.Tick += UpdateFPS_Tick;
-        _updateFps.Start();
+        
+        ThreadPool.QueueUserWorkItem(async _ =>
+        {
+            await ReloadGamesList();
+            if (!_updateFps.IsEnabled)
+            {
+                _updateFps.Start();
+            }
+        }, null);
     }
     
-    private void UpdateFPS_Tick(object? sender, EventArgs e)
+    private async void UpdateFPS_Tick(object? sender, EventArgs e)
     {
         try
         {
@@ -110,7 +120,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred when updating performance statistics");
+            // _logger.Error(ex, "Exception occurred when updating performance statistics");
         }
     }
 

@@ -7,6 +7,7 @@ using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using DynamicData;
 using Microsoft.Extensions.Logging;
+using Universal_x86_Tuning_Utility.Windows.Interfaces;
 using WindowsDisplayAPI;
 using WindowsDisplayAPI.DisplayConfig;
 using WindowsDisplayAPI.Native.DisplayConfig;
@@ -20,22 +21,25 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
     public event DisplayRemovedEventHandler? DisplayRemoved;
     public Lazy<IReadOnlyCollection<Display>> Displays  { get; private set; }
     
-    private readonly ILogger<WindowsDisplayInfoService> _logger;
-    private readonly ManagementEventWatcher _installDeviceEventWatcher;
-    private readonly ManagementEventWatcher _uninstallDeviceEventWatcher;
+    private readonly Serilog.ILogger _logger;
+    private readonly IDisposable _installDeviceSubscription;
+    private readonly IDisposable _uninstallDeviceEventWatcher;
 
-    public WindowsDisplayInfoService(ILogger<WindowsDisplayInfoService> logger)
+    public WindowsDisplayInfoService(Serilog.ILogger logger, IManagementEventService managementEventService)
     {
         _logger = logger;
         Displays = new Lazy<IReadOnlyCollection<Display>>(() => GetDisplays().AsReadOnly());
         
-        _installDeviceEventWatcher = new ManagementEventWatcher("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2");
-        _installDeviceEventWatcher.EventArrived += OnNewDeviceInstalled;
-        _uninstallDeviceEventWatcher = new ManagementEventWatcher("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 3");
-        _uninstallDeviceEventWatcher.EventArrived += OnDeviceUninstalled;
+        _installDeviceSubscription =
+            managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2")
+                .Subscribe(OnNewDeviceInstalled);
+        
+        _uninstallDeviceEventWatcher =
+            managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 3")
+                .Subscribe(OnDeviceUninstalled);
     }
 
-    private void OnNewDeviceInstalled(object sender, EventArrivedEventArgs e)
+    private void OnNewDeviceInstalled(EventArrivedEventArgs e)
     {
         if (Displays.IsValueCreated)
         {
@@ -53,7 +57,7 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
         }
     }
 
-    private void OnDeviceUninstalled(object sender, EventArrivedEventArgs e)
+    private void OnDeviceUninstalled(EventArrivedEventArgs e)
     {
         if (Displays.IsValueCreated)
         {
@@ -167,7 +171,7 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
         }
         else
         {
-            _logger.LogError("Invalid input format");
+            _logger.Error("Invalid input format");
             throw new AggregateException("Invalid input format");
         }
     }
@@ -190,12 +194,7 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
 
     public void Dispose()
     {
-        _installDeviceEventWatcher.EventArrived -= OnNewDeviceInstalled;
-        _installDeviceEventWatcher.Stop();
-        _installDeviceEventWatcher.Dispose();
-        
-        _uninstallDeviceEventWatcher.EventArrived -= OnDeviceUninstalled;
-        _uninstallDeviceEventWatcher.Stop();
+        _installDeviceSubscription.Dispose();
         _uninstallDeviceEventWatcher.Dispose();
     }
 }

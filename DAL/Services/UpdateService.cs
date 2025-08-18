@@ -1,17 +1,17 @@
 ﻿using ApplicationCore.Interfaces;
-using Microsoft.Extensions.Logging;
 using Octokit;
+using Splat;
 using FileMode = System.IO.FileMode;
 
 namespace DAL.Services;
 
 public class UpdateService : IUpdateService
 {
-    private readonly ILogger<UpdateService> _logger;
+    private readonly IFullLogger _logger;
     private const string Owner = "JamesCJ60";
     private const string RepositoryName = "Universal-x86-Tuning-Utility";
 
-    public UpdateService(ILogger<UpdateService> logger)
+    public UpdateService(IFullLogger logger)
     {
         _logger = logger;
     }
@@ -30,7 +30,7 @@ public class UpdateService : IUpdateService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred when checking for updates");
+            _logger.Error(ex, "Exception occurred when checking for updates");
         }
 
         return false;
@@ -65,7 +65,7 @@ public class UpdateService : IUpdateService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred when download last update");
+            _logger.Error(ex, "Exception occurred when download last update");
             throw;
         }
     }

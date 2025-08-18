@@ -6,7 +6,7 @@
     
     <Application.Styles>
         <StyleInclude Source="Resources/ControlsStyles.axaml"/>
-        <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
+        <styling:FluentAvaloniaTheme PreferSystemTheme="False" PreferUserAccentColor="True" />
     </Application.Styles>
     
     <Application.Resources>

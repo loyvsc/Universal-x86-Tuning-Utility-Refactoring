@@ -15,36 +15,45 @@ public class AutomationsViewModel : ReactiveObject
 {
     public ICommand ReloadPResetsCommand { get; }
 
-    public Preset SelectedAcPreset
+    public Preset? SelectedAcPreset
     {
         get => _selectedAcPreset;
         set
         {
             this.RaiseAndSetIfChanged(ref _selectedAcPreset, value);
-            Settings.Default.acPreset = value.Name;
-            Settings.Default.acCommandString = value.CommandValue;
+            if (_selectedAcPreset != null)
+            {
+                Settings.Default.acPreset = value.Name;
+                Settings.Default.acCommandString = value.CommandValue;
+            }
         }
     }
 
-    public Preset SelectedDcPreset
+    public Preset? SelectedDcPreset
     {
         get => _selectedDcPreset;
         set
         {
             this.RaiseAndSetIfChanged(ref _selectedDcPreset, value);
-            Settings.Default.dcPreset = value.Name;
-            Settings.Default.dcCommandString = value.CommandValue;
+            if (_selectedDcPreset != null)
+            {
+                Settings.Default.dcPreset = value.Name;
+                Settings.Default.dcCommandString = value.CommandValue;
+            }
         }
     }
 
-    public Preset SelectedResumePreset
+    public Preset? SelectedResumePreset
     {
         get => _selectedResumePreset;
         set
         {
             this.RaiseAndSetIfChanged(ref _selectedResumePreset, value);
-            Settings.Default.resumePreset = value.Name;
-            Settings.Default.resumeCommandString = value.CommandValue;
+            if (_selectedResumePreset != null)
+            {
+                Settings.Default.resumePreset = value.Name;
+                Settings.Default.resumeCommandString = value.CommandValue;
+            }
         }
     }
 
@@ -55,9 +64,9 @@ public class AutomationsViewModel : ReactiveObject
     }
     
     private List<Preset> _presets;
-    private Preset _selectedAcPreset;
-    private Preset _selectedResumePreset;
-    private Preset _selectedDcPreset;
+    private Preset? _selectedAcPreset;
+    private Preset? _selectedResumePreset;
+    private Preset? _selectedDcPreset;
     
     private readonly ISystemInfoService _systemInfoService;
     private readonly IPremadePresets _premadePresets;

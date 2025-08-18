@@ -6,12 +6,12 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using CastelloBranco.AvaloniaMessageBox;
 using DAL.Services;
-using Microsoft.Extensions.Logging;
+using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.MvvmDialogs.Avalonia;
 using ReactiveUI;
-using Serilog.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 using Splat;
-using Splat.Microsoft.Extensions.Logging;
-using Splat.Serilog;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Helpers;
 using Universal_x86_Tuning_Utility.Interfaces;
@@ -23,19 +23,48 @@ using Universal_x86_Tuning_Utility.Services.PresetServices;
 using Universal_x86_Tuning_Utility.ViewModels;
 using Universal_x86_Tuning_Utility.Views.Windows;
 using Application = Avalonia.Application;
-using ILogger = Splat.ILogger;
 using INotificationManager = DesktopNotifications.INotificationManager;
 
 namespace Universal_x86_Tuning_Utility;
 
 public class App : Application
 {
-    private ILogger<App> _logger;
+    private Serilog.ILogger _logger;
     private IClassicDesktopStyleApplicationLifetime _desktopApplicationLifetime;
 
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console()
+            .WriteTo.File(path: "./logs/log.txt", 
+                outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {Message:lj} {NewLine}{Exception}",
+                rollingInterval: RollingInterval.Day,
+                restrictedToMinimumLevel: LogEventLevel.Information)
+            .Enrich.FromLogContext()
+            .CreateLogger();
+
+        Locator.CurrentMutable.RegisterConstant(Log.Logger);
+        
+        SplatRegistrations.RegisterLazySingleton<IPremadePresets, PremadePresets>();
+        SplatRegistrations.RegisterLazySingleton<IPresetService, PresetService>();
+        SplatRegistrations.RegisterLazySingleton<IPresetServiceFactory, PresetServiceFactory>();
+        SplatRegistrations.RegisterLazySingleton<INavigationService, NavigationService>();
+        SplatRegistrations.RegisterLazySingleton<IUpdateService, UpdateService>();
+        SplatRegistrations.RegisterLazySingleton<IPlatformServiceAccessor, PlatformServiceAccessor>();
+        SplatRegistrations.RegisterLazySingleton<IAmdApuControlService, AmdApuControlService>();
+        SplatRegistrations.RegisterLazySingleton<IImageService, ImageService>();
+       
+        Locator.CurrentMutable.RegisterLazySingleton<IAdaptivePresetService>(() => new AdaptivePresetService("/AdaptivePresets"));
+        Locator.CurrentMutable.RegisterLazySingleton<IGameDataService>(() => new GameDataService(Settings.Default.Path + "gameData.json"));
+        // Locator.CurrentMutable.RegisterLazySingleton<IDialogService>(() => new DialogService(new DialogManager(), type => Locator.Current.GetService(type)));
+        Locator.CurrentMutable.RegisterLazySingleton(() => (IDialogService)new DialogService(
+            new DialogManager(
+                viewLocator: new ViewLocatorBase(),
+                dialogFactory: new DialogFactory().AddMessageBox()),
+            viewModelFactory: x => Locator.Current.GetService(x)));
 
         //Viewmodels
         SplatRegistrations.RegisterLazySingleton<AdaptiveViewModel>();
@@ -50,27 +79,14 @@ public class App : Application
         SplatRegistrations.RegisterLazySingleton<SettingsViewModel>();
         SplatRegistrations.RegisterLazySingleton<SystemInfoViewModel>();
 
-        SplatRegistrations.RegisterLazySingleton<IAdaptivePresetService, AdaptivePresetService>();
-        SplatRegistrations.RegisterLazySingleton<IGameDataService, GameDataService>();
-        SplatRegistrations.RegisterLazySingleton<IPremadePresets, PremadePresets>();
-        SplatRegistrations.RegisterLazySingleton<IPresetService, PresetService>();
-        SplatRegistrations.RegisterLazySingleton<IPresetServiceFactory, PresetServiceFactory>();
-        SplatRegistrations.RegisterLazySingleton<INavigationService, NavigationService>();
-        SplatRegistrations.RegisterLazySingleton<IUpdateService, UpdateService>();
-        SplatRegistrations.RegisterLazySingleton<IPlatformServiceAccessor, PlatformServiceAccessor>();
-        SplatRegistrations.RegisterLazySingleton<IAmdApuControlService, AmdApuControlService>();
-
         SplatRegistrations.SetupIOC();
-
-        Locator.CurrentMutable.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(new SerilogLoggerFactory());
-        Locator.CurrentMutable.UseSerilogFullLogger();
-        Locator.CurrentMutable.RegisterLazySingleton<IAdaptivePresetService>(() => new AdaptivePresetService("/AdaptivePresets"));
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            Settings.Default.Path = AppContext.BaseDirectory;
             _desktopApplicationLifetime = desktop;
             _desktopApplicationLifetime.MainWindow = new MainWindow()
             {
@@ -85,12 +101,12 @@ public class App : Application
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
         }
-
-        base.OnFrameworkInitializationCompleted();
     }
 
     private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
     {
+        Log.CloseAndFlush();
+        
         TaskScheduler.UnobservedTaskException -= TaskSchedulerOnUnobservedTaskException;
         AppDomain.CurrentDomain.UnhandledException -= CurrentDomainOnUnhandledException;
     }
@@ -121,8 +137,8 @@ public class App : Application
     {
         try
         {
-            _logger = Locator.Current.GetService<ILogger<App>>()!;
-
+            _logger = Locator.Current.GetService<Serilog.ILogger>()!;
+            _logger.Information("Application started");
             if (Settings.Default.SettingsUpgradeRequired)
             {
                 try
@@ -132,7 +148,7 @@ public class App : Application
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to update settings on startup");
+                    _logger.Error(ex, "Failed to update settings on startup");
                 }
             }
             
@@ -154,7 +170,7 @@ public class App : Application
         }
         catch (Exception ex)
         {
-            _logger.LogCritical(ex, "Failed to build and start a host");
+            _logger.Warning(ex, "Failed to build and start a host");
         }
     }
 

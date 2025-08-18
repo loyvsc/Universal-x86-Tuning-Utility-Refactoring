@@ -16,7 +16,7 @@ public class WindowsRyzenAdjService : IRyzenAdjService
 {
     private bool _isUpdatingMux;
     
-    private readonly ILogger<WindowsRyzenAdjService> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly IDisplayInfoService _displayInfoService;
     private readonly IIntelManagementService _intelManagementService;
     private readonly IAmdGpuService _amdGpuService;
@@ -25,7 +25,7 @@ public class WindowsRyzenAdjService : IRyzenAdjService
     private readonly IASUSWmiService _asusWmiService;
     private readonly IPowerPlanService _powerPlanService;
 
-    public WindowsRyzenAdjService(ILogger<WindowsRyzenAdjService> logger,
+    public WindowsRyzenAdjService(Serilog.ILogger logger,
                                   IDisplayInfoService displayInfoService,
                                   IIntelManagementService intelManagementService,
                                   IAmdGpuService amdGpuService,
@@ -201,14 +201,14 @@ public class WindowsRyzenAdjService : IRyzenAdjService
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "An exception occurred in RyzenAdjService");
+                        _logger.Error(ex, "An exception occurred in RyzenAdjService");
                     }
                 });
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An exception occurred in RyzenAdjService");
+            _logger.Error(ex, "An exception occurred in RyzenAdjService");
         }
     }
     
@@ -252,7 +252,7 @@ public class WindowsRyzenAdjService : IRyzenAdjService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred when executing ADLX command");
+            _logger.Error(ex, "Exception occurred when executing ADLX command");
         }
     }
 
@@ -275,7 +275,7 @@ public class WindowsRyzenAdjService : IRyzenAdjService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred when executing UXTUSR command");
+            _logger.Error(ex, "Exception occurred when executing UXTUSR command");
         }
     }
 
@@ -305,7 +305,7 @@ public class WindowsRyzenAdjService : IRyzenAdjService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred when executing NVIDIA command");
+            _logger.Error(ex, "Exception occurred when executing NVIDIA command");
         }
     }
 
@@ -354,7 +354,7 @@ public class WindowsRyzenAdjService : IRyzenAdjService
                             if (mux > 0 && value == "true")
                             {
                                 _isUpdatingMux = true;
-                                _logger.LogInformation("Set Mux = 0");
+                                _logger.Information("Set Mux = 0");
                                 _asusWmiService.DeviceSet(device, 0);
                             
                                 Process.Start("shutdown", "/r /t 1");
@@ -362,7 +362,7 @@ public class WindowsRyzenAdjService : IRyzenAdjService
                             else if (mux is < 1 and > -1 && value == "false")
                             {
                                 _isUpdatingMux = true;
-                                _logger.LogInformation("Set Mux = 1");
+                                _logger.Information("Set Mux = 1");
                                 _asusWmiService.DeviceSet(device, 1);
                             
                                 Process.Start("shutdown", "/r /t 1");
@@ -376,7 +376,7 @@ public class WindowsRyzenAdjService : IRyzenAdjService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred when executing Asus Wmi command");
+            _logger.Error(ex, "Exception occurred when executing Asus Wmi command");
         }
     }
 

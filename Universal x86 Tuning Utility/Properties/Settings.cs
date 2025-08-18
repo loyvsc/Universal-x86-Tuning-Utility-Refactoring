@@ -11,7 +11,7 @@ namespace Universal_x86_Tuning_Utility.Properties;
 
 public sealed partial class Settings
 {
-    public static Settings Default = new Settings();
+    public static readonly Settings Default = new Settings();
     
     private readonly string __saveFileName = "props.json";
     private Dictionary<string, object> _properties = new Dictionary<string, object>();
