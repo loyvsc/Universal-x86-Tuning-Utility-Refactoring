@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
+        <OutputType>WinExe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -10,6 +11,7 @@
     <ItemGroup>
       <PackageReference Include="Avalonia.X11" Version="11.3.2" />
       <PackageReference Include="DesktopNotificationsFixed.FreeDesktop" Version="1.0.0" />
+      <PackageReference Include="X11.Net" Version="1.0.7" />
     </ItemGroup>
 
     <ItemGroup>

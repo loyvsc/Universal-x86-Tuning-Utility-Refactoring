@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using System;
+using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Dialogs;
@@ -8,6 +9,7 @@ using DesktopNotifications.FreeDesktop;
 using Splat;
 using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Linux.Services;
+using Universal_x86_Tuning_Utility.Linux.Services.Display;
 using Universal_x86_Tuning_Utility.Linux.Services.GPUs;
 
 namespace Universal_x86_Tuning_Utility.Linux;
@@ -34,7 +36,7 @@ class Program
             {
                 var context = FreeDesktopApplicationContext.FromCurrentProcess();
                 var manager = new FreeDesktopNotificationManager(context);
-                manager.Initialize().GetAwaiter().GetResult();
+                Task.Run(manager.Initialize).Wait();
 
                 builder.AfterSetup(b =>
                 {
@@ -48,7 +50,7 @@ class Program
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, LinuxAsusWmiService>();
                 SplatRegistrations.RegisterLazySingleton<ICliService, LinuxCliService>();
                 SplatRegistrations.RegisterLazySingleton<ICpuControlService, LinuxCpuControlService>();
-                SplatRegistrations.RegisterLazySingleton<IDisplayInfoService, LinuxDisplayInfoService>();
+                // SplatRegistrations.RegisterLazySingleton<IDisplayInfoService, X11DisplayInfoService>();
                 SplatRegistrations.RegisterLazySingleton<IFanControlService, LinuxFanControlService>();
                 SplatRegistrations.RegisterLazySingleton<IGameLauncherService, LinuxGameLauncherService>();
                 SplatRegistrations.RegisterLazySingleton<IAmdGpuService, LinuxAmdGpuService>();
