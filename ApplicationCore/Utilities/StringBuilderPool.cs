@@ -17,12 +17,12 @@ public static class StringBuilderPool
 
     public static StringBuilder Rent()
     {
-        if (Pool.Count == 0)
+        if (!Pool.TryDequeue(out var sb))
         {
-            return new StringBuilder();
+            sb = new StringBuilder();
         }
-        
-        return Pool.Dequeue();
+
+        return sb;
     }
 
     public static void Return(StringBuilder sb)
