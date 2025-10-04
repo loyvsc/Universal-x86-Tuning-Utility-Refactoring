@@ -8,8 +8,10 @@ using DAL.Services;
 using DesktopNotifications.FreeDesktop;
 using Splat;
 using Universal_x86_Tuning_Utility.Interfaces;
+using Universal_x86_Tuning_Utility.Linux.Interfaces;
 using Universal_x86_Tuning_Utility.Linux.Services;
 using Universal_x86_Tuning_Utility.Linux.Services.Display;
+using Universal_x86_Tuning_Utility.Linux.Services.Events;
 using Universal_x86_Tuning_Utility.Linux.Services.GPUs;
 
 namespace Universal_x86_Tuning_Utility.Linux;
@@ -65,6 +67,7 @@ class Program
                 SplatRegistrations.RegisterLazySingleton<IUpdateInstallerService, LinuxUpdateInstallerService>();
                 SplatRegistrations.RegisterLazySingleton<IBatteryInfoService, LinuxBatteryInfoService>();
                 SplatRegistrations.RegisterLazySingleton<IIconExtracter, LinuxIconExtracter>();
+                SplatRegistrations.RegisterLazySingleton<ISysFsEventService, SysFsEventService>();
         
                 SplatRegistrations.SetupIOC();
             })
