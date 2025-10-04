@@ -2,9 +2,9 @@
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 
-namespace Universal_x86_Tuning_Utility.Windows.Services;
+namespace Universal_x86_Tuning_Utility.Services;
 
-public class WindowsCpuControlService : ICpuControlService
+public class CpuControlService : ICpuControlService
 {
     /// <summary>
     /// Current power limit in watts
@@ -27,8 +27,8 @@ public class WindowsCpuControlService : ICpuControlService
     private readonly ISystemInfoService _systemInfoService;
     private readonly IAmdApuControlService _amdApuControlService;
 
-    public WindowsCpuControlService(ISystemInfoService systemInfoService,
-                                    IAmdApuControlService amdApuControlService)
+    public CpuControlService(ISystemInfoService systemInfoService,
+                             IAmdApuControlService amdApuControlService)
     {
         _systemInfoService = systemInfoService;
         _amdApuControlService = amdApuControlService;
