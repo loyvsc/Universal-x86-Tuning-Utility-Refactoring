@@ -30,4 +30,25 @@ public class Display
         CurrentRefreshRate = currentRefreshRate;
         CurrentRefreshRate = currentRefreshRate;
     }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is Display otherDisplay)
+        {
+            return Identifier == otherDisplay.Identifier &&
+                   Name == otherDisplay.Name &&
+                   OutputTechnology == otherDisplay.OutputTechnology &&
+                   CurrentResolution.Equals(otherDisplay.CurrentResolution) &&
+                   CurrentRefreshRate == otherDisplay.CurrentRefreshRate &&
+                   SupportedRefreshRates.SequenceEqual(otherDisplay.SupportedRefreshRates) &&
+                   SupportedResolutions.SequenceEqual(otherDisplay.SupportedResolutions);
+        }
+
+        return false;
+    }
+    
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Identifier, Name, (int)OutputTechnology, SupportedResolutions, SupportedRefreshRates, CurrentResolution, CurrentRefreshRate);
+    }
 }
