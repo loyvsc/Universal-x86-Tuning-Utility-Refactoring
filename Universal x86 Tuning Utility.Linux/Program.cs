@@ -49,7 +49,6 @@ class Program
                 SplatRegistrations.RegisterConstant(manager!);
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, LinuxAsusWmiService>();
                 SplatRegistrations.RegisterLazySingleton<ICliService, LinuxCliService>();
-                SplatRegistrations.RegisterLazySingleton<ICpuControlService, LinuxCpuControlService>();
                 // SplatRegistrations.RegisterLazySingleton<IDisplayInfoService, X11DisplayInfoService>();
                 SplatRegistrations.RegisterLazySingleton<IFanControlService, LinuxFanControlService>();
                 SplatRegistrations.RegisterLazySingleton<IGameLauncherService, LinuxGameLauncherService>();

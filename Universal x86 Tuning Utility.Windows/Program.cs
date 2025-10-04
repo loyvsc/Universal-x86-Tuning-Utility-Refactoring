@@ -43,7 +43,6 @@ class Program
                 SplatRegistrations.RegisterConstant(notificationManager!);
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, WindowsAsusWmiService>(); 
                 SplatRegistrations.RegisterLazySingleton<ICliService, WindowsCliService>();
-                SplatRegistrations.RegisterLazySingleton<ICpuControlService, WindowsCpuControlService>();
                 SplatRegistrations.RegisterLazySingleton<IDisplayInfoService, WindowsDisplayInfoService>();
                 SplatRegistrations.RegisterLazySingleton<IFanControlService, WindowsFanControlService>();
                 SplatRegistrations.RegisterLazySingleton<IGameLauncherService, WindowsGameLauncherService>();
