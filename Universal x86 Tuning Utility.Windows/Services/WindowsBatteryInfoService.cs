@@ -4,7 +4,6 @@ using System.Management;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using Microsoft.Extensions.Logging;
 using Universal_x86_Tuning_Utility.Windows.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services;
@@ -68,12 +67,11 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "Error occurred when requesting battery rate");
+            _logger.Error(ex, "Error occurred when requesting battery info");
             throw;
         }
     }
 
-    /// <param name="deviceId">Target battery DeviceId. if <c>null</c> return info for primary battery</param>
     public decimal GetBatteryRate(string? deviceId = null)
     {
         try
@@ -100,7 +98,6 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         }
     }
     
-    /// <param name="deviceId">Target battery DeviceId. if <c>null</c> return info for primary battery</param>
     public BatteryStatus GetBatteryStatus(string? deviceId = null)
     {
         try
@@ -134,7 +131,6 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         }
     }
 
-    /// <param name="deviceId">Target battery DeviceId. if <c>null</c> return info for primary battery</param>
     public decimal GetFullChargeCapacity(string? deviceId = null)
     {
         try
@@ -158,7 +154,6 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         }
     }
 
-    /// <param name="deviceId">Target battery DeviceId. if <c>null</c> return info for primary battery</param>
     public decimal GetDesignCapacity(string? deviceId = null)
     {
         try
@@ -182,7 +177,6 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         }
     }
 
-    /// <param name="deviceId">Target battery DeviceId. if <c>null</c> return info for primary battery</param>
     public int GetBatteryCycle(string? deviceId = null)
     {
         try
