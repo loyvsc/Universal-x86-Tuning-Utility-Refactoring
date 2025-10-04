@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using ApplicationCore.Utilities;
 
 namespace Universal_x86_Tuning_Utility.Helpers;
 
@@ -6,7 +6,7 @@ public static class SizesConverter
 {
     public static string ToString(double size)
     {
-        var sb = new StringBuilder();
+        var sb = StringBuilderPool.Rent();
         
         if (size < 1024)
         {
@@ -17,6 +17,8 @@ public static class SizesConverter
 
         sb.Append((size / 1024).ToString("0.##"));
         sb.Append(" MB");
-        return sb.ToString();
+        var value = sb.ToString();
+        StringBuilderPool.Return(sb);
+        return value;
     }
 }
