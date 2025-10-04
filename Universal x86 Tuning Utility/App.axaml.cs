@@ -56,6 +56,7 @@ public class App : Application
         SplatRegistrations.RegisterLazySingleton<IPlatformServiceAccessor, PlatformServiceAccessor>();
         SplatRegistrations.RegisterLazySingleton<IAmdApuControlService, AmdApuControlService>();
         SplatRegistrations.RegisterLazySingleton<IImageService, ImageService>();
+        SplatRegistrations.RegisterLazySingleton<ICpuControlService, CpuControlService>();
        
         Locator.CurrentMutable.RegisterLazySingleton<IAdaptivePresetService>(() => new AdaptivePresetService("/AdaptivePresets"));
         Locator.CurrentMutable.RegisterLazySingleton<IGameDataService>(() => new GameDataService(Settings.Default.Path + "gameData.json"));
