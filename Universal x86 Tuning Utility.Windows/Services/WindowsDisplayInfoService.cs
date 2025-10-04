@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Management;
+using System.Threading;
 using ApplicationCore.Enums.Display;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using DynamicData;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using Universal_x86_Tuning_Utility.Windows.Interfaces;
 using WindowsDisplayAPI;
 using WindowsDisplayAPI.DisplayConfig;
@@ -19,16 +22,19 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
 {
     public event DisplayAttachedEventHandler? DisplayAttached;
     public event DisplayRemovedEventHandler? DisplayRemoved;
-    public Lazy<IReadOnlyCollection<Display>> Displays  { get; private set; }
+    public event NotifyCollectionChangedEventHandler? CollectionChanged;
+    public IReadOnlyCollection<Display> Displays => _displays.AsReadOnly();
     
+    private readonly List<Display> _displays = new();
     private readonly Serilog.ILogger _logger;
     private readonly IDisposable _installDeviceSubscription;
     private readonly IDisposable _uninstallDeviceEventWatcher;
+    private readonly Lock _displaysLock = new();
 
     public WindowsDisplayInfoService(Serilog.ILogger logger, IManagementEventService managementEventService)
     {
         _logger = logger;
-        Displays = new Lazy<IReadOnlyCollection<Display>>(() => GetDisplays().AsReadOnly());
+        Initialize();
         
         _installDeviceSubscription =
             managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2")
@@ -37,39 +43,60 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
         _uninstallDeviceEventWatcher =
             managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 3")
                 .Subscribe(OnDeviceUninstalled);
+        
+        SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
+    }
+
+    private void Initialize()
+    {
+        _displays.AddRange(GetDisplays());
+    }
+
+    private void OnDisplaySettingsChanged(object? sender, EventArgs e)
+    {
+        lock (_displaysLock)
+        {
+            _displays.Clear();
+            _displays.AddRange(GetDisplays());
+        }
+        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
     private void OnNewDeviceInstalled(EventArrivedEventArgs e)
     {
-        if (Displays.IsValueCreated)
+        lock (_displaysLock)
         {
             var currentDisplays = GetDisplays();
-            Displays = new Lazy<IReadOnlyCollection<Display>>(currentDisplays.AsReadOnly);
-            
-            var previousDisplays = Displays.Value.ToList();
 
-            currentDisplays.RemoveMany(previousDisplays);
-            
-            foreach (var newDisplay in currentDisplays)
+            foreach (var display in currentDisplays)
             {
-                DisplayAttached?.Invoke(newDisplay);
+                if (_displays.All(d => d.Identifier != display.Identifier))
+                {
+                    DisplayAttached?.Invoke(display);
+                }
             }
+            
+            _displays.Clear();
+            _displays.AddRange(currentDisplays);
         }
     }
 
     private void OnDeviceUninstalled(EventArrivedEventArgs e)
     {
-        if (Displays.IsValueCreated)
+        lock (_displaysLock)
         {
             var currentDisplays = GetDisplays();
-            var previousDisplays = Displays.Value.ToList();
 
-            previousDisplays.RemoveMany(currentDisplays);
-            
-            foreach (var newDisplay in previousDisplays)
+            foreach (var display in _displays)
             {
-                DisplayRemoved?.Invoke(newDisplay);
+                if (currentDisplays.All(d => d.Identifier != display.Identifier))
+                {
+                    DisplayRemoved?.Invoke(display);
+                }
             }
+            
+            _displays.Clear();
+            _displays.AddRange(currentDisplays);
         }
     }
 
@@ -165,6 +192,13 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
                     settingsToSave.Add(displayDevice, new DisplaySetting(possibleSetting));
                     
                     DisplaySetting.SaveDisplaySettings(settingsToSave, true);
+
+                    var changedDisplay = _displays.FirstOrDefault(x => x.Identifier == targetDisplay.Identifier);
+                    if (changedDisplay != null)
+                    {
+                        changedDisplay.UpdateCurrentResolution(targetDisplayResolution, targetHz);
+                        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, _displays));
+                    }
                     break;
                 }
             }
@@ -178,7 +212,7 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
 
     public void ApplySettings(string targetDisplayIdentifier, int targetHz)
     {
-        var targetDisplay = Displays.Value.FirstOrDefault(x => x.Identifier == targetDisplayIdentifier);
+        var targetDisplay = _displays.FirstOrDefault(x => x.Identifier == targetDisplayIdentifier);
 
         if (targetDisplay != null)
         {
@@ -188,12 +222,13 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
         }
         else
         {
-            throw new ArgumentException("Invalid targetDisplayIdentifier");
+            throw new ArgumentException($"Invalid {nameof(targetDisplayIdentifier)}");
         }
     }
 
     public void Dispose()
     {
+        SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
         _installDeviceSubscription.Dispose();
         _uninstallDeviceEventWatcher.Dispose();
     }
