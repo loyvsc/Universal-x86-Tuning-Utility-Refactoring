@@ -23,11 +23,6 @@ public class WindowsAmdGpuService : IAmdGpuService
         }
     }
 
-    public int GetFpsData()
-    {
-        return GetFPSData();
-    }
-
     public int GetGpuMetrics(int gpuId, AmdGpuSensor gpuSensor)
     {
         int sensorId = gpuSensor switch
@@ -39,11 +34,6 @@ public class WindowsAmdGpuService : IAmdGpuService
         };
 
         return GetGPUMetrics(gpuId, sensorId);
-    }
-
-    public void SetFpsLimit(int gpuId, int fpsLimit, bool isEnabled)
-    {
-        _ = SetFPSLimit(gpuId, isEnabled, fpsLimit);
     }
 
     public void SetAntilag(int gpuId, bool isEnabled)
@@ -77,10 +67,8 @@ public class WindowsAmdGpuService : IAmdGpuService
         _ = SetEnhancedSync(gpuId, isEnabled);
     }
     
-    [DllImport(PerfMetrics, CallingConvention = CallingConvention.Cdecl)] private static extern int GetFPSData();
     [DllImport(PerfMetrics, CallingConvention = CallingConvention.Cdecl)] private static extern int GetGPUMetrics(int GPU, int Sensor);
 
-    [DllImport(GraphSettings, CallingConvention = CallingConvention.Cdecl)] private static extern int SetFPSLimit(int GPU, bool isEnabled, int FPS);
     [DllImport(GraphSettings, CallingConvention = CallingConvention.Cdecl)] private static extern int SetAntiLag(int GPU, bool isEnabled);
     [DllImport(GraphSettings, CallingConvention = CallingConvention.Cdecl)] private static extern int SetBoost(int GPU, bool isEnabled, int percent);
     [DllImport(GraphSettings, CallingConvention = CallingConvention.Cdecl)] private static extern int SetRSR(bool isEnabled);
