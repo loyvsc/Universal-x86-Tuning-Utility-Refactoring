@@ -22,6 +22,8 @@ public class WindowsAsusWmiService : IASUSWmiService
 
     #region PInvoke Declarations
 
+    private const IntPtr INVALID_CREATE_FILE_RESULT = -1;
+    
     private const string FILE_NAME = @"\\.\\ATKACPI";
     private const uint CONTROL_CODE = 0x0022240C;
 
@@ -139,7 +141,6 @@ public class WindowsAsusWmiService : IASUSWmiService
 
     #endregion
 
-    private const IntPtr INVALID_CREATE_FILE_RESULT = -1;
     private IntPtr _eventHandle;
     private IntPtr _handle;
     private readonly Serilog.ILogger _logger;
@@ -157,20 +158,23 @@ public class WindowsAsusWmiService : IASUSWmiService
 
     private void Initialize()
     {
-        _handle = CreateFile(
-            FILE_NAME,
-            GENERIC_READ | GENERIC_WRITE,
-            FILE_SHARE_READ | FILE_SHARE_WRITE,
-            IntPtr.Zero,
-            OPEN_EXISTING,
-            FILE_ATTRIBUTE_NORMAL,
-            IntPtr.Zero
-        );
-        if (_handle == INVALID_CREATE_FILE_RESULT)
+        if (!_isInitialized)
         {
-            throw new Exception("Can't connect to ACPI");
+            _handle = CreateFile(
+                FILE_NAME,
+                GENERIC_READ | GENERIC_WRITE,
+                FILE_SHARE_READ | FILE_SHARE_WRITE,
+                IntPtr.Zero,
+                OPEN_EXISTING,
+                FILE_ATTRIBUTE_NORMAL,
+                IntPtr.Zero
+            );
+            if (_handle == INVALID_CREATE_FILE_RESULT)
+            {
+                throw new Exception("Can't connect to ACPI");
+            }
+            _isInitialized = true;
         }
-        _isInitialized = true;
     }
     
     // todo: still works only with asus optimization service on , if someone knows how to get ACPI events from asus without that - let me know
@@ -601,10 +605,13 @@ public class WindowsAsusWmiService : IASUSWmiService
         {
             subscription.Dispose();
         }
-        
-        if (_handle != INVALID_CREATE_FILE_RESULT)
+
+        if (_isInitialized)
         {
-            CloseHandle(_handle);
+            if (_handle != INVALID_CREATE_FILE_RESULT)
+            {
+                CloseHandle(_handle);
+            }
         }
     }
 }
