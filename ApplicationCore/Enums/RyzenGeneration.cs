@@ -1,6 +1,6 @@
 namespace ApplicationCore.Enums;
 
-public enum RyzenGenerations
+public enum RyzenGeneration
 {
     Unknown,
     Zen1_2 = 23,
