@@ -20,7 +20,6 @@ public interface IASUSWmiService : IDisposable
     public bool IsInvalidCurve(byte[] curve);
     public byte[] FixFanCurve(byte[] curve);
     public bool IsXGConnected();
-    public bool IsAllAmdPPT();
     public void ScanRange();
     public void TUFKeyboardBrightness(int brightness);
     public void TUFKeyboardRGB(int mode, Color color, int speed);

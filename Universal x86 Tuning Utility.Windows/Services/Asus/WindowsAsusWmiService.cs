@@ -529,11 +529,6 @@ public class WindowsAsusWmiService : IASUSWmiService
     {
         return DeviceGet(eGPUConnected) == 1;
     }
-
-    public bool IsAllAmdPPT()
-    {
-        return DeviceGet(PPT_CPUB0) >= 0 && DeviceGet(GPUBoost) < 0;
-    }
     
     public void ScanRange()
     {
