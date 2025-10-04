@@ -406,11 +406,11 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         IsRadeonGpuSettingsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) != 0;
         IsNvidiaGpuSettingsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.Nvidia) != 0;
         
-        if (_displayInfoService.Displays.Value.Any(x => x.SupportedRefreshRates.Count > 1))
+        if (_displayInfoService.Displays.Any(x => x.SupportedRefreshRates.Count > 1))
         {
             IsChangeRefreshRateAvailable = true;
             
-            AvailableDisplays = new EnhancedObservableCollection<DisplayModel>(_displayInfoService.Displays.Value.Select(x => new DisplayModel(x)));
+            AvailableDisplays = new EnhancedObservableCollection<DisplayModel>(_displayInfoService.Displays.Select(x => new DisplayModel(x)));
             SelectedDisplay =
                 AvailableDisplays.FirstOrDefault(x =>
                     x.SupportedOutputTechnology == DisplayOutputTechnology.Internal) ?? AvailableDisplays[0];
