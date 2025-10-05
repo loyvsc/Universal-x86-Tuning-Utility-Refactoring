@@ -118,6 +118,7 @@ public class AdaptiveViewModel : ReactiveObject
     private readonly ICpuControlService _cpuControlService;
     private readonly IRtssService _rtssService;
     private readonly IAmdGpuService _amdGpuService;
+    private readonly INvidiaGpuService _nvidiaGpuService;
     private readonly IAmdApuControlService _amdApuControlService;
     private readonly IRyzenAdjService _ryzenAdjService;
     private readonly DispatcherTimer _adaptiveModeTimer;
@@ -131,6 +132,7 @@ public class AdaptiveViewModel : ReactiveObject
                              ICpuControlService cpuControlService,
                              IRtssService rtssService,
                              IAmdGpuService amdGpuService,
+                             INvidiaGpuService nvidiaGpuService,
                              IAmdApuControlService amdApuControlService,
                              IRyzenAdjService ryzenAdjService)
     {
@@ -142,6 +144,7 @@ public class AdaptiveViewModel : ReactiveObject
         _cpuControlService = cpuControlService;
         _rtssService = rtssService;
         _amdGpuService = amdGpuService;
+        _nvidiaGpuService = nvidiaGpuService;
         _amdApuControlService = amdApuControlService;
         _ryzenAdjService = ryzenAdjService;
 
@@ -246,11 +249,17 @@ public class AdaptiveViewModel : ReactiveObject
 
         CPUPower = (int)_sensorsService.GetCPUInfo(SensorType.Power, "Package");
 
-        if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) == 0)
+        if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.Nvidia) == 0)
         {
             GPULoad = _amdGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuLoad);
             GPUClock = _amdGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuClock);
             GPUMemClock = _amdGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuMemClock);
+        }
+        else if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) == 0)
+        {
+            // GPULoad = _nvidiaGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuLoad);
+            // GPUClock = _nvidiaGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuClock);
+            // GPUMemClock = _nvidiaGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuMemClock);
         }
         
         newMinCPUClock = CPULoad < 100 / _systemInfoService.Cpu.CoresCount + 5 ? minCPUClock + 500 : minCPUClock;
