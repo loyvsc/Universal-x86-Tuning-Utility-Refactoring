@@ -3,7 +3,6 @@ using System;
 using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Dialogs;
 using DAL.Services;
 using DesktopNotifications.FreeDesktop;
 using Splat;
@@ -11,6 +10,7 @@ using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Linux.Interfaces;
 using Universal_x86_Tuning_Utility.Linux.Services;
 using Universal_x86_Tuning_Utility.Linux.Services.Display;
+using Universal_x86_Tuning_Utility.Linux.Services.Display.Wayland;
 using Universal_x86_Tuning_Utility.Linux.Services.Events;
 using Universal_x86_Tuning_Utility.Linux.Services.GPUs;
 
@@ -51,7 +51,19 @@ class Program
                 SplatRegistrations.RegisterConstant(manager!);
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, LinuxAsusWmiService>();
                 SplatRegistrations.RegisterLazySingleton<ICliService, LinuxCliService>();
-                // SplatRegistrations.RegisterLazySingleton<IDisplayInfoService, X11DisplayInfoService>();
+                
+                var sessionType = Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") ?? string.Empty;
+                if (sessionType.Contains("x11"))
+                {
+                    SplatRegistrations.RegisterLazySingleton<IDisplayInfoService, X11DisplayInfoService>();
+                }
+                else if (sessionType.Contains("wayland"))
+                {
+#pragma warning disable SPLATDI006
+                    SplatRegistrations.RegisterLazySingleton<IDisplayInfoService, WaylandDisplayInfoService>();
+#pragma warning restore SPLATDI006
+                }
+                
                 SplatRegistrations.RegisterLazySingleton<IFanControlService, LinuxFanControlService>();
                 SplatRegistrations.RegisterLazySingleton<IGameLauncherService, LinuxGameLauncherService>();
                 SplatRegistrations.RegisterLazySingleton<IAmdGpuService, LinuxAmdGpuService>();
