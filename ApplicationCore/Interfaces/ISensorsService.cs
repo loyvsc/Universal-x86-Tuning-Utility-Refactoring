@@ -2,7 +2,7 @@ using ApplicationCore.Enums;
 
 namespace ApplicationCore.Interfaces;
 
-public interface ISensorsService
+public interface ISensorsService : IDisposable
 {
     public void Start();
     public void Stop();
