@@ -84,12 +84,26 @@ public class SettingsGenerator : IIncrementalGenerator
 
             if (string.IsNullOrEmpty(name)) continue;
 
-            sb.AppendLine($@"
-    public {type} {name}
-    {{
-        get => Get<{type}>(nameof({name}));
-        set => Set(nameof({name}), value);
-    }}");
+            sb.Append("public ");
+            sb.Append(type);
+            sb.Append(' ');
+            sb.AppendLine(name);
+
+            sb.Append('{');
+            sb.AppendLine();
+
+            sb.Append("get => Get<");
+            sb.Append(type);
+            sb.Append(">(nameof(");
+            sb.Append(name);
+            sb.AppendLine("));");
+
+            sb.Append("set => Set(nameof(");
+            sb.Append(name);
+            sb.AppendLine("), value);");
+
+            sb.Append('}');
+            sb.AppendLine();
         }
 
         sb.AppendLine("}");
