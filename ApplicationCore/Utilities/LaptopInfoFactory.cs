@@ -1,9 +1,8 @@
-﻿using System;
-using ApplicationCore.Enums;
+﻿using ApplicationCore.Enums;
 using ApplicationCore.Enums.Laptop;
 using ApplicationCore.Models.LaptopInfo;
 
-namespace Universal_x86_Tuning_Utility.Helpers;
+namespace ApplicationCore.Utilities;
 
 public static class LaptopInfoFactory
 {
