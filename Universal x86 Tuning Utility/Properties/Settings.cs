@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
-using Accord;
-using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Universal_x86_Tuning_Utility.Properties;
@@ -54,7 +53,7 @@ public sealed partial class Settings
             var serializedObject = System.IO.File.ReadAllText(__saveFileName);
             if (!string.IsNullOrWhiteSpace(serializedObject))
             {
-                _properties = JsonConvert.DeserializeObject<Dictionary<string, object>>(serializedObject) ?? new Dictionary<string, object>();
+                _properties = JsonSerializer.Deserialize<Dictionary<string, object>>(serializedObject) ?? new Dictionary<string, object>();
             }
         }
         else
@@ -86,9 +85,9 @@ public sealed partial class Settings
                                 object convertedValue = Convert.ChangeType(defaultValue, property.PropertyType, CultureInfo.InvariantCulture);
                                 property.SetValue(this, convertedValue);
                             }
-                            else
+                            else if (property.PropertyType.GetTypeInfo().IsValueType)
                             {
-                                property.SetValue(this, property.PropertyType.GetDefaultValue());
+                                property.SetValue(this, Activator.CreateInstance(property.PropertyType));
                             }
                         }
                     }
