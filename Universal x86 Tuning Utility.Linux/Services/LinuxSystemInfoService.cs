@@ -13,7 +13,6 @@ using Universal_x86_Tuning_Utility.Helpers;
 
 namespace Universal_x86_Tuning_Utility.Linux.Services;
 
-// TODO IMPLEMENT
 public class LinuxSystemInfoService : ISystemInfoService
 {
     private readonly ILogger _logger;
@@ -62,20 +61,13 @@ public class LinuxSystemInfoService : ISystemInfoService
         _hardwareInfo.RefreshVideoControllerList();
         foreach (var device in _hardwareInfo.VideoControllerList)
         {
-            // if (device["Name"] is string name)
-            // {
-            //     var gpuName = name.Split(' ');
-            //     if (gpuName.Length != 0)
-            //     {
-            //         if (Enum.TryParse<GpuManufacturer>(gpuName[0], true, out var gpuManufacturer))
-            //         {
-            //             _gpus.Add(new BasicGpuInfo(gpuManufacturer, name));
-            //             continue;
-            //         }
-            //     
-            //         _gpus.Add(new BasicGpuInfo(GpuManufacturer.Unknown, name));
-            //     }
-            // }
+            if (Enum.TryParse<GpuManufacturer>(device.Manufacturer, true, out var gpuManufacturer))
+            {
+                _gpus.Add(new BasicGpuInfo(gpuManufacturer, device.Name));
+                continue;
+            }
+                
+            _gpus.Add(new BasicGpuInfo(GpuManufacturer.Unknown, device.Name));
         }
     }
     
@@ -85,20 +77,18 @@ public class LinuxSystemInfoService : ISystemInfoService
         {
             InitializeBasicGpuInfo();
             
-            var processorIdentifier = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER");
-
-            var words = processorIdentifier.Split(' ');
-
-            var familyIndex = Array.IndexOf(words, "Family") + 1;
-            var modelIndex = Array.IndexOf(words, "Model") + 1;
-            var steppingIndex = Array.IndexOf(words, "Stepping") + 1;
-
-            var family = int.Parse(words[familyIndex]);
-            var model = int.Parse(words[modelIndex]);
-            var stepping = int.Parse(words[steppingIndex].TrimEnd(','));
-
             _hardwareInfo.RefreshCPUList();
             var firstCpu = _hardwareInfo.CpuList[0];
+
+            var cpuInfo = File.ReadAllLines("/proc/cpuinfo");
+
+            var familyStr = Array.Find(cpuInfo, s => s.Contains("family"))?.Split(' ')[^1];
+            var modelStr = Array.Find(cpuInfo, s => s.Contains("model"))?.Split(' ')[^1];
+            var steppingStr = Array.Find(cpuInfo, s => s.Contains("stepping"))?.Split(' ')[^1];
+
+            var family = int.Parse(familyStr);
+            var model = int.Parse(modelStr);
+            var stepping = int.Parse(steppingStr);
             
             var name = firstCpu.Name;
             var description = firstCpu.Description;
