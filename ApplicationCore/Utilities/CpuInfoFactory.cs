@@ -1,4 +1,4 @@
-﻿using System.Management;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
 using ApplicationCore.Enums;
 using ApplicationCore.Extensions;
@@ -333,23 +333,12 @@ public static class CpuInfoFactory
         }
         return string.Empty;
     }
-
+    
     private static bool IsVirtualizationEnabled()
     {
         if (OperatingSystem.IsWindows())
         {
-            using (var processorInfoSearcher =
-                   new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor"))
-            {
-                foreach (var queryObj in processorInfoSearcher.Get())
-                {
-                    // Check if virtualization is enabled
-                    if (queryObj["VirtualizationFirmwareEnabled"] is bool)
-                    {
-                        return true;
-                    }
-                }
-            }
+            return IsProcessorFeaturePresent(PF_VIRT_FIRMWARE_ENABLED);
         }
         else if (OperatingSystem.IsLinux())
         {
@@ -362,6 +351,11 @@ public static class CpuInfoFactory
 
         return false;
     }
+    
+    [DllImport("kernel32.dll")]
+    private static extern bool IsProcessorFeaturePresent(int processorFeature);
+    
+    private const int PF_VIRT_FIRMWARE_ENABLED = 21;
 
     private static bool IsEM64TSupported()
     {
