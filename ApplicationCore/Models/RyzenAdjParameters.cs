@@ -1,4 +1,3 @@
-using System.Text;
 using ApplicationCore.Enums;
 using ApplicationCore.Utilities;
 
