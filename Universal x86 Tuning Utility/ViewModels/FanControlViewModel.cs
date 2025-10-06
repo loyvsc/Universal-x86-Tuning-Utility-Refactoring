@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using Avalonia.Threading;
 using DesktopNotifications;
-using LibreHardwareMonitor.Hardware;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Interfaces;
@@ -56,18 +56,21 @@ public class FanControlViewModel : ReactiveObject
     private readonly IFanControlService _fanControlService;
     private readonly ISystemInfoService _systemInfoService;
     private readonly INotificationManager _notificationManager;
+    private readonly ISensorsService _sensorsService;
     private readonly IPlatformServiceAccessor _platformServiceAccessor;
 
     public FanControlViewModel(Serilog.ILogger logger,
                                IFanControlService fanControlService,
                                ISystemInfoService systemInfoService,
                                INotificationManager notificationManager,
+                               ISensorsService sensorsService,
                                IPlatformServiceAccessor platformServiceAccessor)
     {
         _logger = logger;
         _fanControlService = fanControlService;
         _systemInfoService = systemInfoService;
         _notificationManager = notificationManager;
+        _sensorsService = sensorsService;
         _platformServiceAccessor = platformServiceAccessor;
 
         ReloadCommand = ReactiveCommand.CreateFromTask(Reload);
@@ -201,22 +204,7 @@ public class FanControlViewModel : ReactiveObject
     {
         try
         {
-            var computer = new Computer
-            {
-                IsCpuEnabled = true
-            };
-            computer.Open();
-            
-            var cpu = computer.Hardware.FirstOrDefault(h => h.HardwareType == HardwareType.Cpu);
-            cpu.Update();
-            
-            var temperature = cpu.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Temperature);
-            if (temperature != null)
-            {
-                return (int)temperature.Value;
-            }
-
-            return 0;
+            return (int) _sensorsService.GetCPUInfo(SensorType.Temperature, _systemInfoService.Cpu.Manufacturer == Manufacturer.Intel ? "Package" : "Core");
         }
         catch (Exception ex)
         {
