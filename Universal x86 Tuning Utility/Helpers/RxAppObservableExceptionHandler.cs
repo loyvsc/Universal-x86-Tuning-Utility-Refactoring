@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
-using CastelloBranco.AvaloniaMessageBox;
+using MsBox.Avalonia;
 using Splat;
 using ILogger = Serilog.ILogger;
 
 namespace Universal_x86_Tuning_Utility.Helpers;
 
-public class RxAppObservableExceptionHandler : IObserver<Exception>, IEnableLogger
+public class RxAppObservableExceptionHandler : IObserver<Exception>
 {
     private readonly ILogger _logger;
     
@@ -21,7 +21,8 @@ public class RxAppObservableExceptionHandler : IObserver<Exception>, IEnableLogg
 
         _logger.Fatal(value, "RxApp unhandled exception");
         
-        ExceptionMessageBox.ShowExceptionDialogAsync(null, value);
+        MessageBoxManager.GetMessageBoxStandard("Error", value.ToString())
+            .ShowAsync();
     }
 
     public void OnError(Exception error) => OnNext(error);
