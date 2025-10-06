@@ -1,113 +1,98 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>favicon.ico</ApplicationIcon>
-    <Platforms>AnyCPU;x64</Platforms>
-    <PackageIcon>favicon.ico</PackageIcon>
-    <Title>$(AssemblyName)</Title>
-    <Authors>JamesCJ60</Authors>
-    <SignAssembly>False</SignAssembly>
-    <Copyright>© UXTU Team 2020 - 2025</Copyright>
-    <Version>2.4.4</Version>
-    <AssemblyVersion>$(Version)</AssemblyVersion>
-    <FileVersion>$(Version)</FileVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Optimize>False</Optimize>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Optimize>True</Optimize>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\DAL\DAL.csproj" />
-    <ProjectReference Include="..\SourceGenerators\SourceGenerators.csproj"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.2" />
-    <PackageReference Include="Avalonia.Skia" Version="11.3.2" />
-    <PackageReference Include="CastelloBranco.AvaloniaMessageBox" Version="1.0.1" />
-    <PackageReference Include="DesktopNotificationsFixed" Version="1.0.1" />
-    <PackageReference Include="Avalonia" Version="11.3.2" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.2" />
-    <PackageReference Include="FluentAvaloniaUI" Version="2.4.0" />
-    <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="1.1.303" />
-    <PackageReference Include="FuzzyStrings.NetStandard" Version="1.0.1" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.1.0" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.1.0" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.1.0" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.MessageBox" Version="2.1.0" />
-    <PackageReference Include="MouseKeyHook" Version="5.7.1" />
-    <PackageReference Include="SecretNest.SequentialScheduler" Version="1.1.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="Splat" Version="15.4.1" />
-    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.2.3"/>
-    <PackageReference Include="Splat.Serilog" Version="15.4.1" />
-    <PackageReference Include="System.Management" Version="9.0.7" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="..\..\..\.nuget\packages\accord\3.8.0\build\Accord.dll.config" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="Assets\BuiltInScaleModels.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AdditionalFiles>
-    <AvaloniaResource Include="Assets\icon.png" />
-    <AvaloniaResource Include="Assets\applicationIcon-1024.png" />
-    <AvaloniaResource Include="Assets\applicationIcon-256.png" />
-    <AvaloniaResource Include="Assets\config-DT-AM4.png" />
-    <AvaloniaResource Include="Assets\config-DT-AM5.png" />
-    <AvaloniaResource Include="Assets\config-FL1.png" />
-    <AvaloniaResource Include="Assets\config.png" />
-    <AvaloniaResource Include="Assets\Laptops\Framework\framework-laptop-13.png" />
-    <AvaloniaResource Include="Assets\Laptops\Framework\framework-laptop-16.png" />
-    <AvaloniaResource Include="Assets\pexels-photo-8037008.jpeg" />
-    <AvaloniaResource Include="Assets\GameImages\default.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </AvaloniaResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Views\Pages\AdaptivePage.axaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Assets\Stress-Test\AVX2 Stress Test.deps.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Stress-Test\AVX2 Stress Test.runtimeconfig.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="favicon.ico">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="app.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AdditionalFiles>
-    <AdditionalFiles Include="Assets\nvidiaGpusData.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AdditionalFiles>
-  </ItemGroup>
-
+    
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>favicon.ico</ApplicationIcon>
+        <Platforms>AnyCPU;x64</Platforms>
+        <PackageIcon>favicon.ico</PackageIcon>
+        <Title>$(AssemblyName)</Title>
+        <Authors>JamesCJ60</Authors>
+        <SignAssembly>False</SignAssembly>
+        <Copyright>© UXTU Team 2020 - 2025</Copyright>
+        <Version>2.4.4</Version>
+        <AssemblyVersion>$(Version)</AssemblyVersion>
+        <FileVersion>$(Version)</FileVersion>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\DAL\DAL.csproj" />
+        <ProjectReference Include="..\SourceGenerators\SourceGenerators.csproj" 
+                          OutputItemType="Analyzer" 
+                          ReferenceOutputAssembly="false"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.3.7" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.7" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.7" />
+        <PackageReference Include="Avalonia.Skia" Version="11.3.7" />
+        <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.1.0" />
+        <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.1.0" />
+        <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.1.0" />
+        <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.MessageBox" Version="2.1.0" />
+        <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
+        <PackageReference Include="FluentAvaloniaUI" Version="2.4.0" />
+        <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="1.1.311" />
+        <PackageReference Include="DesktopNotificationsFixed" Version="1.0.1" />
+        
+        <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+        <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.2.3" />
+    </ItemGroup>
+    
+    <PropertyGroup>
+        <DefineConstants Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">WINDOWS</DefineConstants>
+        <DefineConstants Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">LINUX</DefineConstants>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\icon.png" />
+        <AvaloniaResource Include="Assets\applicationIcon-1024.png" />
+        <AvaloniaResource Include="Assets\applicationIcon-256.png" />
+        <AvaloniaResource Include="Assets\config-DT-AM4.png" />
+        <AvaloniaResource Include="Assets\config-DT-AM5.png" />
+        <AvaloniaResource Include="Assets\config-FL1.png" />
+        <AvaloniaResource Include="Assets\config.png" />
+        <AvaloniaResource Include="Assets\Laptops\Framework\framework-laptop-13.png" />
+        <AvaloniaResource Include="Assets\Laptops\Framework\framework-laptop-16.png" />
+        <AvaloniaResource Include="Assets\pexels-photo-8037008.jpeg" />
+        <AvaloniaResource Include="Assets\GameImages\default.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </AvaloniaResource>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Compile Update="Views\Pages\AdaptivePage.axaml.cs">
+            <SubType>Code</SubType>
+        </Compile>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <None Update="Assets\Stress-Test\AVX2 Stress Test.deps.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Assets\Stress-Test\AVX2 Stress Test.runtimeconfig.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="favicon.ico">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <AdditionalFiles Include="Assets\BuiltInScaleModels.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </AdditionalFiles>
+        <AdditionalFiles Include="app.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </AdditionalFiles>
+        <AdditionalFiles Include="Assets\nvidiaGpusData.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </AdditionalFiles>
+    </ItemGroup>
 </Project>
