@@ -1,17 +1,17 @@
 ﻿using ApplicationCore.Interfaces;
 using Octokit;
-using Splat;
+using Serilog;
 using FileMode = System.IO.FileMode;
 
 namespace DAL.Services;
 
 public class UpdateService : IUpdateService
 {
-    private readonly IFullLogger _logger;
+    private readonly ILogger _logger;
     private const string Owner = "JamesCJ60";
     private const string RepositoryName = "Universal-x86-Tuning-Utility";
 
-    public UpdateService(IFullLogger logger)
+    public UpdateService(ILogger logger)
     {
         _logger = logger;
     }
