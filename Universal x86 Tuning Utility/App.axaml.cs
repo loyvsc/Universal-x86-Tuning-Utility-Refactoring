@@ -4,10 +4,10 @@ using ApplicationCore.Interfaces;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using CastelloBranco.AvaloniaMessageBox;
 using DAL.Services;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using MsBox.Avalonia;
 using ReactiveUI;
 using Serilog;
 using Serilog.Events;
@@ -128,7 +128,9 @@ public class App : Application
 
     private async void HandeUnhandledException(Exception ex)
     {
-        await ExceptionMessageBox.ShowExceptionDialogAsync(null, ex);
+        await MessageBoxManager.GetMessageBoxStandard("Error", ex.ToString())
+            .ShowWindowDialogAsync(_desktopApplicationLifetime.MainWindow!);
+        // await ExceptionMessageBox.ShowExceptionDialogAsync(null, ex);
     }
 
     /// <summary>
