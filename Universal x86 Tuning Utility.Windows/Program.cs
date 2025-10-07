@@ -34,8 +34,7 @@ class Program
                 CompositionMode = new [] { Win32CompositionMode.DirectComposition },
                 RenderingMode = new [] { Win32RenderingMode.AngleEgl }
             })
-            .UseWin32()
-            .UseSkia()
+            .UsePlatformDetect()
             .WithInterFont()
             .SetupDesktopNotifications(out var notificationManager)
             .AfterPlatformServicesSetup(_ =>

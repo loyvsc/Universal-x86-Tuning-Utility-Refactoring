@@ -32,8 +32,7 @@ class Program
             {
                 MaxGpuResourceSizeBytes = 256_000_000
             })
-            .UseX11()
-            .UseSkia()
+            .UsePlatformDetect()
             .AfterSetup(builder =>
             {
                 var context = FreeDesktopApplicationContext.FromCurrentProcess();
