@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+using Newtonsoft.Json;
 
 namespace Universal_x86_Tuning_Utility.Properties;
 
@@ -12,7 +12,7 @@ public sealed partial class Settings
 {
     public static readonly Settings Default = new Settings();
     
-    private readonly string __saveFileName = "props.json";
+    private const string SaveSettingsPath = "props.json";
     private Dictionary<string, object> _properties = new Dictionary<string, object>();
 
     public Settings()
@@ -20,7 +20,7 @@ public sealed partial class Settings
         Reload();
     }
     
-    public T? Get<T>(string key)
+    private T? Get<T>(string key)
     {
         if (_properties.Count != 0)
         {
@@ -31,7 +31,7 @@ public sealed partial class Settings
         return default;
     }
 
-    public void Set<T>(string key, T value)
+    private void Set<T>(string key, T value)
     {
         if (value != null)
         {
@@ -42,18 +42,18 @@ public sealed partial class Settings
 
     public void Save()
     {
-        var serialized = JsonSerializer.Serialize(_properties);
-        System.IO.File.WriteAllText(__saveFileName, serialized);
+        var serialized = JsonConvert.SerializeObject(_properties);
+        System.IO.File.WriteAllText(SaveSettingsPath, serialized);
     }
 
     public void Reload()
     {
-        if (System.IO.File.Exists(__saveFileName))
+        if (System.IO.File.Exists(SaveSettingsPath))
         {
-            var serializedObject = System.IO.File.ReadAllText(__saveFileName);
+            var serializedObject = System.IO.File.ReadAllText(SaveSettingsPath);
             if (!string.IsNullOrWhiteSpace(serializedObject))
             {
-                _properties = JsonSerializer.Deserialize<Dictionary<string, object>>(serializedObject) ?? new Dictionary<string, object>();
+                _properties = JsonConvert.DeserializeObject<Dictionary<string, object>>(serializedObject) ?? new Dictionary<string, object>();
             }
         }
         else
