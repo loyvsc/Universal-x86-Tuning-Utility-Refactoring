@@ -135,8 +135,7 @@ public class App : Application
     private async void HandeUnhandledException(Exception ex)
     {
         await MessageBoxManager.GetMessageBoxStandard("Error", ex.ToString())
-            .ShowWindowDialogAsync(_desktopApplicationLifetime.MainWindow!);
-        // await ExceptionMessageBox.ShowExceptionDialogAsync(null, ex);
+            .ShowDialogAsync();
     }
 
     /// <summary>

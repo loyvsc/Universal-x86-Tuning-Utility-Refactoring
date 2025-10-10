@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using Universal_x86_Tuning_Utility.Extensions;
 using MsBox.Avalonia;
 using Splat;
 using ILogger = Serilog.ILogger;
@@ -17,12 +17,10 @@ public class RxAppObservableExceptionHandler : IObserver<Exception>
     
     public void OnNext(Exception value)
     {
-        if (Debugger.IsAttached) Debugger.Break();
-
         _logger.Fatal(value, "RxApp unhandled exception");
-        
+
         MessageBoxManager.GetMessageBoxStandard("Error", value.ToString())
-            .ShowAsync();
+            .ShowDialogAsync();
     }
 
     public void OnError(Exception error) => OnNext(error);
