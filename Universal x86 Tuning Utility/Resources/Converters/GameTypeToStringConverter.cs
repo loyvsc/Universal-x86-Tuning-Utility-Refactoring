@@ -6,6 +6,11 @@ using Avalonia.Data.Converters;
 
 namespace Universal_x86_Tuning_Utility.Resources.Converters;
 
+public static class GameTypeConverters
+{
+    public static readonly IValueConverter GameTypeToStringConverter = new GameTypeToStringConverter(); 
+}
+
 public class GameTypeToStringConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)

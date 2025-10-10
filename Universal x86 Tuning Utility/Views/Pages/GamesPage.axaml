@@ -6,7 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             xmlns:primitives="clr-namespace:FluentAvalonia.UI.Controls.Primitives;assembly=FluentAvalonia"
+             xmlns:converters="clr-namespace:Universal_x86_Tuning_Utility.Resources.Converters"
              xmlns:models="clr-namespace:ApplicationCore.Models;assembly=ApplicationCore"
              xmlns:controls1="clr-namespace:Universal_x86_Tuning_Utility.Controls"
              x:DataType="viewModels:GamesViewModel"
@@ -51,20 +51,21 @@
                 </Button>
             </StackPanel>
 
-            <ListBox x:Name="GamesListBox"
-                     DockPanel.Dock="Left"
-                     Margin="0,8,0,0"
-                     HorizontalAlignment="Stretch"
-                     BorderBrush="Transparent"
-                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     ScrollViewer.IsDeferredScrollingEnabled="False">
-                <ListBox.ItemTemplate>
+            <ItemsControl ItemsSource="{Binding Games, UpdateSourceTrigger=PropertyChanged}"
+                          DockPanel.Dock="Left"
+                          Margin="0,8,0,0"
+                          HorizontalAlignment="Stretch"
+                          BorderBrush="Transparent"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.IsDeferredScrollingEnabled="False">
+                <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:GameLauncherItem}">
                         <controls1:CardControl x:Name="ccMain"
                                           HorizontalAlignment="Stretch"
                                           HorizontalContentAlignment="Stretch"
                                           Margin="15,8,8,0"
+                                          Height="100"
                                           Padding="16,14,16,14">
                             <DockPanel HorizontalAlignment="Stretch"
                                        LastChildFill="False"
@@ -77,8 +78,8 @@
                                         BorderBrush="Transparent"
                                         CornerRadius="8">
                                     <Border.Background>
-                                        <ImageBrush Source="{Binding IconPath}"
-                                                    Stretch="UniformToFill" />
+                                        <ImageBrush Source="{Binding IconPath, UpdateSourceTrigger=PropertyChanged, Converter={x:Static converters:BitmapConverters.StringToBitmapConverter}}"
+                                                    Stretch="UniformToFill"/>
                                     </Border.Background>
                                 </Border>
                                 <StackPanel DockPanel.Dock="Left"
@@ -88,7 +89,7 @@
                                                Text="{Binding GameName}"
                                                FontSize="18" />
                                     <TextBlock VerticalAlignment="Center"
-                                               Text="{Binding GameType, Converter={StaticResource GameTypeToStringConverter}}"
+                                               Text="{Binding GameType, Converter={x:Static converters:GameTypeConverters.GameTypeToStringConverter}}"
                                                       FontSize="14" />
                                     <TextBlock VerticalAlignment="Center"
                                                Text="{Binding Path}"
@@ -98,7 +99,7 @@
                                         Height="40"
                                         DockPanel.Dock="Right"
                                         HorizontalAlignment="Right"
-                                        Command="{Binding ((viewModels:GamesViewModel)DataContext).RunGameCommand, ElementName=ViewRoot}"
+                                        Command="{Binding $parent[ItemsControl].((viewModels:GamesViewModel)DataContext).RunGameCommand}"
                                         CommandParameter="{Binding}">
                                     <controls:SymbolIcon Symbol="Play"
                                                          FontSize="24"
@@ -109,7 +110,7 @@
                                             VerticalAlignment="Center">
                                     <TextBlock HorizontalAlignment="Center"
                                                Text="Average Frametime"
-                                                      FontSize="14" />
+                                               FontSize="14" />
                                     <TextBlock HorizontalAlignment="Center"
                                                Text="{Binding MillisecondData}"
                                                FontSize="18" />
@@ -119,7 +120,7 @@
                                             VerticalAlignment="Center">
                                     <TextBlock HorizontalAlignment="Center"
                                                Text="Average FPS"
-                                                      FontSize="14" />
+                                               FontSize="14" />
                                     <TextBlock HorizontalAlignment="Center"
                                                Text="{Binding FpsData}"
                                                FontSize="18" />
@@ -127,12 +128,12 @@
                             </DockPanel>
                         </controls1:CardControl>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </DockPanel>
         
         <controls1:CardControl HorizontalAlignment="Center"
-                               Padding="80,40,80,40"
+                               Padding="80,40"
                                HorizontalContentAlignment="Center"
                                Height="NaN"
                                IsVisible="{Binding GamesListUpdating, UpdateSourceTrigger=PropertyChanged}">
