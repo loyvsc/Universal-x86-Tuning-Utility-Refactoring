@@ -135,14 +135,14 @@ public class GamesViewModel : ReactiveObject, IDisposable
             }
         };
 
-        var openFileDialogResult = await _dialogService.ShowOpenFileDialogAsync(this, openFileDialogSettings);
+        var openFileDialogResult = await _dialogService.ShowOpenFileDialogAsync(openFileDialogSettings);
         
         if (openFileDialogResult != null)
         {
-            var filePath = openFileDialogResult.Path.ToString();
+            var filePath = openFileDialogResult.LocalPath;
             var gameName = Path.GetFileNameWithoutExtension(filePath);
             
-            const string gameImagesDirectory = @"\Assets\GameImages\";
+            const string gameImagesDirectory = @"Assets\GameImages\";
             
             var game = new GameLauncherItem
             {
@@ -202,8 +202,8 @@ public class GamesViewModel : ReactiveObject, IDisposable
     
     private async Task RunGame(GameLauncherItem gameToRun)
     {
-        _gameLauncherService.LaunchGame(gameToRun);
         await _toastNotificationsService.ShowTextNotification($"Launching {gameToRun.GameName}", "This should only take a few moments!");
+        await _gameLauncherService.LaunchGame(gameToRun);
     }
 
     public void Dispose()

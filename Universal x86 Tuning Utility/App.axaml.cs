@@ -63,7 +63,7 @@ public class App : Application
         // Locator.CurrentMutable.RegisterLazySingleton<IDialogService>(() => new DialogService(new DialogManager(), type => Locator.Current.GetService(type)));
         Locator.CurrentMutable.RegisterLazySingleton(() => (IDialogService)new DialogService(
             new DialogManager(
-                viewLocator: new ViewLocatorBase(),
+                viewLocator: new ViewLocator(),
                 dialogFactory: new DialogFactory().AddMessageBox()),
             viewModelFactory: x => Locator.Current.GetService(x)));
 
@@ -81,6 +81,12 @@ public class App : Application
         SplatRegistrations.RegisterLazySingleton<SystemInfoViewModel>();
 
         SplatRegistrations.SetupIOC();
+    }
+
+    private class ViewLocator : ViewLocatorBase
+    {
+        /// <inheritdoc />
+        protected override string GetViewName(object viewModel) => viewModel.GetType().FullName!.Replace("ViewModel", "");
     }
 
     public override void OnFrameworkInitializationCompleted()
