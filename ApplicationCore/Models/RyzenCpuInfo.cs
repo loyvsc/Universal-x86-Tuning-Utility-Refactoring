@@ -7,4 +7,9 @@ public class RyzenCpuInfo : CpuInfo
     public RyzenFamily RyzenFamily { get; set; }
     public RyzenGeneration RyzenGeneration { get; set; }
     public RyzenSeries RyzenSeries { get; set; }
+
+    public RyzenCpuInfo()
+    {
+        Manufacturer = Manufacturer.AMD;
+    }
 }
