@@ -19,8 +19,7 @@ public static class NotificationManagerExtensions
     
     public static async Task ShowTextNotification(this INotificationManager notificationManager, string title,
                                               string text,
-                                              NotificationType notificationType = NotificationType.Normal,
-                                              CancellationToken cancellationToken = default)
+                                              NotificationType notificationType = NotificationType.Normal)
     {
         var notification = new Notification()
         {

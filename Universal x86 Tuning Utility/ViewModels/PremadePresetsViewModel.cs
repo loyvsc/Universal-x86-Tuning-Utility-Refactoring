@@ -71,7 +71,7 @@ public class PremadePresetsViewModel : ReactiveObject
         Header = "Premade Presets";
     }
 
-    private async Task ApplyPreset(CancellationToken cancellationToken)
+    private async Task ApplyPreset()
     {
         if (CurrentPreset == null) return;
         try
@@ -81,8 +81,7 @@ public class PremadePresetsViewModel : ReactiveObject
             await _ryzenAdjService.Translate(CurrentPreset.RyzenAdjParameters);
 
             await _notificationManager.ShowTextNotification(title: $"{CurrentPreset.Name} Preset Applied!",
-                text: $"The {CurrentPreset.Name.ToLower()} premade power preset has been applied!",
-                cancellationToken: cancellationToken);
+                text: $"The {CurrentPreset.Name.ToLower()} premade power preset has been applied!");
 
             Settings.Default.CommandString = CurrentPreset.RyzenAdjParameters;
             Settings.Default.premadePreset =
@@ -93,8 +92,7 @@ public class PremadePresetsViewModel : ReactiveObject
         {
             await _notificationManager.ShowTextNotification(title: "Error", 
                                                             text: "Error occured while applying preset",
-                                                            notificationType: NotificationManagerExtensions.NotificationType.Error,
-                                                            cancellationToken: cancellationToken);
+                                                            notificationType: NotificationManagerExtensions.NotificationType.Error);
             _logger.Error(ex, "Error while applying preset");
         }
     }
