@@ -55,7 +55,7 @@ public class WindowsIntelManagementService : IIntelManagementService
             _ => throw new ArgumentOutOfRangeException(nameof(voltagePlan), voltagePlan, null)
         };
 
-        _cliService.RunProcess(ProcessMsr, commandArguments, false);
+        _cliService.RunProcess(ProcessMsr, commandArguments);
     }
 
     public async Task ChangeClockRatioOffset(int[] clockRatios)
@@ -67,7 +67,7 @@ public class WindowsIntelManagementService : IIntelManagementService
         }
 
         string commandArguments = $"-s write 0x1AD 0x0 0x{hexValue};";
-        await _cliService.RunProcess(ProcessMsr, commandArguments, false);
+        await _cliService.RunProcess(ProcessMsr, commandArguments);
     }
 
     //refactor this
@@ -167,7 +167,7 @@ public class WindowsIntelManagementService : IIntelManagementService
         var hexValue = "0x" + value.ToString("X");
         var commandArguments = "-s write " + address + " " + hexValue;
         
-        await _cliService.RunProcess(ProcessMsr, commandArguments, false);
+        await _cliService.RunProcess(ProcessMsr, commandArguments);
     }
 
     private void CheckDriverBlockRegistry()

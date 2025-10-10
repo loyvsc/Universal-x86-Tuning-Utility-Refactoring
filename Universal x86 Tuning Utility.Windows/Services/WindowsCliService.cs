@@ -33,16 +33,15 @@ public class WindowsCliService : ICliService
             };
             
             process.Start();
-            await process.WaitForExitAsync(cancellationToken);
             
             if (readOutput)
             {
+                await process.WaitForExitAsync(cancellationToken);
                 var output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
                 process.Close();
                 return output;
             }
     
-            process.Close();
             return "COMPLETE";
         }
         catch (Exception ex)
