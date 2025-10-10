@@ -122,7 +122,7 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
                 }
             }
 
-            return BatteryStatus.Unknown;
+            return BatteryStatus.NoSystemBattery;
         }
         catch (Exception ex)
         {
