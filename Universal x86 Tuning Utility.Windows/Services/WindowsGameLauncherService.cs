@@ -240,10 +240,7 @@ public class WindowsGameLauncherService : IGameLauncherService
     {
         if (gameLauncherItem.GameType == GameType.Custom)
         {
-            if (File.Exists(gameLauncherItem.Path))
-            {
-                await RunGame(gameLauncherItem.Path);
-            }
+            await RunGame(gameLauncherItem.Executable);
         }
         else
         {
