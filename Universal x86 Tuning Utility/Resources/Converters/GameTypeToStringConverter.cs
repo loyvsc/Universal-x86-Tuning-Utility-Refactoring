@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using ApplicationCore.Enums;
+using ApplicationCore.Extensions;
 using Avalonia;
 using Avalonia.Data.Converters;
 
@@ -20,7 +21,7 @@ public class GameTypeToStringConverter : IValueConverter
             return gameType switch
             {
                 GameType.Custom => "Manually added game",
-                _ => gameType.ToString()
+                _ => gameType.GetDescription()
             };
         }
 
