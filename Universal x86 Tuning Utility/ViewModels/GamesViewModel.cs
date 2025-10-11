@@ -44,6 +44,8 @@ public class GamesViewModel : ReactiveObject, IDisposable
         get => _isActionsAvailable;
         set => this.RaiseAndSetIfChanged(ref _isActionsAvailable, value);
     }
+    
+    private const string GameImagesDirectory = @"Assets\GameImages\";
 
     private readonly ILogger _logger;
     private readonly IGameDataService _gameDataService;
@@ -142,15 +144,13 @@ public class GamesViewModel : ReactiveObject, IDisposable
             var filePath = openFileDialogResult.LocalPath;
             var gameName = Path.GetFileNameWithoutExtension(filePath);
             
-            const string gameImagesDirectory = @"Assets\GameImages\";
-            
             var game = new GameLauncherItem
             {
                 GameName = gameName,
                 GameType = GameType.Custom,
                 Path = Path.GetDirectoryName(filePath)!,
                 Executable = filePath,
-                IconPath = await _iconExtracter.ExtractIcon(filePath, gameImagesDirectory)
+                IconPath = await _iconExtracter.ExtractIcon(filePath, GameImagesDirectory)
             };
             
             var preset = new GameData
