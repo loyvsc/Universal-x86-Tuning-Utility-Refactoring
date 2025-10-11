@@ -89,11 +89,8 @@
                                                Text="{Binding GameName}"
                                                FontSize="18" />
                                     <TextBlock VerticalAlignment="Center"
-                                               Text="{Binding GameType, Converter={x:Static converters:GameTypeConverters.GameTypeToStringConverter}}"
-                                                      FontSize="14" />
-                                    <TextBlock VerticalAlignment="Center"
-                                               Text="{Binding Path}"
-                                                      FontSize="12" />
+                                               Text="{Binding Converter={x:Static converters:GameTypeConverters.GameTypeToStringConverter}}"
+                                               FontSize="14" />
                                 </StackPanel>
                                 <Button Width="48"
                                         Height="40"
