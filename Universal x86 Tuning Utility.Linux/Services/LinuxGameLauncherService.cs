@@ -20,7 +20,7 @@ public class LinuxGameLauncherService : IGameLauncherService
         throw new NotImplementedException();
     }
 
-    public Task RunGame(string executableFilePath)
+    private Task RunGame(string executableFilePath)
     {
         throw new NotImplementedException();
     }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Management;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -17,10 +16,7 @@ using GameLib.Plugin.Epic;
 using GameLib.Plugin.Gog;
 using GameLib.Plugin.Origin;
 using GameLib.Plugin.Steam;
-using GameLib.Plugin.Steam.Model;
-using Microsoft.Extensions.Logging;
-using Universal_x86_Tuning_Utility.Interfaces;
-using WinRT;
+using GameLib.Plugin.Ubisoft;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services;
 
@@ -30,15 +26,16 @@ public class WindowsGameLauncherService : IGameLauncherService
     
     private readonly Serilog.ILogger _logger;
     private readonly ICliService _cliService;
-    private readonly IIconExtracter _iconExtracter;
+    private readonly IIconExtractor _iconExtractor;
+    private const string GameImagesDirectory = @"Assets\GameImages\";
 
     public WindowsGameLauncherService(Serilog.ILogger logger,
                                       ICliService cliService,
-                                      IIconExtracter iconExtracter)
+                                      IIconExtractor iconExtractor)
     {
         _logger = logger;
         _cliService = cliService;
-        _iconExtracter = iconExtracter;
+        _iconExtractor = iconExtractor;
 
         InstalledGames = new Lazy<IReadOnlyCollection<GameLauncherItem>>(() => ReSearchGames());
     }
@@ -75,48 +72,19 @@ public class WindowsGameLauncherService : IGameLauncherService
                                 GameType = GameType.Steam,
                                 Path = game.InstallDir
                             };
-                            // launcherItem.iconPath = game.ExecutableIcon;
 
-                            if (game.Executables.Count() == 1)
+                            if (game.ExecutableIcon != null)
                             {
-                                launcherItem.Path = game.InstallDir;
-                                launcherItem.Executable = Path.GetFileNameWithoutExtension(game.Executables.First());
-                            }
-                            else
-                            {
-                                string[] array = launcherItem.GameName.Split(' ');
-                                foreach (var exe in game.Executables)
+                                using (var stream = new MemoryStream())
                                 {
-                                    string exeName = Path.GetFileNameWithoutExtension(exe);
-                                    if (game.Name.Contains("Call of duty", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        if (exeName.Contains("cod", StringComparison.OrdinalIgnoreCase))
-                                        {
-                                            launcherItem.Path = game.InstallDir;
-                                            launcherItem.Executable = exeName;
-                                            break;
-                                        }
-                                    }
-                                    foreach (string arr in array)
-                                    {
-                                        if (exeName.Contains(arr, StringComparison.OrdinalIgnoreCase))
-                                        {
-                                            launcherItem.Path = game.InstallDir;
-                                            launcherItem.Executable = exeName;
-                                            break;
-                                        }
-                                    }
-
-                                    if (launcherItem.Path != null)
-                                    {
-                                        break;
-                                    }
+                                    game.ExecutableIcon.Save(stream);
+                                    launcherItem.IconPath = _iconExtractor.ExtractIcon(stream, launcherItem.GameName, GameImagesDirectory).GetAwaiter().GetResult();
                                 }
                             }
-                            if (launcherItem.Path == "" || launcherItem.Executable == "")
+                            
+                            if (string.IsNullOrWhiteSpace(launcherItem.Path))
                             {
                                 launcherItem.Path = Path.GetFileNameWithoutExtension(game.Executables.Last());
-                                launcherItem.Executable = Path.GetFileNameWithoutExtension(game.Executables.Last());
                             }
                                     
                             list.Add(launcherItem);
@@ -163,6 +131,7 @@ public class WindowsGameLauncherService : IGameLauncherService
                         EpicLauncher => GameType.EpicGamesStore,
                         OriginLauncher => GameType.Origin,
                         GogLauncher => GameType.Gog,
+                        UbisoftLauncher => GameType.UbisoftStore,
                         _ => GameType.Custom
                     };
                     foreach (var game in launcher.Games)
@@ -184,7 +153,9 @@ public class WindowsGameLauncherService : IGameLauncherService
 
         //microsoft store apps below
         var packageManager = new PackageManager();
-        IEnumerable<Package> packages = packageManager.FindPackages();
+        IEnumerable<Package> packages = packageManager.FindPackages()
+            .Where(x => x.InstalledLocation.Path.Contains("WindowsApps") && 
+                        x.SignatureKind == PackageSignatureKind.Store && !x.IsFramework);
 
         foreach (var driveInfo in DriveInfo.GetDrives())
         {
@@ -203,24 +174,17 @@ public class WindowsGameLauncherService : IGameLauncherService
                         {
                             foreach (var package in packages)
                             {
-                                string install = package.InstalledLocation.Path;
-                                string sig = package.SignatureKind.ToString();
-
-                                if (install.Contains("WindowsApps") && sig == "Store" &&
-                                    package.IsFramework == false)
+                                if (files.Contains(package.DisplayName))
                                 {
-                                    if (files.Contains(package.DisplayName))
+                                    var launcherItem = new GameLauncherItem()
                                     {
-                                        var launcherItem = new GameLauncherItem()
-                                        {
-                                            GameType = GameType.EpicGamesStore,
-                                            GameName = package.DisplayName,
-                                            GameId = package.Id.FullName,
-                                            Path = package.InstalledPath,
-                                            ImageLocation = package.Logo.AbsolutePath
-                                        };
-                                        list.Add(launcherItem);
-                                    }
+                                        GameType = GameType.MicrosoftStore,
+                                        GameName = package.DisplayName,
+                                        GameId = package.Id.FullName,
+                                        Path = package.InstalledPath,
+                                        ImageLocation = package.Logo.AbsolutePath
+                                    };
+                                    list.Add(launcherItem);
                                 }
                             }
                         }
@@ -250,18 +214,18 @@ public class WindowsGameLauncherService : IGameLauncherService
                 {
                     case GameType.EpicGamesStore:
                     {
-                        await _cliService.RunProcess(gameLauncherItem.Executable);
+                        await _cliService.RunProcess($"com.epicgames.launcher://apps/{gameLauncherItem.GameId}?action=launch&silent=true");
                         break;
                     }
                     case GameType.Steam:
                     {
-                        await _cliService.RunProcess(gameLauncherItem.Executable);
+                        await _cliService.RunProcess($"steam://rungameid/{gameLauncherItem.GameId}");
                         break;
                     }
                     case GameType.BattleNet:
                     {
                         string battlenetfile = Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), "Battle.net\\Battle.net.exe");
-                        if (BattleNetRunning())
+                        if (IsBattleNetRunning())
                         {
                             await _cliService.RunProcess(battlenetfile, " --exec=\"launch " + gameLauncherItem.GameId.ToUpper() + "\"");
                         }
@@ -285,12 +249,22 @@ public class WindowsGameLauncherService : IGameLauncherService
                         packageManager.FindPackage(gameLauncherItem.GameId).GetAppListEntries().First().LaunchAsync();
                         break;
                     }
+                    case GameType.UbisoftStore:
+                    {
+                        await _cliService.RunProcess($"uplay://launch/2688/{gameLauncherItem.GameId}");
+                        break;
+                    }
+                    case GameType.Origin:
+                    {
+                        await _cliService.RunProcess(gameLauncherItem.Executable);
+                        break;
+                    }
                 }
             }
         }
     }
 
-    public async Task RunGame(string executableFilePath)
+    private async Task RunGame(string executableFilePath)
     {
         if (File.Exists(executableFilePath))
         {
@@ -298,7 +272,7 @@ public class WindowsGameLauncherService : IGameLauncherService
         }
     }
 
-    private bool BattleNetRunning()
+    private bool IsBattleNetRunning()
     {
         var processesByName = Process.GetProcessesByName("Battle.net.exe");
         return processesByName.Length != 0;
