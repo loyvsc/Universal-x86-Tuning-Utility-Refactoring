@@ -133,6 +133,7 @@
                                Padding="80,40"
                                HorizontalContentAlignment="Center"
                                Height="NaN"
+                               Background="#2B2B2B"
                                IsVisible="{Binding GamesListUpdating, UpdateSourceTrigger=PropertyChanged}">
             <StackPanel HorizontalAlignment="Center">
                 <TextBlock FontSize="24"
