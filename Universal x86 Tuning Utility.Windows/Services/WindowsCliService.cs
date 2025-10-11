@@ -14,16 +14,18 @@ public class WindowsCliService : ICliService
     {
         try
         {
+            var isUri = Uri.IsWellFormedUriString(processName, UriKind.RelativeOrAbsolute);
+            
             var processStartInfo = new System.Diagnostics.ProcessStartInfo 
             {
-                UseShellExecute = false,
+                UseShellExecute = isUri,
                 RedirectStandardOutput = readOutput,
                 FileName = processName,
                 Arguments = arguments,
                 CreateNoWindow = true,
                 RedirectStandardInput = readOutput,
                 RedirectStandardError = readOutput,
-                Verb = "runas"
+                Verb = isUri ? "open" : "runas"
             };
                 
             var process = new System.Diagnostics.Process

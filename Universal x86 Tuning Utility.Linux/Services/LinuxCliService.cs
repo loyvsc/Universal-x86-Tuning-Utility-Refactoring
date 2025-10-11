@@ -14,15 +14,18 @@ public class LinuxCliService : ICliService
     {
         try
         {
+            var isUri = Uri.IsWellFormedUriString(processName, UriKind.RelativeOrAbsolute);
+
             var processStartInfo = new System.Diagnostics.ProcessStartInfo 
             {
-                UseShellExecute = false,
+                UseShellExecute = isUri,
                 RedirectStandardOutput = readOutput,
                 FileName = processName,
                 Arguments = arguments,
                 CreateNoWindow = true,
                 RedirectStandardInput = readOutput,
-                RedirectStandardError = readOutput
+                RedirectStandardError = readOutput,
+                Verb = isUri ? "open" : string.Empty
             };
                 
             var process = new System.Diagnostics.Process
@@ -32,16 +35,16 @@ public class LinuxCliService : ICliService
             };
             
             process.Start();
-            await process.WaitForExitAsync(cancellationToken);
             
             if (readOutput)
             {
+                await process.WaitForExitAsync(cancellationToken);
+                
                 var output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
                 process.Close();
                 return output;
             }
     
-            process.Close();
             return "COMPLETE";
         }
         catch (Exception ex)
