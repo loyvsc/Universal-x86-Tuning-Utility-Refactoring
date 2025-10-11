@@ -77,7 +77,7 @@ class Program
                 SplatRegistrations.RegisterLazySingleton<IUpdateService, UpdateService>();
                 SplatRegistrations.RegisterLazySingleton<IUpdateInstallerService, LinuxUpdateInstallerService>();
                 SplatRegistrations.RegisterLazySingleton<IBatteryInfoService, LinuxBatteryInfoService>();
-                SplatRegistrations.RegisterLazySingleton<IIconExtracter, LinuxIconExtracter>();
+                SplatRegistrations.RegisterLazySingleton<IIconExtractor, LinuxIconExtractor>();
                 SplatRegistrations.RegisterLazySingleton<ISysFsEventService, SysFsEventService>();
         
                 SplatRegistrations.SetupIOC();

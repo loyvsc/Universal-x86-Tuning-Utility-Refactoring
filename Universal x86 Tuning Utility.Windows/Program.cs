@@ -57,7 +57,7 @@ class Program
                 SplatRegistrations.RegisterLazySingleton<ISystemInfoService, WindowsSystemInfoService>();
                 SplatRegistrations.RegisterLazySingleton<IUpdateInstallerService, WindowsUpdateInstallerService>();
                 SplatRegistrations.RegisterLazySingleton<IBatteryInfoService, WindowsBatteryInfoService>();
-                SplatRegistrations.RegisterLazySingleton<IIconExtracter, WindowsIconExtracter>();
+                SplatRegistrations.RegisterLazySingleton<IIconExtractor, WindowsIconExtractor>();
                 SplatRegistrations.RegisterLazySingleton<IXgMobileConnectionService, XgMobileConnectionService>();
                 SplatRegistrations.RegisterLazySingleton<IManagementEventService, ManagementEventService>();
         

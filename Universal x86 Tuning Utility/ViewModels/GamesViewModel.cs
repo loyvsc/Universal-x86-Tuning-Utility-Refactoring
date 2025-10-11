@@ -53,7 +53,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
     private readonly INotificationManager _toastNotificationsService;
     private readonly IImageService _imageService;
     private readonly IGameLauncherService _gameLauncherService;
-    private readonly IIconExtracter _iconExtracter;
+    private readonly IIconExtractor _iconExtractor;
     private ObservableCollection<GameLauncherItem> _games;
     private readonly DispatcherTimer _updateFps;
     private bool _gamesListUpdating;
@@ -65,7 +65,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
                           INotificationManager toastNotificationsService,
                           IImageService imageService,
                           IGameLauncherService gameLauncherService,
-                          IIconExtracter iconExtracter)
+                          IIconExtractor iconExtractor)
     {
         _logger = logger;
         _gameDataService = gameDataService;
@@ -73,7 +73,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
         _toastNotificationsService = toastNotificationsService;
         _imageService = imageService;
         _gameLauncherService = gameLauncherService;
-        _iconExtracter = iconExtracter;
+        _iconExtractor = iconExtractor;
 
         RunGameCommand = ReactiveCommand.CreateFromTask((GameLauncherItem gameToRun) => RunGame(gameToRun));
         AddGameCommand = ReactiveCommand.CreateFromTask(AddCustomGame);
@@ -150,7 +150,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
                 GameType = GameType.Custom,
                 Path = Path.GetDirectoryName(filePath)!,
                 Executable = filePath,
-                IconPath = await _iconExtracter.ExtractIcon(filePath, GameImagesDirectory)
+                IconPath = await _iconExtractor.ExtractIcon(filePath, GameImagesDirectory)
             };
             
             var preset = new GameData
