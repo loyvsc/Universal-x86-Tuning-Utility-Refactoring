@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text.Json;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using Microsoft.Extensions.Logging;
 using NvAPIWrapper.GPU;
 using NvAPIWrapper.Native;
 using NvAPIWrapper.Native.GPU;
@@ -30,7 +29,7 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
     private readonly Serilog.ILogger _logger;
     private readonly Lazy<Dictionary<string, int>> _ropCountDictionary = new Lazy<Dictionary<string, int>>(() =>
     {
-        var data = File.ReadAllText(@"./Assets/nvidiaGpusData.json");
+        var data = File.ReadAllText("./Assets/nvidiaGpusData.json");
         var deserializedData = JsonSerializer.Deserialize<Dictionary<string, int>>(data);
         return deserializedData ?? new Dictionary<string, int>();
     });
