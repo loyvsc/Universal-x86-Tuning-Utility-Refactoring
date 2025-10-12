@@ -40,7 +40,7 @@ public class WindowsGameLauncherService : IGameLauncherService
         InstalledGames = new Lazy<IReadOnlyCollection<GameLauncherItem>>(() => ReSearchGames());
     }
 
-    public IReadOnlyCollection<GameLauncherItem> ReSearchGames(bool isAdaptive = false)
+    public IReadOnlyCollection<GameLauncherItem> ReSearchGames()
     {
         var list = new List<GameLauncherItem>();
         

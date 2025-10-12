@@ -10,7 +10,7 @@ public class LinuxGameLauncherService : IGameLauncherService
 {
     public Lazy<IReadOnlyCollection<GameLauncherItem>> InstalledGames { get; }
     
-    public IReadOnlyCollection<GameLauncherItem> ReSearchGames(bool isAdaptive = false)
+    public IReadOnlyCollection<GameLauncherItem> ReSearchGames()
     {
         throw new NotImplementedException();
     }
