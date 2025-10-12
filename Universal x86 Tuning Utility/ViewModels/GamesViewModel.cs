@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Accord.Math.Distances;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
@@ -188,8 +189,22 @@ public class GamesViewModel : ReactiveObject, IDisposable
             }
 
             _gameDataService.SavePreset(game.GameName, gameData);
+            
+            var iconPath = await _imageService.GetIconImageUrl(game.GameName);
+            if (string.IsNullOrWhiteSpace(iconPath))
+            {
+                var otherGames = installedGames.ToList();
+                otherGames.Remove(game);
+                
+                var levenshtein = new Levenshtein();
+                var sameGame = otherGames.FirstOrDefault(x => levenshtein.Distance(game.GameName, x.GameName) <= 20);
+                if (sameGame != null)
+                {
+                    iconPath = string.IsNullOrWhiteSpace(sameGame.IconPath) ? await _imageService.GetIconImageUrl(sameGame.GameName) : sameGame.IconPath;
+                }
+            }
 
-            game.IconPath = await _imageService.GetIconImageUrl(game.GameName);
+            game.IconPath = iconPath;
 
             return game;
         }));
