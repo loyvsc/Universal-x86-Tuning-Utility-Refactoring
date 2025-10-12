@@ -17,10 +17,15 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
     private readonly IDisposable _installDeviceSubscription;
     private readonly IDisposable _uninstallDeviceEventWatcher;
 
+    private readonly Lazy<List<BatteryInfo>> _batteryInfo;
+
     public WindowsBatteryInfoService(Serilog.ILogger logger, IManagementEventService managementEventService)
     {
         _logger = logger;
         _managementEventService = managementEventService;
+
+        _batteryInfo = new Lazy<List<BatteryInfo>>(() => GetData());
+        
         _batteryInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Battery");
         _installDeviceSubscription =
             _managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2")
@@ -29,20 +34,36 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         _uninstallDeviceEventWatcher =
             _managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 3")
                 .Subscribe(OnDeviceChanged);
-        
-        Analyze();
     }
     
     public event Action? BatteryCountChanged;
 
-    public IReadOnlyCollection<BatteryInfo> Batteries { get; private set; } = [];
+    public IReadOnlyCollection<BatteryInfo> Batteries => _batteryInfo.Value;
 
     private void OnDeviceChanged(EventArrivedEventArgs e)
     {
-        Analyze();
+        try
+        {
+            if (_batteryInfo.IsValueCreated)
+            {
+                var initialCount = _batteryInfo.Value.Count;
+                _batteryInfo.Value.Clear();
+                _batteryInfo.Value.AddRange(GetData());
+                
+                if (_batteryInfo.Value.Count != initialCount)
+                {
+                    BatteryCountChanged?.Invoke();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Error occurred when device chan");
+            throw;
+        }
     }
 
-    private void Analyze()
+    private List<BatteryInfo> GetData()
     {
         try
         {
@@ -50,20 +71,16 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
             foreach (var obj in _batteryInfoSearcher.Get())
             {
                 var batteryInfo = new BatteryInfo(deviceId: obj["DeviceID"].ToString(),
-                    rate: () => GetBatteryRate(), 
-                    status: () => GetBatteryStatus(), 
+                    rate: () => GetBatteryRate(),
+                    status: () => GetBatteryStatus(),
                     fullChargeCapacity: () => GetFullChargeCapacity(),
-                    designCapacity:  () => GetDesignCapacity(),
+                    designCapacity: () => GetDesignCapacity(),
                     cycleCount: () => GetBatteryCycle(),
                     health: () => GetBatteryHealth());
                 batteries.Add(batteryInfo);
             }
-            
-            if (batteries.Count != Batteries.Count)
-            {
-                Batteries = batteries.AsReadOnly();
-                BatteryCountChanged?.Invoke();
-            }
+
+            return batteries;
         }
         catch (Exception ex)
         {
