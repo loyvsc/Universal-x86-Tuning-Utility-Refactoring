@@ -8,24 +8,32 @@ namespace Universal_x86_Tuning_Utility.Windows.Services;
 
 public class WindowsSensorsService : ISensorsService, IDisposable
 {
-    private readonly Computer _thisPc = new Computer
-    {
-        IsCpuEnabled = true,
-        IsGpuEnabled = true,
-        IsMemoryEnabled = true
-    };
-
+    private readonly Lazy<Computer> _thisPc;
+    
     private DateTime _lastUpdate;
     private readonly TimeSpan _updateInterval = TimeSpan.FromSeconds(1);
 
+    public WindowsSensorsService()
+    {
+        _thisPc = new Lazy<Computer>(() => new Computer
+        {
+            IsCpuEnabled = true,
+            IsGpuEnabled = true,
+            IsMemoryEnabled = true
+        });
+    }
+
     public void Start()
     {
-        _thisPc.Open();
+        _thisPc.Value.Open();
     }
 
     public void Stop()
     {
-        _thisPc.Close();
+        if (_thisPc.IsValueCreated)
+        {
+            _thisPc.Value.Close();
+        }
     }
 
     private void UpdateAllHardware()
@@ -35,7 +43,7 @@ public class WindowsSensorsService : ISensorsService, IDisposable
             return;
         }
 
-        foreach (var hardware in _thisPc.Hardware)
+        foreach (var hardware in _thisPc.Value.Hardware)
         {
             hardware.Update();
         }
@@ -46,7 +54,7 @@ public class WindowsSensorsService : ISensorsService, IDisposable
     public float GetCPUInfo(SensorType sensorType, string sensorName)
     {
         UpdateAllHardware();
-        var hardware = _thisPc.Hardware.FirstOrDefault(h => h.HardwareType == HardwareType.Cpu);
+        var hardware = _thisPc.Value.Hardware.FirstOrDefault(h => h.HardwareType == HardwareType.Cpu);
         if (hardware == null) return 0;
         
         return GetSensorValue(hardware, sensorType, sensorName);
@@ -55,7 +63,7 @@ public class WindowsSensorsService : ISensorsService, IDisposable
     public float GetAMDGPUInfo(SensorType sensorType, string sensorName)
     {
         UpdateAllHardware();
-        var hardware = _thisPc.Hardware.FirstOrDefault(h => h.HardwareType == HardwareType.GpuAmd);
+        var hardware = _thisPc.Value.Hardware.FirstOrDefault(h => h.HardwareType == HardwareType.GpuAmd);
         if (hardware == null) return 0;
         
         return GetSensorValue(hardware, sensorType, sensorName);
@@ -64,7 +72,7 @@ public class WindowsSensorsService : ISensorsService, IDisposable
     public float GetNvidiaGPUInfo(SensorType sensorType, string sensorName)
     {
         UpdateAllHardware();
-        var hardware = _thisPc.Hardware.FirstOrDefault(h => h.HardwareType == HardwareType.GpuNvidia);
+        var hardware = _thisPc.Value.Hardware.FirstOrDefault(h => h.HardwareType == HardwareType.GpuNvidia);
         if (hardware == null) return 0;
         
         return GetSensorValue(hardware, sensorType, sensorName);
