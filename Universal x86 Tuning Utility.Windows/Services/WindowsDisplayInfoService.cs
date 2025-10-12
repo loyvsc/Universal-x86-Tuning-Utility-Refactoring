@@ -7,8 +7,6 @@ using System.Threading;
 using ApplicationCore.Enums.Display;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using DynamicData;
-using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Universal_x86_Tuning_Utility.Windows.Interfaces;
 using WindowsDisplayAPI;
@@ -23,9 +21,9 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
     public event DisplayAttachedEventHandler? DisplayAttached;
     public event DisplayRemovedEventHandler? DisplayRemoved;
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
-    public IReadOnlyCollection<Display> Displays => _displays.AsReadOnly();
-    
-    private readonly List<Display> _displays = new();
+    public IReadOnlyCollection<Display> Displays => _displays.Value.AsReadOnly();
+
+    private readonly Lazy<List<Display>> _displays;
     private readonly Serilog.ILogger _logger;
     private readonly IDisposable _installDeviceSubscription;
     private readonly IDisposable _uninstallDeviceEventWatcher;
@@ -34,7 +32,7 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
     public WindowsDisplayInfoService(Serilog.ILogger logger, IManagementEventService managementEventService)
     {
         _logger = logger;
-        Initialize();
+        _displays = new  Lazy<List<Display>>(() => GetDisplays());
         
         _installDeviceSubscription =
             managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2")
@@ -47,60 +45,51 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
     }
 
-    private void Initialize()
-    {
-        _displays.AddRange(GetDisplays());
-    }
-
     private void OnDisplaySettingsChanged(object? sender, EventArgs e)
     {
-        lock (_displaysLock)
+        if (_displays.IsValueCreated)
         {
-            _displays.Clear();
-            _displays.AddRange(GetDisplays());
+            _displays.Value.Clear();
+            _displays.Value.AddRange(GetDisplays());
         }
         CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
     private void OnNewDeviceInstalled(EventArrivedEventArgs e)
     {
-        lock (_displaysLock)
+        if (_displays.IsValueCreated)
         {
-            var currentDisplays = GetDisplays();
+            _displays.Value.Clear();
 
-            foreach (var display in currentDisplays)
+            foreach (var display in GetDisplays())
             {
-                if (_displays.All(d => d.Identifier != display.Identifier))
+                if (_displays.Value.All(d => d.Identifier != display.Identifier))
                 {
+                    _displays.Value.Add(display);
                     DisplayAttached?.Invoke(display);
                 }
             }
-            
-            _displays.Clear();
-            _displays.AddRange(currentDisplays);
         }
     }
 
     private void OnDeviceUninstalled(EventArrivedEventArgs e)
     {
-        lock (_displaysLock)
+        if (_displays.IsValueCreated)
         {
-            var currentDisplays = GetDisplays();
+            _displays.Value.Clear();
 
-            foreach (var display in _displays)
+            foreach (var display in GetDisplays())
             {
-                if (currentDisplays.All(d => d.Identifier != display.Identifier))
+                if (_displays.Value.All(d => d.Identifier != display.Identifier))
                 {
+                    _displays.Value.Remove(display);
                     DisplayRemoved?.Invoke(display);
                 }
             }
-            
-            _displays.Clear();
-            _displays.AddRange(currentDisplays);
         }
     }
 
-    private IList<Display> GetDisplays()
+    private List<Display> GetDisplays()
     {
         var displays = new List<Display>();
 
@@ -180,26 +169,32 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
     {
         if (targetHz > 0)
         {
-            foreach (var displayAdapter in DisplayAdapter.GetDisplayAdapters())
+            lock (_displaysLock)
             {
-                var displayDevice = displayAdapter.GetDisplayDevices()
-                    .FirstOrDefault(x => x.DevicePath == targetDisplay.Identifier && x.IsAvailable);
-
-                var possibleSetting = displayDevice?.GetPossibleSettings().FirstOrDefault(x => x.Resolution.Width == targetDisplayResolution.Width && x.Resolution.Height == targetDisplayResolution.Height && x.Frequency == targetHz);
-                if (possibleSetting != null)
+                foreach (var displayAdapter in DisplayAdapter.GetDisplayAdapters())
                 {
-                    var settingsToSave = new Dictionary<DisplayDevice, DisplaySetting>();
-                    settingsToSave.Add(displayDevice, new DisplaySetting(possibleSetting));
-                    
-                    DisplaySetting.SaveDisplaySettings(settingsToSave, true);
+                    var displayDevice = displayAdapter.GetDisplayDevices()
+                        .FirstOrDefault(x => x.DevicePath == targetDisplay.Identifier && x.IsAvailable);
 
-                    var changedDisplay = _displays.FirstOrDefault(x => x.Identifier == targetDisplay.Identifier);
-                    if (changedDisplay != null)
+                    if (displayDevice != null)
                     {
-                        changedDisplay.UpdateCurrentResolution(targetDisplayResolution, targetHz);
-                        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, _displays));
+                        var possibleSetting = displayDevice.GetPossibleSettings().FirstOrDefault(x => x.Resolution.Width == targetDisplayResolution.Width && x.Resolution.Height == targetDisplayResolution.Height && x.Frequency == targetHz);
+                        if (possibleSetting != null)
+                        {
+                            var settingsToSave = new Dictionary<DisplayDevice, DisplaySetting>();
+                            settingsToSave.Add(displayDevice, new DisplaySetting(possibleSetting));
+                    
+                            DisplaySetting.SaveDisplaySettings(settingsToSave, true);
+
+                            var changedDisplay = _displays.Value.FirstOrDefault(x => x.Identifier == targetDisplay.Identifier);
+                            if (changedDisplay != null)
+                            {
+                                changedDisplay.UpdateCurrentResolution(targetDisplayResolution, targetHz);
+                                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, _displays));
+                            }
+                            break;
+                        }
                     }
-                    break;
                 }
             }
         }
@@ -212,18 +207,17 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
 
     public void ApplySettings(string targetDisplayIdentifier, int targetHz)
     {
-        var targetDisplay = _displays.FirstOrDefault(x => x.Identifier == targetDisplayIdentifier);
+        var targetDisplay = _displays.Value.FirstOrDefault(x => x.Identifier == targetDisplayIdentifier);
 
         if (targetDisplay != null)
         {
             var currentResolution = targetDisplay.CurrentResolution;
             
             ApplySettings(targetDisplay, currentResolution, targetHz);
+            return;
         }
-        else
-        {
-            throw new ArgumentException($"Invalid {nameof(targetDisplayIdentifier)}");
-        }
+        
+        throw new ArgumentException($"Invalid {nameof(targetDisplayIdentifier)}");
     }
 
     public void Dispose()
