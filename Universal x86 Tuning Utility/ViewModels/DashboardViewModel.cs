@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
@@ -13,6 +14,7 @@ namespace Universal_x86_Tuning_Utility.ViewModels;
 
 public partial class DashboardViewModel : ReactiveObject
 {
+    private readonly ISystemInfoService _systemInfoService;
     private readonly INotificationManager _notificationManager;
     private readonly INvidiaGpuService _nvidiaGpuService;
     private readonly INavigationService _navigationService;
@@ -33,6 +35,7 @@ public partial class DashboardViewModel : ReactiveObject
                              INvidiaGpuService nvidiaGpuService,
                              INavigationService navigationService)
     {
+        _systemInfoService = systemInfoService;
         _notificationManager = notificationManager;
         _nvidiaGpuService = nvidiaGpuService;
         _navigationService = navigationService;
@@ -48,13 +51,17 @@ public partial class DashboardViewModel : ReactiveObject
 
     private void AutoAdaptive_Tick(object? sender, EventArgs e)
     {
-        foreach (var checkResult in _nvidiaGpuService.CheckIsGpusOriginal())
+        if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.Nvidia) != 0)
         {
-            if (!checkResult.IsGpuOriginal)
+            foreach (var checkResult in _nvidiaGpuService.CheckIsGpusOriginal())
             {
-                _notificationManager.ShowTextNotification("NVIDIA GPU Warning", $"ROP count is lower than expected on {checkResult.GpuName} (#{checkResult.GpuNumber}) ({checkResult.ActualRopCount } ROPs out of {checkResult.ExpectedRopCount} ROPs)");
+                if (!checkResult.IsGpuOriginal)
+                {
+                    _notificationManager.ShowTextNotification("NVIDIA GPU Warning", $"ROP count is lower than expected on {checkResult.GpuName} (#{checkResult.GpuNumber}) ({checkResult.ActualRopCount } ROPs out of {checkResult.ExpectedRopCount} ROPs)");
+                }
             }
         }
+        
         if (Settings.Default.isStartAdpative)
         {
             _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));
