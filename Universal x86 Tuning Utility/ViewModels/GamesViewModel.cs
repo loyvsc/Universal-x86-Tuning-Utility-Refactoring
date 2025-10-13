@@ -56,7 +56,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
     private readonly IGameLauncherService _gameLauncherService;
     private readonly IIconExtractor _iconExtractor;
     private ObservableCollection<GameLauncherItem> _games;
-    private readonly DispatcherTimer _updateFps;
+    private IDisposable _updateFpsTimer;
     private bool _gamesListUpdating;
     private bool _isActionsAvailable;
 
@@ -80,23 +80,14 @@ public class GamesViewModel : ReactiveObject, IDisposable
         AddGameCommand = ReactiveCommand.CreateFromTask(AddCustomGame);
         ReloadGamesListCommand = ReactiveCommand.CreateFromTask(ReloadGamesList);
         
-        _updateFps = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromSeconds(2)
-        };
-        _updateFps.Tick += UpdateFPS_Tick;
-        
         ThreadPool.QueueUserWorkItem(async _ =>
         {
             await ReloadGamesList();
-            if (!_updateFps.IsEnabled)
-            {
-                _updateFps.Start();
-            }
+            _updateFpsTimer = DispatcherTimer.Run(UpdateFPS_Tick, TimeSpan.FromSeconds(2), DispatcherPriority.Normal);
         }, null);
     }
     
-    private async void UpdateFPS_Tick(object? sender, EventArgs e)
+    private bool UpdateFPS_Tick()
     {
         try
         {
@@ -123,12 +114,15 @@ public class GamesViewModel : ReactiveObject, IDisposable
         }
         catch (Exception ex)
         {
-            // _logger.Error(ex, "Exception occurred when updating performance statistics");
+            _logger.Error(ex, "Exception occurred when updating performance statistics");
         }
+
+        return true;
     }
 
     private async Task AddCustomGame()
     {
+        _logger.Information("Adding custom game");
         var openFileDialogSettings = new OpenFileDialogSettings()
         {
             Title = "Select game",
@@ -162,11 +156,14 @@ public class GamesViewModel : ReactiveObject, IDisposable
             _gameDataService.SavePreset(game.GameName, preset);
             
             Games.Add(game);
+            _logger.Information("Custom game added (path: {0})", filePath);
         }
     }
 
     private async Task ReloadGamesList()
     {
+        _logger.Information("Games list reloading");
+        
         IsActionsAvailable = false;
         GamesListUpdating = true;
 
@@ -213,16 +210,19 @@ public class GamesViewModel : ReactiveObject, IDisposable
         Games = new ObservableCollection<GameLauncherItem>(filteredGamesList);
         GamesListUpdating = false;
         IsActionsAvailable = true;
+        
+        _logger.Information("Games list reloaded");
     }
     
     private async Task RunGame(GameLauncherItem gameToRun)
     {
+        _logger.Information("Running game {gameName} ({launcherType})", gameToRun.GameName, gameToRun.GameType.ToString());
         await _toastNotificationsService.ShowTextNotification($"Launching {gameToRun.GameName}", "This should only take a few moments!");
         await _gameLauncherService.LaunchGame(gameToRun);
     }
 
     public void Dispose()
     {
-        _updateFps.Stop();
+        _updateFpsTimer.Dispose();
     }
 }
