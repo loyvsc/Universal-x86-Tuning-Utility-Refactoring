@@ -16,6 +16,10 @@ public class WindowsIconExtractor : IIconExtractor
         {
             if (icon != null)
             {
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
                 await using (var fileStream = new FileStream(iconPath, FileMode.Create))
                 {
                     icon.Save(fileStream);
