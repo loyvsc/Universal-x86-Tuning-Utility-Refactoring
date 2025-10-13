@@ -144,9 +144,30 @@ public class GamesViewModel : ReactiveObject, IDisposable
                 GameName = gameName,
                 GameType = GameType.Custom,
                 Path = Path.GetDirectoryName(filePath)!,
-                Executable = filePath,
-                IconPath = await _iconExtractor.ExtractIcon(filePath, GameImagesDirectory)
+                Executable = filePath
             };
+            var icon = await _imageService.GetIconImageUrl(gameName);
+            if (string.IsNullOrWhiteSpace(icon))
+            {
+                var lastFolderNames = filePath.Split('\\').SkipLast(1).TakeLast(3);
+                
+                foreach (var pathPart in lastFolderNames)
+                {
+                    var potentialIcon = await _imageService.GetIconImageUrl(pathPart);
+                    if (!string.IsNullOrWhiteSpace(potentialIcon))
+                    {
+                        icon = potentialIcon;
+                        game.GameName = pathPart;
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(icon))
+                {
+                    icon = await _iconExtractor.ExtractIcon(filePath, GameImagesDirectory);
+                }
+            }
+            game.IconPath = icon;
             
             var preset = new GameData
             {
