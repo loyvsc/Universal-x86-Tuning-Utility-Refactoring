@@ -4,6 +4,7 @@ using System.Management;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
+using Universal_x86_Tuning_Utility.Windows.Extensions;
 using Universal_x86_Tuning_Utility.Windows.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services;
@@ -11,8 +12,10 @@ namespace Universal_x86_Tuning_Utility.Windows.Services;
 public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
 {
     private readonly Serilog.ILogger _logger;
-    private readonly IManagementEventService _managementEventService;
-    private readonly ManagementObjectSearcher _batteryInfoSearcher;
+    private readonly ManagementObjectSearcher _batteryStatusSearcher;
+    private readonly ManagementObjectSearcher _batteryStaticDataSearcher;
+    private readonly ManagementObjectSearcher _batteryFullChargedCapacitySearcher;
+    private readonly ManagementObjectSearcher _batteryCycleSearcher;
 
     private readonly IDisposable _installDeviceSubscription;
     private readonly IDisposable _uninstallDeviceEventWatcher;
@@ -22,17 +25,20 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
     public WindowsBatteryInfoService(Serilog.ILogger logger, IManagementEventService managementEventService)
     {
         _logger = logger;
-        _managementEventService = managementEventService;
 
         _batteryInfo = new Lazy<List<BatteryInfo>>(() => GetData());
         
-        _batteryInfoSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Battery");
+        _batteryStatusSearcher = new ManagementObjectSearcher("root\\wmi", "SELECT * FROM BatteryStatus");
+        _batteryStaticDataSearcher = new ManagementObjectSearcher("root\\wmi", "SELECT * FROM BatteryStaticData");
+        _batteryFullChargedCapacitySearcher = new ManagementObjectSearcher("root\\wmi", "SELECT * FROM BatteryFullChargedCapacity");
+        _batteryCycleSearcher = new ManagementObjectSearcher("root\\wmi", "SELECT * FROM BatteryCycleCount");
+        
         _installDeviceSubscription =
-            _managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2")
+            managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2")
                 .Subscribe(OnDeviceChanged);
         
         _uninstallDeviceEventWatcher =
-            _managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 3")
+            managementEventService.SubscribeToQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 3")
                 .Subscribe(OnDeviceChanged);
     }
     
@@ -58,7 +64,7 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "Error occurred when device chan");
+            _logger.Error(ex, "Error occurred when device changed");
             throw;
         }
     }
@@ -68,16 +74,24 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         try
         {
             var batteries = new List<BatteryInfo>();
-            foreach (var obj in _batteryInfoSearcher.Get())
+            
+            foreach (var obj in _batteryStaticDataSearcher.Get())
             {
-                var batteryInfo = new BatteryInfo(deviceId: obj["DeviceID"].ToString(),
-                    rate: () => GetBatteryRate(),
-                    status: () => GetBatteryStatus(),
-                    fullChargeCapacity: () => GetFullChargeCapacity(),
-                    designCapacity: () => GetDesignCapacity(),
-                    cycleCount: () => GetBatteryCycle(),
-                    health: () => GetBatteryHealth());
-                batteries.Add(batteryInfo);
+                var deviceId = obj.Get<string>("InstanceName");
+
+                if (!string.IsNullOrEmpty(deviceId))
+                {
+                    var batteryInfo = new BatteryInfo(
+                        deviceId: deviceId,
+                        rate: () => GetBatteryRate(deviceId),
+                        status: () => GetBatteryStatus(deviceId),
+                        fullChargeCapacity: () => GetFullChargeCapacity(deviceId),
+                        designCapacity: () => GetDesignCapacity(deviceId),
+                        cycleCount: () => GetBatteryCycle(deviceId),
+                        health: () => GetBatteryHealth(deviceId));
+                
+                    batteries.Add(batteryInfo);
+                }
             }
 
             return batteries;
@@ -93,17 +107,18 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
     {
         try
         {
-            foreach (var obj in _batteryInfoSearcher.Get())
+            var targetBattery = _batteryStatusSearcher.Find(x =>
             {
-                var batteryDeviceId = obj["DeviceID"].ToString();
+                var batteryDeviceId = x.Get<string>("InstanceName");
+                return string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId?.Contains(deviceId) == true;
+            });
 
-                if (string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId == deviceId)
-                {
-                    var chargeRate = Convert.ToDecimal(obj["ChargeRate"]);
-                    var dischargeRate = Convert.ToDecimal(obj["DischargeRate"]);
+            if (targetBattery != null)
+            {
+                var chargeRate = targetBattery.Get<decimal>("ChargeRate");
+                var dischargeRate = targetBattery.Get<decimal>("DischargeRate");
 
-                    return chargeRate > 0 ? chargeRate : dischargeRate;
-                }
+                return chargeRate > 0 ? chargeRate : -dischargeRate;
             }
         
             return 0;
@@ -119,24 +134,27 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
     {
         try
         {
-            foreach (var obj in _batteryInfoSearcher.Get())
+            var targetBattery = _batteryCycleSearcher.Find(x =>
             {
-                var batteryDeviceId = obj["DeviceID"].ToString();
-
-                if (string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId == deviceId)
-                {
-                    if (obj["BatteryStatus"] is ushort batteryStatus)
-                    {
-                        return batteryStatus switch
-                        {
-                            1 => BatteryStatus.Discharging,
-                            3 => BatteryStatus.FullCharged,
-                            4 or 5 => BatteryStatus.Low,
-                            2 or 7 or 8 or 9 or 11 => BatteryStatus.Charging,
-                            _ => BatteryStatus.Unknown
-                        };
-                    }
-                }
+                var batteryDeviceId = x.Get<string>("InstanceName");
+                return string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId?.Contains(deviceId) == true;
+            });
+            if (targetBattery != null)
+            {
+                var batteryDeviceId = targetBattery.Get<string>("InstanceName");
+                
+                var fullChargeCapacity = _batteryFullChargedCapacitySearcher
+                    .Find(x => x.Properties["InstanceName"].Value.ToString() == batteryDeviceId)
+                    ?.Get<decimal>("FullChargedCapacity") ?? 0;
+                var remainingCapacity = targetBattery.Get<decimal>("RemainingCapacity");
+                var chargingRate = targetBattery.Get<decimal>("ChargingRate");
+                var dischargeRate = targetBattery.Get<decimal>("DischargeRate");
+                    
+                if (chargingRate == 0 && dischargeRate == 0) return BatteryStatus.FullCharged;
+                if (chargingRate > 0) return BatteryStatus.Charging;
+                if (remainingCapacity <= fullChargeCapacity * 0.15M) return BatteryStatus.Low;
+                if (chargingRate < 0) return BatteryStatus.Discharging;
+                return BatteryStatus.Unknown;
             }
 
             return BatteryStatus.NoSystemBattery;
@@ -152,17 +170,12 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
     {
         try
         {
-            foreach (var obj in _batteryInfoSearcher.Get())
-            {
-                var batteryDeviceId = obj["DeviceID"].ToString();
-
-                if (string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId == deviceId)
+            return _batteryFullChargedCapacitySearcher.Find(x => 
                 {
-                    return Convert.ToDecimal(obj["FullChargedCapacity"]);
-                }
-            }
-
-            return 0;
+                    var batteryDeviceId = x.Get<string>("InstanceName");
+                    return string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId?.Contains(deviceId) == true;
+                })
+                ?.Get<decimal>("FullChargedCapacity") ?? 0;
         }
         catch (Exception ex)
         {
@@ -175,17 +188,12 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
     {
         try
         {
-            foreach (var obj in _batteryInfoSearcher.Get())
-            {
-                var batteryDeviceId = obj["DeviceID"].ToString();
-
-                if (string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId == deviceId)
+            return _batteryStaticDataSearcher.Find(x => 
                 {
-                    return Convert.ToDecimal(obj["DesignedCapacity"]);
-                }
-            }
-
-            return 0;
+                    var batteryDeviceId = x.Get<string>("InstanceName");
+                    return string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId?.Contains(deviceId) == true;
+                })
+                ?.Get<decimal>("DesignedCapacity") ?? 0;
         }
         catch (Exception ex)
         {
@@ -198,57 +206,48 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
     {
         try
         {
-            foreach (var obj in _batteryInfoSearcher.Get())
-            {
-                var batteryDeviceId = obj["DeviceID"].ToString();
-
-                if (string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId == deviceId)
+            return _batteryCycleSearcher.Find(x => 
                 {
-                    return Convert.ToInt32(obj["CycleCount"]);
-                }
+                    var batteryDeviceId = x.Get<string>("InstanceName");
+                    return string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId?.Contains(deviceId) == true;
+                })
+                ?.Get<int>("CycleCount") ?? 0;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Error occurred when requesting battery cycle count");
+            return 0;
+        }
+    }
+
+    public decimal GetBatteryHealth(string? deviceId = null)
+    {
+        try
+        {
+            var designCap = GetDesignCapacity(deviceId);
+            var fullCap = GetFullChargeCapacity(deviceId);
+
+            if (designCap > 0)
+            {
+                var health = fullCap / designCap;
+                return health;
             }
 
             return 0;
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "Error occurred when requesting battery design capacity");
-            throw;
-        }
-    }
-
-    /// <param name="deviceId">Target battery DeviceId. if <c>null</c> return info for primary battery</param>
-    public decimal GetBatteryHealth(string? deviceId = null)
-    {
-        try
-        {
-            foreach (var obj in _batteryInfoSearcher.Get())
-            {
-                var batteryDeviceId = obj["DeviceID"].ToString();
-
-                if (string.IsNullOrWhiteSpace(deviceId) || batteryDeviceId == deviceId)
-                {
-                    var designCap = GetDesignCapacity();
-                    var fullCap = GetFullChargeCapacity();
-
-                    var health = fullCap / designCap;
-
-                    return health;
-                }
-            }
-
+            _logger.Error(ex, "Error occurred when requesting battery health");
             return 0;
-        }
-        catch
-        {
-            _logger.Error("Error occurred when requesting battery health");
-            throw;
         }
     }
 
     public void Dispose()
     {
-        _batteryInfoSearcher.Dispose();
+        _batteryStatusSearcher.Dispose();
+        _batteryStaticDataSearcher.Dispose();
+        _batteryFullChargedCapacitySearcher.Dispose();
+        _batteryCycleSearcher.Dispose();
         _installDeviceSubscription.Dispose();
         _uninstallDeviceEventWatcher.Dispose();
     }
