@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
@@ -27,6 +28,11 @@ public class WindowsCliService : ICliService
                 RedirectStandardError = readOutput,
                 Verb = isUri ? "open" : "runas"
             };
+
+            if (processName.EndsWith(".bat"))
+            {
+                processStartInfo.WorkingDirectory = Path.GetDirectoryName(processName);
+            }
                 
             var process = new System.Diagnostics.Process
             {

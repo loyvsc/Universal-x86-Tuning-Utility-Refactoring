@@ -128,7 +128,10 @@ public class GamesViewModel : ReactiveObject, IDisposable
             Title = "Select game",
             Filters = new List<FileFilter>()
             {
-                new("Executable", ".exe")
+                new("Executable", ".exe"),
+                new("Batch script", ".bat"),
+                new("CMD file", ".cmd"),
+                new("All files", ".*"),
             }
         };
 
