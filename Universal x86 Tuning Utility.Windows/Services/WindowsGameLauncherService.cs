@@ -152,49 +152,58 @@ public class WindowsGameLauncherService : IGameLauncherService
         }
 
         //microsoft store apps below
-        var packageManager = new PackageManager();
-        IEnumerable<Package> packages = packageManager.FindPackages()
-            .Where(x => x.InstalledLocation.Path.Contains("WindowsApps") && 
-                        x.SignatureKind == PackageSignatureKind.Store && !x.IsFramework);
-
-        foreach (var driveInfo in DriveInfo.GetDrives())
+        try
         {
-            try
+            var packageManager = new PackageManager();
+            IEnumerable<Package> packages = packageManager.FindPackages()
+                .Where(x => x.InstalledLocation.Path.Contains("WindowsApps")
+                            && x.SignatureKind == PackageSignatureKind.Store 
+                            && !x.IsFramework)
+                .ToList();
+
+            foreach (var driveInfo in DriveInfo.GetDrives())
             {
-                string xboxGameDirectory = Path.Combine(driveInfo.Name, "XboxGames");
-                if (Directory.Exists(xboxGameDirectory))
+                try
                 {
-                    var filesInDirectory = Directory.GetDirectories(xboxGameDirectory);
-
-                    if (filesInDirectory.Length > 0)
+                    string xboxGameDirectory = Path.Combine(driveInfo.Name, "XboxGames");
+                    if (Directory.Exists(xboxGameDirectory))
                     {
-                        var files = filesInDirectory.Select(x => Path.GetFileName(x)).ToArray();
+                        var filesInDirectory = Directory.GetDirectories(xboxGameDirectory);
 
-                        if (files.Length > 0)
+                        if (filesInDirectory.Length > 0)
                         {
-                            foreach (var package in packages)
+                            var files = filesInDirectory.Select(x => Path.GetFileName(x)).ToArray();
+
+                            if (files.Length > 0)
                             {
-                                if (files.Contains(package.DisplayName))
+                                foreach (var package in packages)
                                 {
-                                    var launcherItem = new GameLauncherItem()
+                                    if (files.Contains(package.DisplayName))
                                     {
-                                        GameType = GameType.MicrosoftStore,
-                                        GameName = package.DisplayName,
-                                        GameId = package.Id.FullName,
-                                        Path = package.InstalledPath,
-                                        ImageLocation = package.Logo.AbsolutePath
-                                    };
-                                    list.Add(launcherItem);
+                                        var launcherItem = new GameLauncherItem()
+                                        {
+                                            GameType = GameType.MicrosoftStore,
+                                            GameName = package.DisplayName,
+                                            GameId = package.Id.FullName,
+                                            Path = package.InstalledPath,
+                                            ImageLocation = package.Logo.AbsolutePath
+                                        };
+                                        list.Add(launcherItem);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Exception occurred when checking for Microsoft Store games");
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "Exception occurred when checking for Microsoft Store games");
-            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Exception occurred when checking for Microsoft Store games");
         }
         
         return list.Distinct(new GameLauncherItemEqualityComparer()).ToList();
