@@ -11,19 +11,22 @@ namespace Universal_x86_Tuning_Utility.Services.PresetServices;
 public class PremadePresets : IPremadePresets
 {
     private readonly ISystemInfoService _systemInfoService;
+    private readonly Lazy<List<PremadePreset>> _premadePresets;
 
     public PrematePresetType PrematePresetType { get; private set; }
-    public List<PremadePreset> PremadePresetsList { get; }
+    public List<PremadePreset> PremadePresetsList => _premadePresets.Value;
 
     public PremadePresets(ISystemInfoService systemInfoService)
     {
         _systemInfoService = systemInfoService;
         
-        PremadePresetsList = new List<PremadePreset>(4);
+        _premadePresets = new Lazy<List<PremadePreset>>(InitializePremadePresets);
     }
 
-    public void InitializePremadePresets()
+    private List<PremadePreset> InitializePremadePresets()
     {
+        var presetsList = new List<PremadePreset>();
+        
         if (_systemInfoService.Cpu.ProcessorType is ProcessorType.Apu or ProcessorType.Desktop)
         {
             if (_systemInfoService.Cpu is RyzenCpuInfo ryzenCpuInfo)
@@ -981,11 +984,13 @@ public class PremadePresets : IPremadePresets
                     RyzenAdjParameters = extremePresetParameters.BuildParamtersString()
                 };
 
-                PremadePresetsList.Add(ecoPreset);
-                PremadePresetsList.Add(balancePreset);
-                PremadePresetsList.Add(performancePreset);
-                PremadePresetsList.Add(extremePreset);
+                presetsList.Add(ecoPreset);
+                presetsList.Add(balancePreset);
+                presetsList.Add(performancePreset);
+                presetsList.Add(extremePreset);
             }
         }
+        
+        return presetsList;
     }
 }
