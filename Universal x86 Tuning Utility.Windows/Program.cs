@@ -36,7 +36,7 @@ class Program
             })
             .UsePlatformDetect()
             .WithInterFont()
-            .SetupDesktopNotifications(out var notificationManager)
+            .SetupDesktopNotifications(out var notificationManager, "Universal x86 Tuning Utility")
             .AfterPlatformServicesSetup(_ =>
             {
                 SplatRegistrations.RegisterConstant(notificationManager!);

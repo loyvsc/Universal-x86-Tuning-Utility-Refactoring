@@ -35,7 +35,7 @@ class Program
             .UsePlatformDetect()
             .AfterSetup(builder =>
             {
-                var context = FreeDesktopApplicationContext.FromCurrentProcess();
+                var context = FreeDesktopApplicationContext.FromCurrentProcess(customName: "Universal x86 Tuning Utility");
                 var manager = new FreeDesktopNotificationManager(context);
                 Task.Run(manager.Initialize).Wait();
 
