@@ -199,6 +199,10 @@ public class WindowsRyzenAdjService : IRyzenAdjService
                             Task.Delay(50);
                         }
                     }
+                    catch (SmuCommandNotFound ex)
+                    {
+                        _logger.Error("RyzenAdj param {paramName} not support", ex.Command);
+                    }
                     catch (Exception ex)
                     {
                         _logger.Error(ex, "An exception occurred in RyzenAdjService");

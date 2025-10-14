@@ -402,7 +402,7 @@ public static class WindowsSMUCommands
                     RyzenAccess.SendRsmu(command.Item3, ref Args);
             })).ToArray());
         }
-        else throw new ArgumentException($"Command '{commandName}' not found");
+        else throw new SmuCommandNotFound(commandName);
     }
 }
 
@@ -592,5 +592,15 @@ internal class Smu
             return _ryzenNbAccess.ReadPciConfigDwordEx(SMU_PCI_ADDR, SMU_OFFSET_DATA, ref data) == 1;
         }
         return false;
+    }
+}
+
+public class SmuCommandNotFound : Exception
+{
+    public string Command { get; }
+    
+    public SmuCommandNotFound(string command, string? message = null) : base(message)
+    {
+        Command = command;
     }
 }
