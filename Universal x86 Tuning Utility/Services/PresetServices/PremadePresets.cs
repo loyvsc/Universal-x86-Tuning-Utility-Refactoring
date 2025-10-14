@@ -962,25 +962,25 @@ public class PremadePresets : IPremadePresets
                 
                 var ecoPreset = new PremadePreset()
                 {
-                    Name = "PM - Eco",
+                    Name = "Eco",
                     RyzenAdjParameters = ecoPresetParameters.BuildParamtersString()
                 };
 
                 var balancePreset = new PremadePreset()
                 {
-                    Name = "PM - Balance",
+                    Name = "Balance",
                     RyzenAdjParameters = balancePresetParameters.BuildParamtersString()
                 };
 
                 var performancePreset = new PremadePreset()
                 {
-                    Name = "PM - Performance",
+                    Name = "Performance",
                     RyzenAdjParameters = performancePresetParameters.BuildParamtersString()
                 };
 
                 var extremePreset = new PremadePreset()
                 {
-                    Name = "PM - Extreme",
+                    Name = "Extreme",
                     RyzenAdjParameters = extremePresetParameters.BuildParamtersString()
                 };
 
