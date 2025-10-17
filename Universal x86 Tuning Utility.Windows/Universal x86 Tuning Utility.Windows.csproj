@@ -11,8 +11,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.7" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.7" />
         <PackageReference Include="DesktopNotificationsFixed.Avalonia" Version="1.0.1" />
         <PackageReference Include="DesktopNotificationsFixed.Windows" Version="1.0.0" />
         <PackageReference Include="WindowsDisplayAPI" Version="1.3.0.13" />
