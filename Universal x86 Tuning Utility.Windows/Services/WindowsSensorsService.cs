@@ -15,11 +15,16 @@ public class WindowsSensorsService : ISensorsService, IDisposable
 
     public WindowsSensorsService()
     {
-        _thisPc = new Lazy<Computer>(() => new Computer
+        _thisPc = new Lazy<Computer>(() =>
         {
-            IsCpuEnabled = true,
-            IsGpuEnabled = true,
-            IsMemoryEnabled = true
+            var computer = new Computer
+            {
+                IsCpuEnabled = true,
+                IsGpuEnabled = true,
+                IsMemoryEnabled = true
+            };
+            computer.Open();
+            return computer;
         });
     }
 
