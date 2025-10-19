@@ -425,22 +425,22 @@ internal class Smu
         // Check WinRing0 status
         switch (_ryzenNbAccess.GetDllStatus())
         {
-            case (uint)Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_LOADED:
+            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_LOADED:
                 throw new ApplicationException("WinRing OLS_DRIVER_NOT_LOADED");
 
-            case (uint)Ols.OlsDllStatus.OLS_DLL_UNSUPPORTED_PLATFORM:
+            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_UNSUPPORTED_PLATFORM:
                 throw new ApplicationException("WinRing OLS_UNSUPPORTED_PLATFORM");
 
-            case (uint)Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_FOUND:
+            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_FOUND:
                 throw new ApplicationException("WinRing OLS_DLL_DRIVER_NOT_FOUND");
 
-            case (uint)Ols.OlsDllStatus.OLS_DLL_DRIVER_UNLOADED:
+            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_DRIVER_UNLOADED:
                 throw new ApplicationException("WinRing OLS_DLL_DRIVER_UNLOADED");
 
-            case (uint)Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_LOADED_ON_NETWORK:
+            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_LOADED_ON_NETWORK:
                 throw new ApplicationException("WinRing DRIVER_NOT_LOADED_ON_NETWORK");
 
-            case (uint)Ols.OlsDllStatus.OLS_DLL_UNKNOWN_ERROR:
+            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_UNKNOWN_ERROR:
                 throw new ApplicationException("WinRing OLS_DLL_UNKNOWN_ERROR");
         }
 
@@ -454,13 +454,13 @@ internal class Smu
         // Check WinRing0 status
         switch (_ryzenNbAccess.GetStatus())
         {
-            case (uint)Ols.Status.DLL_NOT_FOUND:
+            case Ols.Status.DLL_NOT_FOUND:
                 throw new ApplicationException("WinRing DLL_NOT_FOUND");
             
-            case (uint)Ols.Status.DLL_INCORRECT_VERSION:
+            case Ols.Status.DLL_INCORRECT_VERSION:
                 throw new ApplicationException("WinRing DLL_INCORRECT_VERSION");
             
-            case (uint)Ols.Status.DLL_INITIALIZE_ERROR:
+            case Ols.Status.DLL_INITIALIZE_ERROR:
                 throw new ApplicationException("WinRing DLL_INITIALIZE_ERROR");
         }
     }

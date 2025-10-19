@@ -60,6 +60,7 @@ class Program
                 SplatRegistrations.RegisterLazySingleton<IIconExtractor, WindowsIconExtractor>();
                 SplatRegistrations.RegisterLazySingleton<IXgMobileConnectionService, XgMobileConnectionService>();
                 SplatRegistrations.RegisterLazySingleton<IManagementEventService, ManagementEventService>();
+                SplatRegistrations.RegisterLazySingleton<IWinRingEcManagementService, WinRingEcManagementService>();
         
                 SplatRegistrations.SetupIOC();
             })

@@ -3,7 +3,7 @@ using System.IO;
 using System.Text.Json;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using Universal_x86_Tuning_Utility.Windows.Services.Amd.Windows;
+using Universal_x86_Tuning_Utility.Windows.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services;
 
@@ -17,62 +17,76 @@ public class WindowsFanControlService : IFanControlService
 
     public bool IsFanControlEnabled { get; private set; }
 
-    public bool IsFanEnabled => WinRingECManagement.ECRamRead(FanToggleAddress) == 0;
+    public bool IsFanEnabled => _winRingEcManagementService.ECRamRead(_fanToggleAddress) == 0;
     
-    private ushort FanToggleAddress;
-    private ushort FanChangeAddress;
+    private ushort _fanToggleAddress;
+    private ushort _fanChangeAddress;
 
-    private byte EnableToggleAddress;
-    private byte DisableToggleAddress;
+    private byte _enableToggleAddress;
+    private byte _disableToggleAddress;
 
-    private ushort RegAddress;
-    private ushort RegData;
+    private ushort _regAddress;
+    private ushort _regData;
     
     private readonly ISystemInfoService _systemInfoService;
+    private readonly IWinRingEcManagementService _winRingEcManagementService;
+    private readonly Serilog.ILogger _logger;
 
-    public WindowsFanControlService(ISystemInfoService systemInfoService)
+    public WindowsFanControlService(Serilog.ILogger logger, ISystemInfoService systemInfoService, IWinRingEcManagementService winRingEcManagementService)
     {
+        _logger = logger;
         _systemInfoService = systemInfoService;
+        _winRingEcManagementService = winRingEcManagementService;
     }
 
     private const string FanConfigsFolderPath = @"\Assets\Fan Configs";
 
     public void UpdateAddresses()
     {
-        string path = $@"{FanConfigsFolderPath}\{_systemInfoService.Manufacturer.Value.ToUpper()}_{_systemInfoService.Product.Value.ToUpper()}.json";
+        string path = $@"{FanConfigsFolderPath}\{_systemInfoService.Manufacturer.ToUpper()}_{_systemInfoService.Product.ToUpper()}.json";
 
         if (File.Exists(path))
         {
             var json = File.ReadAllText(path);
             var dataForDevice = JsonSerializer.Deserialize<FanData>(json);
 
-            // Access data for the device
-            MinFanSpeed = dataForDevice.MinFanSpeed;
-            MaxFanSpeed = dataForDevice.MaxFanSpeed;
-            MinFanSpeedPercentage = dataForDevice.MinFanSpeedPercentage;
-            FanToggleAddress = Convert.ToUInt16(dataForDevice.FanControlAddress, 16);
-            FanChangeAddress = Convert.ToUInt16(dataForDevice.FanSetAddress, 16);
-            EnableToggleAddress = Convert.ToByte(dataForDevice.EnableToggleAddress, 16);
-            DisableToggleAddress = Convert.ToByte(dataForDevice.DisableToggleAddress, 16);
+            if (dataForDevice != null)
+            {
+                // Access data for the device
+                MinFanSpeed = dataForDevice.MinFanSpeed;
+                MaxFanSpeed = dataForDevice.MaxFanSpeed;
+                MinFanSpeedPercentage = dataForDevice.MinFanSpeedPercentage;
+                _fanToggleAddress = Convert.ToUInt16(dataForDevice.FanControlAddress, 16);
+                _fanChangeAddress = Convert.ToUInt16(dataForDevice.FanSetAddress, 16);
+                _enableToggleAddress = Convert.ToByte(dataForDevice.EnableToggleAddress, 16);
+                _disableToggleAddress = Convert.ToByte(dataForDevice.DisableToggleAddress, 16);
 
-            RegAddress = Convert.ToUInt16(dataForDevice.RegAddress, 16);
-            RegData = Convert.ToUInt16(dataForDevice.RegData, 16);
+                _regAddress = Convert.ToUInt16(dataForDevice.RegAddress, 16);
+                _regData = Convert.ToUInt16(dataForDevice.RegData, 16);
 
-            WinRingECManagement.reg_addr = RegAddress;
-            WinRingECManagement.reg_data = RegData;
+                _winRingEcManagementService.RegAddress = _regAddress;
+                _winRingEcManagementService.RegData = _regData;
+                _logger.Information("Config {manufacturer}_{product} ", _systemInfoService.Manufacturer.ToUpper(), _systemInfoService.Product.ToUpper());
+            }
+            else
+            {
+                _logger.Error("Incorrect fan config at {path}", path);
+            }
         }
     }
 
     public void EnableFanControl()
     {
-        WinRingECManagement.ECRamWrite(FanToggleAddress, EnableToggleAddress);
+        _winRingEcManagementService.ECRamWrite(_fanToggleAddress, _enableToggleAddress);
         IsFanControlEnabled = true;
+        _logger.Information("Fan control enabled");
     }
 
     public void DisableFanControl()
     {
-        WinRingECManagement.ECRamWrite(FanToggleAddress, DisableToggleAddress);
+        _winRingEcManagementService.ECRamWrite(_fanToggleAddress, _disableToggleAddress);
         IsFanControlEnabled = false;
+        _logger.Information("Fan control disabled");
     }
 
     public void SetFanSpeed(int speedPercentage)
@@ -83,290 +97,23 @@ public class WindowsFanControlService : IFanControlService
         }
 
         byte setValue = (byte)Math.Round((double)speedPercentage / 100 * MaxFanSpeed, 0);
-        WinRingECManagement.ECRamWrite(FanChangeAddress, setValue);
+        _winRingEcManagementService.ECRamWrite(_fanChangeAddress, setValue);
 
         FanSpeed = speedPercentage;
+        _logger.Information("Fan speed changed to {fanSpeed}", FanSpeed);
     }
 
     public void ReadFanSpeed()
     {
-        byte returnValue = WinRingECManagement.ECRamRead(FanChangeAddress);
+        byte returnValue = _winRingEcManagementService.ECRamRead(_fanChangeAddress);
 
         double fanPercentage = Math.Round(100 * (Convert.ToDouble(returnValue) / MaxFanSpeed), 0);
         FanSpeed = fanPercentage;
+        _logger.Information("Fan speed has been read: {fanSpeed}", FanSpeed);
     }
 
     public void Dispose()
     {
         DisableFanControl();
-    }
-}
-
-internal class WinRingECManagement
-{
-    public static ushort reg_addr;
-    public static ushort reg_data;
-    private static FanOls _ols = new FanOls();
-    private static object _lock = new();
-    
-    public static void InitECWin4()
-    {
-        if (_ols == null)
-            OlsInit();
-
-        if (_ols == null)
-            return;
-
-        try
-        {
-            byte EC_Chip_ID1 = ECRamReadWin4(0x2000);
-
-            if (EC_Chip_ID1 == 0x55)
-            {
-                byte EC_Chip_Ver = ECRamReadWin4(0x1060);
-                EC_Chip_Ver = (byte)(EC_Chip_Ver | 0x80);
-
-                ECRamWriteWin4(0x1060, EC_Chip_Ver);
-            }
-
-            //if (ols != null)
-            //    OlsFree();
-        }
-        catch
-        {
-            OlsFree();
-        }
-    }
-        
-    public static byte ECRamReadWin4(ushort address)
-    {
-        if (_ols == null)
-            OlsInit();
-
-        if (_ols == null)
-            return 0;
-
-        byte data;
-        byte highByte = (byte)((address >> 8) & 0xFF);
-        byte lowByte = (byte)(address & 0xFF);
-        
-        try
-        {
-            lock (_lock)
-            {
-                reg_addr = 0x2E;
-                reg_data = 0x2F;
-
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x11);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                _ols.WriteIoPortByte(reg_data, highByte);
-                
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x10);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                _ols.WriteIoPortByte(reg_data, lowByte);
-    
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x12);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                
-                data = _ols.ReadIoPortByte(reg_data);
-            }
-
-            //if (ols != null)
-            //   OlsFree();
-        }
-        catch
-        {
-            OlsFree();
-            return 0;
-        }
-
-        return data;
-
-    }
-
-    public static void ECRamWriteWin4(ushort address, byte data)
-    {
-        if (_ols == null)
-            OlsInit();
-
-        if (_ols == null)
-            return;
-
-        byte highByte = (byte)((address >> 8) & 0xFF);
-        byte lowByte = (byte)(address & 0xFF);
-
-        try
-        {
-            lock (_lock)
-            {
-                reg_addr = 0x2E;
-                reg_data = 0x2F;
-
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x11);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                _ols.WriteIoPortByte(reg_data, highByte);
-
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x10);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                _ols.WriteIoPortByte(reg_data, lowByte);
-                
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x12);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                _ols.WriteIoPortByte(reg_data, data);
-            }
-            
-            //if (ols != null)
-            //    OlsFree();
-        }
-        catch
-        {
-            OlsFree();
-        }
-    }
-    
-    public static void ECRamWrite(ushort address, byte data)
-    {
-        if (_ols == null)
-            OlsInit();
-        if (_ols == null)
-            return;
-        
-        byte highByte = (byte)((address >> 8) & 0xFF);
-        byte lowByte = (byte)(address & 0xFF);
-        
-        try
-        {
-            lock (_lock)
-            {
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x11);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                _ols.WriteIoPortByte(reg_data, highByte);
-
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x10);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                _ols.WriteIoPortByte(reg_data, lowByte);
-
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x12);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                _ols.WriteIoPortByte(reg_data, data);
-            }
-        }
-        catch
-        {
-            _ols = null;
-        }
-    }
-
-    public static byte ECRamRead(ushort address)
-    {
-        if (_ols == null)
-            OlsInit();
-        if (_ols == null)
-            return 0;
-        
-        byte data;
-        byte high_byte = (byte)((address >> 8) & 0xFF);
-        byte low_byte = (byte)(address & 0xFF);
-        
-        try
-        {
-            lock (_lock)
-            {
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x11);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                _ols.WriteIoPortByte(reg_data, high_byte);
-
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x10);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                _ols.WriteIoPortByte(reg_data, low_byte);
-
-                _ols.WriteIoPortByte(reg_addr, 0x2E);
-                _ols.WriteIoPortByte(reg_data, 0x12);
-                _ols.WriteIoPortByte(reg_addr, 0x2F);
-                data = _ols.ReadIoPortByte(reg_data);
-            }
-        }
-        catch
-        {
-            _ols = null;
-            return 0;
-        }
-
-        return data;
-    }
-
-    public static void OlsInit()
-    {
-        // Check support library sutatus
-        switch (_ols.GetStatus())
-        {
-            case (uint)FanOls.Status.NO_ERROR:
-                break;
-            case (uint)FanOls.Status.DLL_NOT_FOUND:
-                _ols = null;
-                // MessageBox.Show("WingRing0 Status Error!! DLL_NOT_FOUND");
-                break;
-            case (uint)FanOls.Status.DLL_INCORRECT_VERSION:
-                _ols = null;
-                //  MessageBox.Show("WingRing0 Status Error!! DLL_INCORRECT_VERSION");
-                break;
-            case (uint)FanOls.Status.DLL_INITIALIZE_ERROR:
-                _ols = null;
-                //  MessageBox.Show("WingRing0 Status Error!! DLL_INITIALIZE_ERROR");
-                break;
-        }
-        if (_ols == null)
-        {
-            //RaiseOlsInitFailedEvent();
-            return;
-        }
-
-        // Check WinRing0 status
-        switch (_ols.GetDllStatus())
-        {
-            case (uint)FanOls.OlsDllStatus.OLS_DLL_NO_ERROR:
-                break;
-            case (uint)FanOls.OlsDllStatus.OLS_DLL_DRIVER_NOT_LOADED:
-                _ols = null;
-                break;
-            case (uint)FanOls.OlsDllStatus.OLS_DLL_UNSUPPORTED_PLATFORM:
-                _ols = null;
-                break;
-            case (uint)FanOls.OlsDllStatus.OLS_DLL_DRIVER_NOT_FOUND:
-                _ols = null;
-                break;
-            case (uint)FanOls.OlsDllStatus.OLS_DLL_DRIVER_UNLOADED:
-                _ols = null;
-                break;
-            case (uint)FanOls.OlsDllStatus.OLS_DLL_DRIVER_NOT_LOADED_ON_NETWORK:
-                _ols = null;
-                break;
-            case (uint)FanOls.OlsDllStatus.OLS_DLL_UNKNOWN_ERROR:
-                _ols = null;
-                break;
-        }
-        if (_ols == null)
-        {
-            //RaiseOlsInitFailedEvent();
-        }
-    }
-
-    private static void OlsFree()
-    {
-        if (_ols != null)
-        {
-            _ols.DeinitializeOls();
-        }
     }
 }

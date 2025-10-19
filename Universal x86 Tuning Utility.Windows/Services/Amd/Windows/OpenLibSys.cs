@@ -96,7 +96,7 @@ public class Ols : IDisposable
     private static extern IntPtr GetProcAddress(IntPtr hModule, [MarshalAs(UnmanagedType.LPStr)] string lpProcName);
 
     private IntPtr module = IntPtr.Zero;
-    private uint status = (uint)Status.NO_ERROR;
+    private Status status = Status.NO_ERROR;
 
     public Ols()
     {
@@ -105,7 +105,7 @@ public class Ols : IDisposable
             
         if (module == IntPtr.Zero)
         {
-            status = (uint)Status.DLL_NOT_FOUND;
+            status = Status.DLL_NOT_FOUND;
         }
         else
         {
@@ -236,17 +236,17 @@ public class Ols : IDisposable
 #endif
                 ))
             {
-                status = (uint)Status.DLL_INCORRECT_VERSION;
+                status = Status.DLL_INCORRECT_VERSION;
             }
 
             if (InitializeOls() == 0)
             {
-                status = (uint)Status.DLL_INITIALIZE_ERROR;
+                status = Status.DLL_INITIALIZE_ERROR;
             }
         }
     }
 
-    public uint GetStatus()
+    public Status GetStatus()
     {
         return status;
     }
