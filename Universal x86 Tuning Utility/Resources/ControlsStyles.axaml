@@ -64,4 +64,74 @@
     <Style Selector="controls|CardControl">
         <Setter Property="Height" Value="70"/>
     </Style>
+    
+    <Style Selector="Border.Card">
+        <Setter Property="Background" Value="#0DFFFFFF"/>
+        <Setter Property="BorderBrush" Value="#19000000" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,16,14,16" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
+        <Setter Property="TextBlock.FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="TextBlock.FontWeight" Value="Normal" />
+        <Setter Property="Border.CornerRadius" Value="4,4,4,4" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
+    </Style>
+    
+    <Style Selector="UserControl.ValueInfoBadgeStyle">
+        <Setter Property="Background" Value="#9d9d9d"/>
+
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid x:Name="InfoBadgeRoot">
+                    <Border
+                        x:Name="ContentBorder"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        MinWidth="16"
+                        MinHeight="16"
+                        Margin="2"
+                        Padding="3,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{TemplateBinding Background}"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Opacity="{TemplateBinding Opacity}">
+                        <TextBlock
+                            x:Name="TextBlock"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Focusable="False"
+                            FontSize="{TemplateBinding FontSize}"
+                            Foreground="#E4000000"
+                            Text="{TemplateBinding Content}"
+                            TextWrapping="Wrap" />
+
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Border.ValueInfoBadgeStyle.Attention">
+        <Setter Property="Background" Value="#4cc2ff"/>
+    </Style>
+    
+    <Style Selector="Border.ValueInfoBadgeStyle.Success">
+        <Setter Property="Background" Value="#6CCB5F"/>
+    </Style>
+    
+    <Style Selector="Border.ValueInfoBadgeStyle.Caution">
+        <Setter Property="Background" Value="#FCE100"/>
+    </Style>
+    
+    <Style Selector="Border.ValueInfoBadgeStyle.Critical">
+        <Setter Property="Background" Value="#FF99A4"/>
+    </Style>
 </Styles>

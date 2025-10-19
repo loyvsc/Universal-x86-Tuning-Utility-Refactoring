@@ -6,91 +6,195 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
              xmlns:models="clr-namespace:ApplicationCore.Models;assembly=ApplicationCore"
-             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent"
+             xmlns:converters="clr-namespace:Universal_x86_Tuning_Utility.Resources.Converters"
              x:DataType="viewModels:PremadePresetsViewModel"
-             d:DataContext="{d:DesignInstance viewModels:PremadePresetsViewModel}"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
-    <Grid>
-        <DockPanel>
-            <TextBlock FontSize="{StaticResource HeaderFontSize}"
-                       FontWeight="Medium"
-                       Text="{Binding Header, UpdateSourceTrigger=PropertyChanged}"
-                       DockPanel.Dock="Top"
-                       Margin="18,10,0,0" />
-            <Border DockPanel.Dock="Bottom"
-                              Height="55"
-                              Margin="0,0,9,12"
-                              Padding="0"
-                              MaxWidth="662">
-                <UniformGrid Columns="4"
-                             VerticalAlignment="Center"
-                             HorizontalAlignment="Center"
-                             Height="60">
-                    <ListBox ItemsSource="{Binding AvailablePresets, UpdateSourceTrigger=PropertyChanged}"
-                             SelectedValue="{Binding CurrentPreset, UpdateSourceTrigger=PropertyChanged}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="models:PremadePreset">
-                                <ToggleButton Width="155"
-                                              Margin="4.5,0"
-                                              Command="{Binding $parent[UserControl].((viewModels:PremadePresetsViewModel)DataContext).ApplyPresetCommand}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fluent:FluentIcon Icon="LeafTwo"
-                                                           FontSize="24"
-                                                           Margin="0,0,9,0" />
-                                        <Label Height="23"
-                                               FontSize="16"
-                                               Content="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-                                    </StackPanel>
-                                </ToggleButton>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ListBox>
-                </UniformGrid>
+    <Grid RowDefinitions="Auto, *, Auto">
+        <TextBlock FontSize="{StaticResource HeaderFontSize}"
+                   FontWeight="Medium"
+                   Text="{Binding Header, UpdateSourceTrigger=PropertyChanged}"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="18,10,0,0" />
+        
+        <UniformGrid Grid.Row="1"
+                     Columns="2">
+            <Image Source="/Assets/config.png"
+                   MaxWidth="500"
+                   MaxHeight="500"
+                   Stretch="Uniform" />
+            <Border Margin="0,0,18,0"
+                    Classes="Card"
+                    MaxWidth="475"
+                    MaxHeight="475">
+                <DockPanel LastChildFill="False"
+                           MinHeight="260">
+                    <StackPanel DockPanel.Dock="Top"
+                                Margin="0,-6,0,0"
+                                Spacing="9">
+                        <TextBlock FontWeight="DemiBold"
+                                   FontSize="20"
+                                   Text="{Binding CurrentPreset.Name, UpdateSourceTrigger=PropertyChanged}" />
+                        <UserControl Classes="ValueInfoBadgeStyle"
+                                     Content="Device Certified Preset"
+                                     HorizontalAlignment="Left"
+                                     IsVisible="{Binding IsCertifiedBadgeVisible, UpdateSourceTrigger=PropertyChanged}"/>
+                        
+                        <TextBlock FontSize="14.5"
+                                   TextWrapping="Wrap"
+                                   Text="{Binding CurrentPreset.Description}" />
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Bottom">
+                        <TextBlock FontWeight="DemiBold"
+                                   FontSize="16"
+                                   Margin="0,0,0,9"
+                                   Text="UXTU Command Output:" />
+                        <TextBox Text="{Binding CurrentPreset.RyzenAdjParameters, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock FontSize="14"
+                                   Margin="0,4,0,-4"
+                                   Foreground="Gray"
+                                   TextWrapping="Wrap"
+                                   Text="Note: Some output commands may not be compatible with RyzenAdj" />
+                    </StackPanel>
+                </DockPanel>
             </Border>
-            <UniformGrid Columns="2">
-                <Image Source="/Assets/config.png"
-                       MaxWidth="500"
-                       MaxHeight="500"
-                       Stretch="Uniform" />
-                <Border Margin="0,0,18,0"
-                        MaxWidth="475"
-                        MaxHeight="475">
-                    <DockPanel LastChildFill="False"
-                               MinHeight="260">
-                        <StackPanel DockPanel.Dock="Top">
-                            <TextBlock FontWeight="DemiBold"
-                                       FontSize="20"
-                                       Margin="0,-6,0,0"
-                                       Text="{Binding CurrentPreset.Name, UpdateSourceTrigger=PropertyChanged}" />
-                            <controls:InfoBadge Margin="0,9,0,0"
-                                                Width="150"
-                                                HorizontalAlignment="Left"
-                                                IsVisible="{Binding IsCertifiedBadgeVisible, UpdateSourceTrigger=PropertyChanged}"/>
-                            <!-- todo: infobadge not displays text ! Value="Device Certified Preset"-->
-                            <TextBlock FontSize="14.5"
-                                       Margin="0,9,0,0"
-                                       TextWrapping="Wrap"
-                                       Text="{Binding }" />
-                        </StackPanel>
-                        <StackPanel DockPanel.Dock="Bottom">
-                            <TextBlock FontWeight="DemiBold"
+        </UniformGrid>
+        
+        <Border Grid.Row="2"
+                Height="55"
+                Classes="Card"
+                Margin="0,0,9,12"
+                Padding="0,9"
+                MaxWidth="662">
+            <ListBox ItemsSource="{Binding AvailablePresets, UpdateSourceTrigger=PropertyChanged}"
+                     SelectedValue="{Binding CurrentPreset, UpdateSourceTrigger=PropertyChanged}"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="9"
+                                    Margin="4.5,0"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemContainerTheme>
+                    <ControlTheme TargetType="ListBoxItem">
+                        <Setter Property="Template">
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border Name="PART_Container" 
+                                        Width="155">
+                                    <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                      Content="{TemplateBinding Content}"
+                                                      HorizontalContentAlignment="Center"
+                                                      VerticalContentAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter>
+                    </ControlTheme>
+                </ListBox.ItemContainerTheme>
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Style Selector="^ /template/ Border#PART_Container">
+                            <Setter Property="Background" Value="{DynamicResource ToggleButtonBackground}" />
+                            <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForeground}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrush}" />
+                            <Setter Property="BorderThickness" Value="{DynamicResource ToggleButtonBorderThemeThickness}" />
+                            <Setter Property="Padding" Value="{DynamicResource ButtonPadding}" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+                        </Style>
+                                            
+                        <Style Selector="^:pointerover /template/ Border#PART_Container">
+                            <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundPointerOver}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushPointerOver}" />
+                            <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundPointerOver}" />
+                        </Style>
+
+                        <Style Selector="^:pressed /template/ Border#PART_Container">
+                            <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundPressed}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushPressed}" />
+                            <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundPressed}" />
+                        </Style>
+
+                        <Style Selector="^:disabled /template/ Border#PART_Container">
+                            <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundDisabled}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushDisabled}" />
+                            <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundDisabled}" />
+                        </Style>
+
+                        <Style Selector="^:selected">
+                            <Style Selector="^ /template/ Border#PART_Container">
+                                <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundChecked}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushChecked}" />
+                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundChecked}" />
+                            </Style>
+
+                            <Style Selector="^:pointerover /template/ Border#PART_Container">
+                                <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundCheckedPointerOver}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPointerOver}" />
+                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPointerOver}" />
+                            </Style>
+
+                            <Style Selector="^:pressed /template/ Border#PART_Container">
+                                <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundCheckedPressed}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPressed}" />
+                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPressed}" />
+                            </Style>
+
+                            <Style Selector="^:disabled /template/ Border#PART_Container">
+                                <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundCheckedDisabled}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedDisabled}" />
+                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedDisabled}" />
+                            </Style>
+                        </Style>
+
+                        <Style Selector="^:indeterminate">
+                            <Style Selector="^ /template/ Border#PART_Container">
+                                <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundIndeterminate}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminate}" />
+                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundIndeterminate}" />
+                            </Style>
+
+                            <Style Selector="^:pointerover /template/ Border#PART_Container">
+                                <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundIndeterminatePointerOver}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminatePointerOver}" />
+                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundIndeterminatePointerOver}" />
+                            </Style>
+
+                            <Style Selector="^:pressed /template/ Border#PART_Container">
+                                <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundIndeterminatePressed}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminatePressed}" />
+                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundIndeterminatePressed}" />
+                            </Style>
+
+                            <Style Selector="^:disabled /template/ Border#PART_Container">
+                                <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundIndeterminateDisabled}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminateDisabled}" />
+                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundIndeterminateDisabled}" />
+                            </Style>
+                        </Style> 
+                    </Style>
+                </ListBox.Styles>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="models:PremadePreset">
+                        <Grid ColumnDefinitions="Auto, Auto"
+                              HorizontalAlignment="Center">
+                            <fluent:FluentIcon Grid.Column="0"
+                                               Icon="{Binding Converter={x:Static converters:FluentIconsConverters.PremadePresetToFluentIcon}}"
+                                               FontSize="24" />
+                            <TextBlock Grid.Column="1"
                                        FontSize="16"
-                                       Margin="0,0,0,9"
-                                       Text="UXTU Command Output:" />
-                            <TextBox
-                                Text="{Binding CurrentPreset.RyzenAdjParameters, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock FontSize="14"
-                                       Margin="0,4,0,-4"
-                                       Foreground="Gray"
-                                       TextWrapping="Wrap"
-                                       Text="Note: Some output commands may not be compatible with RyzenAdj" />
-                        </StackPanel>
-                    </DockPanel>
-                </Border>
-            </UniformGrid>
-        </DockPanel>
+                                       Padding="0"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
     </Grid>
 </UserControl>

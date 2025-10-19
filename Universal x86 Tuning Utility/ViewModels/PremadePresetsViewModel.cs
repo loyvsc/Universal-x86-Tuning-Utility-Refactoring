@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -22,6 +23,8 @@ public class PremadePresetsViewModel : ReactiveObject
     private readonly IPremadePresets _premadePresets;
     private readonly IRyzenAdjService _ryzenAdjService;
     private readonly INotificationManager _notificationManager;
+    private readonly IBatteryInfoService _batteryInfoService;
+    private readonly ISensorsService _sensorsService;
     public ICommand ApplyPresetCommand { get; }
 
     public string Header
@@ -39,7 +42,15 @@ public class PremadePresetsViewModel : ReactiveObject
     public PremadePreset? CurrentPreset
     {
         get => _currentPreset;
-        set => this.RaiseAndSetIfChanged(ref _currentPreset, value);
+        set
+        {
+            if (_currentPreset != value && value != null)
+            {
+                _currentPreset = value;
+                this.RaisePropertyChanged();
+                ApplyPreset(_currentPreset);
+            }
+        }
     }
 
     public EnhancedObservableCollection<PremadePreset> AvailablePresets
@@ -57,28 +68,51 @@ public class PremadePresetsViewModel : ReactiveObject
                                    ISystemInfoService systemInfoService,
                                    IPremadePresets premadePresets,
                                    IRyzenAdjService ryzenAdjService,
-                                   INotificationManager notificationManager)
+                                   INotificationManager notificationManager,
+                                   IBatteryInfoService batteryInfoService,
+                                   ISensorsService sensorsService)
     {
         _logger = logger;
         _systemInfoService = systemInfoService;
         _premadePresets = premadePresets;
         _ryzenAdjService = ryzenAdjService;
         _notificationManager = notificationManager;
-        
+        _batteryInfoService = batteryInfoService;
+        _sensorsService = sensorsService;
+
         AvailablePresets = new EnhancedObservableCollection<PremadePreset>(_premadePresets.PremadePresetsList);
-        ApplyPresetCommand = ReactiveCommand.CreateFromTask(ApplyPreset);
+        ApplyPresetCommand = ReactiveCommand.CreateFromTask((PremadePreset? x) => ApplyPreset(x));
 
         Header = "Premade Presets";
+
+        if (_batteryInfoService.Batteries.Count != 0)
+        {
+            if (_batteryInfoService.Batteries.All(x => x.Status.Value is BatteryStatus.FullCharged or BatteryStatus.Charging))
+            {
+                Task.Run(() => CurrentPreset = AvailablePresets[2]);
+            }
+            else
+            {
+                Task.Run(() => CurrentPreset = AvailablePresets[1]);
+            }
+        }
+        else
+        {
+            if (_sensorsService.GetCPUInfo(SensorType.Temperature, "Package") <= 70)
+            {
+                Task.Run(() => CurrentPreset = AvailablePresets[3]);
+            }
+        }
     }
 
-    private async Task ApplyPreset()
+    private async Task ApplyPreset(PremadePreset? premadePreset)
     {
-        if (CurrentPreset == null) return;
+        if (premadePreset == null) return;
         try
         {
             ReloadValue();
 
-            await _ryzenAdjService.Translate(CurrentPreset.RyzenAdjParameters);
+            await _ryzenAdjService.Translate(premadePreset.RyzenAdjParameters);
 
             await _notificationManager.ShowTextNotification(title: $"{CurrentPreset.Name} Preset Applied!",
                 text: $"The {CurrentPreset.Name.ToLower()} premade power preset has been applied!");
@@ -123,8 +157,6 @@ public class PremadePresetsViewModel : ReactiveObject
                 {
                     IsCertifiedBadgeVisible = false;
                 }
-                
-                _premadePresets.InitializePremadePresets();
     
                 int selectedPreset = Settings.Default.premadePreset;
             }
