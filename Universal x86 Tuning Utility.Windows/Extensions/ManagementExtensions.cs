@@ -5,7 +5,7 @@ namespace Universal_x86_Tuning_Utility.Windows.Extensions;
 
 public static class ManagementExtensions
 {
-    public static T? Get<T>(this ManagementBaseObject managementObject, string propertyName)
+    public static T? Get<T>(this ManagementBaseObject managementObject, string propertyName, Func<PropertyData, T?>? converter = null)
     {
         if (string.IsNullOrWhiteSpace(propertyName))
         {
@@ -16,6 +16,15 @@ public static class ManagementExtensions
         {
             var property =  managementObject.Properties[propertyName];
             if (property.Value == null) return default;
+            if (converter != null)
+            {
+                return converter(property);
+            }
+
+            if (property.IsArray && typeof(T).IsArray)
+            {
+                return (T) property.Value;
+            }
             return (T) Convert.ChangeType(property.Value, typeof(T));
         }
         catch

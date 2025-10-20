@@ -163,9 +163,9 @@ public class SystemInfoViewModel : ReactiveObject, IDisposable
 
         CpuInfo = _systemInfoService.Cpu;
 
-        DeviceName = _systemInfoService.SystemName.Value;
-        DeviceManufacturer = _systemInfoService.Manufacturer.Value;
-        DeviceModel = _systemInfoService.Product.Value;
+        DeviceName = _systemInfoService.SystemName;
+        DeviceManufacturer = _systemInfoService.Manufacturer;
+        DeviceModel = _systemInfoService.Product;
 
         CpuCoresInfo = CpuInfo.BigLITTLEInfo ?? CpuInfo.CoresCount.ToString();
             

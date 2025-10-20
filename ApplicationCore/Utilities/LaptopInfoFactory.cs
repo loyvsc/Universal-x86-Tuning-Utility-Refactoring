@@ -1,15 +1,28 @@
 ﻿using ApplicationCore.Enums;
 using ApplicationCore.Enums.Laptop;
+using ApplicationCore.Extensions;
+using ApplicationCore.Interfaces;
 using ApplicationCore.Models.LaptopInfo;
 
 namespace ApplicationCore.Utilities;
 
-public static class LaptopInfoFactory
+public class LaptopInfoFactory : ILaptopInfoFactory
 {
-    public static LaptopInfoBase? Create(string manufacturer, string product)
+    private readonly IDeviceManagerService _deviceManagerService;
+    private readonly ISystemInfoService _systemInfoService;
+
+    public LaptopInfoFactory(ISystemInfoService systemInfoService, IDeviceManagerService deviceManagerService)
     {
-        if (product.Contains("laptop"))
+        _deviceManagerService = deviceManagerService;
+        _systemInfoService = systemInfoService;
+    }
+    
+    public LaptopInfoBase? Create()
+    {
+        var manufacturer = _systemInfoService.Manufacturer.Trim().ToLower();
+        if (_systemInfoService.ChassisType.IsLaptop())
         {
+            var product = _systemInfoService.Product.Trim().ToLower();
             if (manufacturer.Contains("asus"))
             {
                 if (product.Contains("rog"))
@@ -17,7 +30,7 @@ public static class LaptopInfoFactory
                     var rogSeries = AsusRogSeries.Basic;
                     if (product.Contains("ally"))
                     {
-                        rogSeries = AsusRogSeries.Ally;
+                        return new PortableConsoleInfo(PortableConsoleManufacturer.Asus);
                     }
                     else if (product.Contains("flow"))
                     {
@@ -52,13 +65,29 @@ public static class LaptopInfoFactory
         
         if (portableConsoleManufacturer != PortableConsoleManufacturer.Unknown)
         {
-            return new PortableConsoleInfo(portableConsoleManufacturer);
+            switch (portableConsoleManufacturer)
+            {
+                case PortableConsoleManufacturer.Valve:
+                {
+                    if (_deviceManagerService.Contains(x =>
+                            x.DeviceID.Contains("VID_28DE") || x.DeviceID.Contains("Valve")))
+                    {
+                        return new PortableConsoleInfo(portableConsoleManufacturer);
+                    }
+                    break;
+                }
+                case PortableConsoleManufacturer.Gpd:
+                {
+                    break;
+                }
+                default: return new PortableConsoleInfo(portableConsoleManufacturer);
+            }
         }
 
         return null;
     }
     
-    private static PortableConsoleManufacturer GetPortableConsoleManufacturer(string manufacturer)
+    private PortableConsoleManufacturer GetPortableConsoleManufacturer(string manufacturer)
     {
         var manufacturerValues = manufacturer.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         foreach (var value in manufacturerValues)

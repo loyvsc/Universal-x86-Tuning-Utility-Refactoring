@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Utilities;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -57,6 +58,7 @@ public class App : Application
         SplatRegistrations.RegisterLazySingleton<IAmdApuControlService, AmdApuControlService>();
         SplatRegistrations.RegisterLazySingleton<IImageService, ImageService>();
         SplatRegistrations.RegisterLazySingleton<ICpuControlService, CpuControlService>();
+        SplatRegistrations.RegisterLazySingleton<ILaptopInfoFactory, LaptopInfoFactory>();
        
         Locator.CurrentMutable.RegisterLazySingleton<IAdaptivePresetService>(() => new AdaptivePresetService("AdaptivePresets"));
         Locator.CurrentMutable.RegisterLazySingleton<IGameDataService>(() => new GameDataService(Settings.Default.Path + "gameData.json"));

@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using System;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Utilities;
 using Avalonia.ReactiveUI;
 using DesktopNotifications.Avalonia;
 using Splat;
@@ -61,6 +62,7 @@ class Program
                 SplatRegistrations.RegisterLazySingleton<IXgMobileConnectionService, XgMobileConnectionService>();
                 SplatRegistrations.RegisterLazySingleton<IManagementEventService, ManagementEventService>();
                 SplatRegistrations.RegisterLazySingleton<IWinRingEcManagementService, WinRingEcManagementService>();
+                SplatRegistrations.RegisterLazySingleton<IDeviceManagerService, WindowsDeviceManagerService>();
         
                 SplatRegistrations.SetupIOC();
             })

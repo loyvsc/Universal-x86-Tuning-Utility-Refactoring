@@ -1,3 +1,4 @@
+using ApplicationCore.Enums;
 using ApplicationCore.Models;
 using ApplicationCore.Models.LaptopInfo;
 
@@ -12,7 +13,9 @@ public interface ISystemInfoService
     public LaptopInfoBase? LaptopInfo { get; }
     public IReadOnlyCollection<BasicGpuInfo> Gpus { get; }
     
-    public Lazy<string> Manufacturer { get; }
-    public Lazy<string> Product { get; }
-    public Lazy<string> SystemName { get; }
+    public string Manufacturer { get; }
+    public string Product { get; }
+    public string SystemName { get; }
+    
+    public ChassisType ChassisType { get; }
 }

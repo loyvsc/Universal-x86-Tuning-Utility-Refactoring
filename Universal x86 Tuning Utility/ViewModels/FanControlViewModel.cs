@@ -81,7 +81,7 @@ public class FanControlViewModel : ReactiveObject
         CopyCommand = ReactiveCommand.CreateFromTask(Copy);
 
         FanSpeed = 50;
-        ConfigName = $"{_systemInfoService.Manufacturer.Value.ToUpper()}_{_systemInfoService.Product.Value.ToUpper()}.json";
+        ConfigName = $"{_systemInfoService.Manufacturer.ToUpper()}_{_systemInfoService.Product.ToUpper()}.json";
         
         _timer = new DispatcherTimer
         {
