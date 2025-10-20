@@ -2,10 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
                     xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent">
-    <Design.PreviewWith>
-        
-    </Design.PreviewWith>
-    
+   
     <ControlTheme x:Key="{x:Type controls:FluentIconButton}" TargetType="controls:FluentIconButton"
                   BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="FontSize" Value="13"/>
@@ -152,6 +149,53 @@
             <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushDisabled}" />
             <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundDisabled}" />
         </Style>
+    </ControlTheme>
+    
+    <ControlTheme x:Key="EditImageButton"
+                  TargetType="Button"
+                  BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Style Selector="^:pointerover">
+            <Style Selector="^ /template/ Border#PART_Background">
+                <Setter Property="Opacity" Value="0"/>
+        
+                <Style Selector="^:pointerover">
+                    <Setter Property="Opacity" Value="0.75"/>
+                </Style>
+        
+                <Setter Property="Transitions">
+                    <Transitions>
+                        <DoubleTransition Property="Opacity"
+                                          Easing="LinearEasing"
+                                          Duration="0:0:0.2"/>
+                    </Transitions>
+                </Setter>
+            </Style>
+        </Style>
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border CornerRadius="{TemplateBinding CornerRadius}">
+                    <Border.Styles>
+                        <Style Selector="Border#PART_Background">
+                            <Setter Property="Opacity" Value="0"/>
+                        </Style>
+                    </Border.Styles>
+                    <Grid>
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          Margin="{TemplateBinding Padding}"
+                                          CornerRadius="{TemplateBinding CornerRadius}"/>
+                        <Border Name="PART_Background" 
+                                Background="Black"
+                                CornerRadius="{TemplateBinding CornerRadius}">
+                            <Image Name="PART_EditImage"
+                                   Source="/Assets/edit.png"
+                                   Margin="10"/>
+                        </Border>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
     </ControlTheme>
     
 </ResourceDictionary>

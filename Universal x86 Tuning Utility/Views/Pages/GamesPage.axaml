@@ -14,122 +14,130 @@
              d:DesignHeight="450"
              d:DesignWidth="800">
 
-    <Grid>
-        <DockPanel Margin="0,0,0,0"
-                   LastChildFill="True">
-            <TextBlock FontSize="{StaticResource HeaderFontSize}"
+    <Grid RowDefinitions="Auto, *, Auto">
+        <TextBlock FontSize="{StaticResource HeaderFontSize}"
                        FontWeight="Medium"
-                       DockPanel.Dock="Top"
                        Margin="18,10,0,0"
                        Text="Game Library" />
 
-            <StackPanel DockPanel.Dock="Bottom"
-                        HorizontalAlignment="Right"
-                        Margin="0,9,9,6"
-                        IsEnabled="{Binding IsActionsAvailable, UpdateSourceTrigger=PropertyChanged}">
-                <Button HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Margin="0,0,9,9"
-                        Height="40"
-                        DockPanel.Dock="Bottom"
-                        Width="50"
-                        ToolTip.Tip="Reload list of games"
-                        Command="{Binding ReloadGamesListCommand}">
-                    <controls:SymbolIcon Symbol="Sync"
-                                         FontSize="24" />
-                </Button>
-                <Button HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Margin="0,0,9,9"
-                        Height="40"
-                        Width="50"
-                        DockPanel.Dock="Bottom"
-                        ToolTip.Tip="Add a game manually"
-                        Command="{Binding AddGameCommand}">
-                    <controls:SymbolIcon Symbol="Add"
-                                         FontSize="24" />
-                </Button>
-            </StackPanel>
-
-            <ItemsControl ItemsSource="{Binding Games, UpdateSourceTrigger=PropertyChanged}"
-                          DockPanel.Dock="Left"
-                          Margin="0,8,0,0"
-                          HorizontalAlignment="Stretch"
-                          BorderBrush="Transparent"
-                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          ScrollViewer.IsDeferredScrollingEnabled="False">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models:GameLauncherItem}">
-                        <controls1:CardControl x:Name="ccMain"
-                                          HorizontalAlignment="Stretch"
-                                          HorizontalContentAlignment="Stretch"
-                                          Margin="15,8,8,0"
-                                          Height="100"
-                                          Padding="16,14,16,14">
-                            <DockPanel HorizontalAlignment="Stretch"
-                                       LastChildFill="False"
-                                       Margin="0,4,0,0">
-                                <Border DockPanel.Dock="Left"
-                                        VerticalAlignment="Center"
-                                        Width="64"
-                                        Height="64"
-                                        Margin="0,0,0,0"
-                                        BorderBrush="Transparent"
-                                        CornerRadius="8">
-                                    <Border.Background>
-                                        <ImageBrush Source="{Binding IconPath, UpdateSourceTrigger=PropertyChanged, Converter={x:Static converters:BitmapConverters.StringToBitmapConverter}}"
-                                                    Stretch="UniformToFill"/>
-                                    </Border.Background>
-                                </Border>
-                                <StackPanel DockPanel.Dock="Left"
-                                            Margin="18,0,0,0"
-                                            VerticalAlignment="Center">
-                                    <TextBlock VerticalAlignment="Center"
-                                               Text="{Binding GameName}"
-                                               FontSize="18" />
-                                    <TextBlock VerticalAlignment="Center"
-                                               Text="{Binding Converter={x:Static converters:GameTypeConverters.GameTypeToStringConverter}}"
-                                               FontSize="14" />
-                                </StackPanel>
-                                <Button Width="48"
-                                        Height="40"
-                                        DockPanel.Dock="Right"
-                                        HorizontalAlignment="Right"
-                                        Command="{Binding $parent[ItemsControl].((viewModels:GamesViewModel)DataContext).RunGameCommand}"
-                                        CommandParameter="{Binding}">
-                                    <controls:SymbolIcon Symbol="Play"
-                                                         FontSize="24"
-                                                         Margin="0,1,0,0" />
-                                </Button>
-                                <StackPanel DockPanel.Dock="Right"
-                                            Margin="0,0,18,0"
-                                            VerticalAlignment="Center">
-                                    <TextBlock HorizontalAlignment="Center"
-                                               Text="Average Frametime"
-                                               FontSize="14" />
-                                    <TextBlock HorizontalAlignment="Center"
-                                               Text="{Binding MillisecondData}"
-                                               FontSize="18" />
-                                </StackPanel>
-                                <StackPanel DockPanel.Dock="Right"
-                                            Margin="0,0,18,0"
-                                            VerticalAlignment="Center">
-                                    <TextBlock HorizontalAlignment="Center"
-                                               Text="Average FPS"
-                                               FontSize="14" />
-                                    <TextBlock HorizontalAlignment="Center"
-                                               Text="{Binding FpsData}"
-                                               FontSize="18" />
-                                </StackPanel>
-                            </DockPanel>
-                        </controls1:CardControl>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </DockPanel>
+        <ScrollViewer Grid.Row="1"
+                      Grid.RowSpan="2"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Margin="0,8,0,0"
+                      Padding="15,0"
+                      IsEnabled="{Binding IsActionsAvailable, UpdateSourceTrigger=PropertyChanged}">
+                <ItemsControl ItemsSource="{Binding Games, UpdateSourceTrigger=PropertyChanged}"
+                              BorderBrush="Transparent">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical"
+                                        Spacing="8"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:GameLauncherItem}">
+                            <controls1:CardControl x:Name="ccMain"
+                                              HorizontalAlignment="Stretch"
+                                              HorizontalContentAlignment="Stretch"
+                                              Height="100"
+                                              Padding="16,14">
+                                <DockPanel HorizontalAlignment="Stretch"
+                                           LastChildFill="False"
+                                           Margin="0,4,0,0">
+                                    <Button DockPanel.Dock="Left"
+                                            CornerRadius="8"
+                                            Padding="0"
+                                            Width="64"
+                                            Height="64"
+                                            BorderBrush="Transparent"
+                                            Command="{Binding $parent[ItemsControl].((viewModels:GamesViewModel)DataContext).ChangeGameIconCommand}"
+                                            CommandParameter="{Binding}"
+                                            Theme="{StaticResource EditImageButton}">
+                                        <Border CornerRadius="8"
+                                                BorderThickness="0">
+                                            <Border.Background>
+                                                <ImageBrush Source="{Binding IconPath, UpdateSourceTrigger=PropertyChanged, Converter={x:Static converters:BitmapConverters.StringToBitmapConverter}}"
+                                                            Stretch="UniformToFill"/>
+                                            </Border.Background>
+                                        </Border>
+                                    </Button>
+                                    <StackPanel DockPanel.Dock="Left"
+                                                Margin="18,0,0,0"
+                                                VerticalAlignment="Center">
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Text="{Binding GameName}"
+                                                   FontSize="18" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Text="{Binding Converter={x:Static converters:GameTypeConverters.GameTypeToStringConverter}}"
+                                                   FontSize="14" />
+                                    </StackPanel>
+                                    <Button Width="48"
+                                            Height="40"
+                                            DockPanel.Dock="Right"
+                                            HorizontalAlignment="Right"
+                                            Command="{Binding $parent[ItemsControl].((viewModels:GamesViewModel)DataContext).RunGameCommand}"
+                                            CommandParameter="{Binding}">
+                                        <controls:SymbolIcon Symbol="Play"
+                                                             FontSize="24"
+                                                             Margin="0,1,0,0" />
+                                    </Button>
+                                    <StackPanel DockPanel.Dock="Right"
+                                                Margin="0,0,18,0"
+                                                VerticalAlignment="Center">
+                                        <TextBlock HorizontalAlignment="Center"
+                                                   Text="Average Frametime"
+                                                   FontSize="14" />
+                                        <TextBlock HorizontalAlignment="Center"
+                                                   Text="{Binding AverageMillisecond}"
+                                                   FontSize="18" />
+                                    </StackPanel>
+                                    <StackPanel DockPanel.Dock="Right"
+                                                Margin="0,0,18,0"
+                                                VerticalAlignment="Center">
+                                        <TextBlock HorizontalAlignment="Center"
+                                                   Text="Average FPS"
+                                                   FontSize="14" />
+                                        <TextBlock HorizontalAlignment="Center"
+                                                   Text="{Binding AverageFps}"
+                                                   FontSize="18" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </controls1:CardControl>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         
-        <controls1:CardControl HorizontalAlignment="Center"
+        <StackPanel Grid.Row="2"
+                    DockPanel.Dock="Bottom"
+                    HorizontalAlignment="Right"
+                    Margin="0,9,9,6"
+                    IsEnabled="{Binding IsActionsAvailable, UpdateSourceTrigger=PropertyChanged}">
+            <Button VerticalAlignment="Center"
+                    Margin="0,0,9,9"
+                    Height="40"
+                    DockPanel.Dock="Bottom"
+                    Width="50"
+                    ToolTip.Tip="Reload list of games"
+                    Command="{Binding ReloadGamesListCommand}">
+                <controls:SymbolIcon Symbol="Sync"
+                                     FontSize="24" />
+            </Button>
+            <Button VerticalAlignment="Center"
+                    Margin="0,0,9,9"
+                    Height="40"
+                    Width="50"
+                    DockPanel.Dock="Bottom"
+                    ToolTip.Tip="Add a game manually"
+                    Command="{Binding AddGameCommand}">
+                <controls:SymbolIcon Symbol="Add"
+                                     FontSize="24" />
+            </Button>
+        </StackPanel>
+        
+        <controls1:CardControl Grid.Row="0"
+                               Grid.RowSpan="3"
+                               HorizontalAlignment="Center"
                                Padding="80,40"
                                HorizontalContentAlignment="Center"
                                Height="NaN"

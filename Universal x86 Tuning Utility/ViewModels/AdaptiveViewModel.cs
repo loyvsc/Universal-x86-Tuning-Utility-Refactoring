@@ -242,7 +242,7 @@ public class AdaptiveViewModel : ReactiveObject
         
         _gameLauncherService.ReSearchGames();
         
-        var installedGames = _gameLauncherService.InstalledGames.Value;
+        var installedGames = _gameLauncherService.ReSearchGames();
         foreach (var game in installedGames)
         {
             var adaptivePreset = _adaptivePresetService.GetPreset(game.GameName);
@@ -298,7 +298,7 @@ public class AdaptiveViewModel : ReactiveObject
     
     private string? GetRunningGame()
     {
-        var installedGames = _gameLauncherService.InstalledGames.Value;
+        var installedGames = _gameLauncherService.ReSearchGames();
         foreach (GameLauncherItem item in installedGames)
         {
             int i = 0;

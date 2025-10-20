@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using ApplicationCore.Utilities;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -14,10 +14,8 @@ using Avalonia.Threading;
 using DesktopNotifications;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
-using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
-using Universal_x86_Tuning_Utility.Interfaces;
 using ILogger = Serilog.ILogger;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
@@ -25,10 +23,11 @@ namespace Universal_x86_Tuning_Utility.ViewModels;
 public class GamesViewModel : ReactiveObject, IDisposable
 {
     public ICommand ReloadGamesListCommand { get; }
+    public ICommand ChangeGameIconCommand { get; }
     public ICommand AddGameCommand { get; }
     public ICommand RunGameCommand { get; }
 
-    public ObservableCollection<GameLauncherItem> Games
+    public EnhancedObservableCollection<GameLauncherItem> Games
     {
         get => _games;
         set => this.RaiseAndSetIfChanged(ref _games, value);
@@ -55,8 +54,8 @@ public class GamesViewModel : ReactiveObject, IDisposable
     private readonly IImageService _imageService;
     private readonly IGameLauncherService _gameLauncherService;
     private readonly IIconExtractor _iconExtractor;
-    private ObservableCollection<GameLauncherItem> _games;
-    private IDisposable _updateFpsTimer;
+    private EnhancedObservableCollection<GameLauncherItem> _games = new();
+    private IDisposable? _updateFpsTimer;
     private bool _gamesListUpdating;
     private bool _isActionsAvailable;
 
@@ -78,7 +77,8 @@ public class GamesViewModel : ReactiveObject, IDisposable
 
         RunGameCommand = ReactiveCommand.CreateFromTask((GameLauncherItem gameToRun) => RunGame(gameToRun));
         AddGameCommand = ReactiveCommand.CreateFromTask(AddCustomGame);
-        ReloadGamesListCommand = ReactiveCommand.CreateFromTask(ReloadGamesList);
+        ReloadGamesListCommand = ReactiveCommand.CreateRunInBackground(ReloadGamesList);
+        ChangeGameIconCommand = ReactiveCommand.CreateFromTask((GameLauncherItem gameToRun) => ChangeGameIcon(gameToRun));
         
         ThreadPool.QueueUserWorkItem(async _ =>
         {
@@ -98,15 +98,9 @@ public class GamesViewModel : ReactiveObject, IDisposable
                 if (gameToUpdate != null)
                 {
                     var gameData = _gameDataService.GetPreset(name)!;
-                        
-                    if (gameData.FpsData != "No Data")
-                    {
-                        gameToUpdate.FpsData = $"{gameData.FpsData} FPS";
-                    }
-                    if (gameData.MsData != "No Data")
-                    {
-                        gameToUpdate.MillisecondData = $"{gameData.MsData} ms";
-                    }
+                    
+                    gameToUpdate.SetAverageFps(gameData.FpsData);
+                    gameToUpdate.SetAverageMs(gameData.MsData);
 
                     _gameDataService.SavePreset(name, gameData);
                 }
@@ -174,13 +168,39 @@ public class GamesViewModel : ReactiveObject, IDisposable
             
             var preset = new GameData
             {
-                GameName = game.GameName,
-                FpsData = "No Data"
+                GameName = game.GameName
             };
             _gameDataService.SavePreset(game.GameName, preset);
             
             Games.Add(game);
             _logger.Information("Custom game added (path: {0})", filePath);
+        }
+    }
+
+    private async Task ChangeGameIcon(GameLauncherItem? gameToChange)
+    {
+        if (gameToChange == null) return;
+        
+        var openFileDialogSettings = new OpenFileDialogSettings()
+        {
+            Title = "Select new icon",
+            Filters = new List<FileFilter>()
+            {
+                new("Portable Network Graphic", ".png"),
+                new("JPEG", ".jpg"),
+                new("ICO", ".ico")
+            }
+        };
+
+        var openFileDialogResult = await _dialogService.ShowOpenFileDialogAsync(openFileDialogSettings);
+
+        if (openFileDialogResult != null)
+        {
+            var newIconPath = openFileDialogResult.LocalPath;
+            
+            File.Copy(newIconPath, gameToChange.IconPath, true);
+            
+            gameToChange.RaiseIconChanged();
         }
     }
 
@@ -191,7 +211,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
         IsActionsAvailable = false;
         GamesListUpdating = true;
 
-        var installedGames = _gameLauncherService.InstalledGames.Value;
+        var installedGames = _gameLauncherService.ReSearchGames();
 
         var games = await Task.WhenAll(installedGames.Select(async game =>
         {
@@ -199,14 +219,12 @@ public class GamesViewModel : ReactiveObject, IDisposable
 
             if (gameData == null)
             {
-                gameData = new GameData
-                {
-                    FpsData = "No Data"
-                };
+                gameData = new GameData();
             }
             else
             {
-                gameData.FpsData = $"{gameData.FpsData} FPS";
+                game.SetAverageMs(gameData.MsData);
+                game.SetAverageFps(gameData.FpsData);
             }
 
             _gameDataService.SavePreset(game.GameName, gameData);
@@ -231,7 +249,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
         }));
 
         var filteredGamesList = games.ToList().OrderBy(item => item.GameName).Distinct().ToList();
-        Games = new ObservableCollection<GameLauncherItem>(filteredGamesList);
+        Games.Reset(filteredGamesList);
         GamesListUpdating = false;
         IsActionsAvailable = true;
         
@@ -247,6 +265,6 @@ public class GamesViewModel : ReactiveObject, IDisposable
 
     public void Dispose()
     {
-        _updateFpsTimer.Dispose();
+        _updateFpsTimer?.Dispose();
     }
 }

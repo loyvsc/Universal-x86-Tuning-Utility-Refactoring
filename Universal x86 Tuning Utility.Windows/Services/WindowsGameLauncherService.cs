@@ -22,8 +22,6 @@ namespace Universal_x86_Tuning_Utility.Windows.Services;
 
 public class WindowsGameLauncherService : IGameLauncherService
 {
-    public Lazy<IReadOnlyCollection<GameLauncherItem>> InstalledGames { get; }
-    
     private readonly Serilog.ILogger _logger;
     private readonly ICliService _cliService;
     private readonly IIconExtractor _iconExtractor;
@@ -36,8 +34,6 @@ public class WindowsGameLauncherService : IGameLauncherService
         _logger = logger;
         _cliService = cliService;
         _iconExtractor = iconExtractor;
-
-        InstalledGames = new Lazy<IReadOnlyCollection<GameLauncherItem>>(() => ReSearchGames());
     }
 
     public IReadOnlyCollection<GameLauncherItem> ReSearchGames()

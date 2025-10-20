@@ -15,6 +15,11 @@ public class ImageService : IImageService
         string filePath = $@"Assets\GameImages\{CleanFileName(gameName)}.jpeg";
         try
         {
+            if (File.Exists(filePath))
+            {
+                return filePath;
+            }
+            
             using var client = new SteamGridDb(SteamApiKey);
             SteamGridDbGame[]? games = await client.SearchForGamesAsync(gameName);
 

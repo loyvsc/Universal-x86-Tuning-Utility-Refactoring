@@ -416,24 +416,8 @@ public class MainWindowViewModel : ReactiveObject
 
     private void UpdateGamePerformanceData(ApplicationRenderInfo app, GameData gameData)
     {
-        var fpsArray = ParseAndUpdateData(app.InstantaneousFrames, gameData.FpsAverageData, out var averageFps);
-        var timeSpans = ParseAndUpdateData(app.InstantaneousFrameTime, gameData.MsAverageData, out var averageTimeSpan);
-
-        gameData.FpsData = averageFps.ToString();
-        gameData.FpsAverageData = fpsArray;
-        gameData.MsData = averageTimeSpan.TotalMilliseconds.ToString("0.##");
-        gameData.MsAverageData = timeSpans;
-    }
-
-    private string ParseAndUpdateData<T>(T newData, string existingData, out T average)
-    {
-        var dataList = existingData.Split(',').Select(s => (T)Convert.ChangeType(s, typeof(T))).ToList();
-        dataList.Add(newData);
-
-        if (dataList.Count > 100) dataList.RemoveAt(0);
-
-        average = (T)Convert.ChangeType(dataList.Average(x => Convert.ToDouble(x)), typeof(T));
-        return string.Join(",", dataList);
+        gameData.FpsData.Add(app.InstantaneousFrames);
+        gameData.MsData.Add(app.InstantaneousFrameTime.TotalMilliseconds);
     }
 
     private async Task AutoReapplySettings(object sender, EventArgs e)
