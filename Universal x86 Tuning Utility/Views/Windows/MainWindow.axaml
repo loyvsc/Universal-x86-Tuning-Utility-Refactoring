@@ -73,11 +73,12 @@
                            Grid.Row="1"
                            PaneDisplayMode="LeftCompact"
                            AlwaysShowHeader="False"
-                           IsSettingsVisible="False"
+                           IsSettingsVisible="True"
                            IsPaneToggleButtonVisible="False"
                            IsBackButtonVisible="False"
                            IsBackEnabled="False"
                            FontSize="40"
+                           SettingsItem="{Binding SettingsItem, UpdateSourceTrigger=PropertyChanged}"
                            MenuItemsSource="{Binding NavigationItems, UpdateSourceTrigger=PropertyChanged}"
                            SelectedItem="{Binding SelectedNavigationItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                            ItemInvoked="OnNavigationViewItemInvoked">

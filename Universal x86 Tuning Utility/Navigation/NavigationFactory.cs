@@ -27,6 +27,7 @@ public class NavigationFactory : INavigationPageFactory
             GamesViewModel => new GamesPage() { DataContext = target },
             AutomationsViewModel => new AutomationsPage() { DataContext = target },
             SystemInfoViewModel => new SystemInfoPage() { DataContext = target },
+            SettingsViewModel => new SettingsPage() { DataContext = target },
             _ => new UserControl()
             {
                 Background = Brushes.White, 

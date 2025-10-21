@@ -39,6 +39,8 @@ public class MainWindowViewModel : ReactiveObject
     private string _lastAppliedState = "";
 
     public ObservableCollection<NavigationViewModel> NavigationItems { get; set; }
+    
+    public NavigationViewModel SettingsItem { get; set; }
 
     public NavigationViewModel SelectedNavigationItem
     {
@@ -331,6 +333,14 @@ public class MainWindowViewModel : ReactiveObject
                 IconSymbol = Icon.Info,
                 ViewModelType = typeof(SystemInfoViewModel)
             }
+        };
+
+        SettingsItem = new NavigationViewModel()
+        {
+            Title = "Info",
+            // Tag = "info",
+            IconSymbol = Icon.Settings,
+            ViewModelType = typeof(SettingsViewModel)
         };
 
         // NavigationFooter = new ObservableCollection<INavigationControl>

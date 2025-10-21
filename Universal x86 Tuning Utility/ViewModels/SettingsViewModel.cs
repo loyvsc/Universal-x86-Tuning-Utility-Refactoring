@@ -2,7 +2,6 @@
 using System.Windows.Input;
 using ApplicationCore.Interfaces;
 using DesktopNotifications;
-using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Helpers;
@@ -22,7 +21,10 @@ public class SettingsViewModel : ReactiveObject
     public int ReapplySecond
     {
         get => _reapplySecond;
-        set => this.RaiseAndSetIfChanged(ref _reapplySecond, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _reapplySecond, value, () =>
+        {
+            Settings.Default.AutoReapplyTime = value;
+        });
     }
     
     public string ApplicationVersion
@@ -40,43 +42,64 @@ public class SettingsViewModel : ReactiveObject
     public bool IsStartMinimizedEnabled
     {
         get => _isStartMinimizedEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isStartMinimizedEnabled, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isStartMinimizedEnabled, value, () =>
+        {
+            Settings.Default.StartMini = value;
+        });
     }
 
     public bool IsMinimizeOnClose
     {
         get => _isMinimizeOnClose;
-        set => this.RaiseAndSetIfChanged(ref _isMinimizeOnClose, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isMinimizeOnClose, value, () =>
+        {
+            Settings.Default.MinimizeClose = value;
+        });
     }
 
     public bool IsReapplyOnStart
     {
         get => _isReapplyOnStart;
-        set => this.RaiseAndSetIfChanged(ref _isReapplyOnStart, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isReapplyOnStart, value, () =>
+        {
+            Settings.Default.ApplyOnStart = value;
+        });
     }
 
     public bool IsAutoReapply
     {
         get => _isIsAutoReapply;
-        set => this.RaiseAndSetIfChanged(ref _isIsAutoReapply, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isIsAutoReapply, value, () =>
+        {
+            Settings.Default.AutoReapply = value;
+        });
     }
 
     public bool IsAutoCheckUpdates
     {
         get => _isAutoCheckUpdates;
-        set => this.RaiseAndSetIfChanged(ref _isAutoCheckUpdates, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isAutoCheckUpdates, value, () =>
+        {
+            Settings.Default.UpdateCheck = value;
+        });
     }
 
     public bool IsAutoStartAdaptiveMode
     {
         get => _isAutoStartAdaptiveMode;
-        set => this.RaiseAndSetIfChanged(ref _isAutoStartAdaptiveMode, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isAutoStartAdaptiveMode, value, () =>
+        {
+            Settings.Default.isStartAdpative = value;
+        });
     }
 
     public bool IsAutoTrackGames
     {
         get => _isAutoTrackGames;
-        set => this.RaiseAndSetIfChanged(ref _isAutoTrackGames, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isAutoTrackGames, value, () =>
+        {
+            Settings.Default.isTrack = value;
+        });
     }
 
     public bool IsUpdateAvailable
@@ -99,7 +122,7 @@ public class SettingsViewModel : ReactiveObject
     private readonly IPlatformServiceAccessor _platformServiceAccessor;
     private readonly IStressTestService _stressTestService;
     private string _appVersion = string.Empty;
-    private string _updatesMessage;
+    private string _updatesMessage = string.Empty;
     private int _reapplySecond;
     private bool _isUpdateAvailable;
     private bool _isReapplyOnStart;
@@ -143,6 +166,12 @@ public class SettingsViewModel : ReactiveObject
         IsAutoTrackGames = Settings.Default.isTrack;
 
         ApplicationVersion = _platformServiceAccessor.ProductVersion;
+
+        if (_updateService.IsUpdateAvailable)
+        {
+            UpdatesMessage = "An update for Universal x86 Tuning Utility has been found!";
+            IsUpdateAvailable = true;
+        }
     }
 
     private async Task StartOnSystemBoot()
@@ -186,7 +215,7 @@ public class SettingsViewModel : ReactiveObject
     {
         if (UpdateHelper.IsInternetAvailable())
         {
-            var isUpdateAvailable = await _updateService.IsUpdatesAvailable(ApplicationVersion);
+            var isUpdateAvailable = await _updateService.CheckIsUpdatesAvailableAsync(ApplicationVersion);
 
             if (isUpdateAvailable)
             {

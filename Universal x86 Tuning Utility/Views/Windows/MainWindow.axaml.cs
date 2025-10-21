@@ -58,6 +58,12 @@ public partial class MainWindow : AppWindow, IDisposable
         // Change the current selected item back to normal
         // SetNVIIcon(sender as NavigationViewItem, false);
 
+        if (e.IsSettingsInvoked)
+        {
+            NavigationService.Instance?.Navigate(typeof(SettingsViewModel));
+            return;
+        }
+
         if (e.InvokedItemContainer is NavigationViewItem nvi)
         {
             NavigationService.Instance?.Navigate(nvi.Tag as Type);

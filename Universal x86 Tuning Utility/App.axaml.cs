@@ -166,7 +166,7 @@ public class App : Application
             {
                 var updateManager = Locator.Current.GetService<IUpdateService>()!;
                 var platformServiceAccessor = Locator.Current.GetService<IPlatformServiceAccessor>()!;
-                var isUpdateAvailable = await updateManager.IsUpdatesAvailable(platformServiceAccessor.ProductVersion);
+                var isUpdateAvailable = await updateManager.CheckIsUpdatesAvailableAsync(platformServiceAccessor.ProductVersion);
 
                 if (isUpdateAvailable)
                 {

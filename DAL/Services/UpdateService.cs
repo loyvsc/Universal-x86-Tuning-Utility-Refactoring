@@ -10,13 +10,15 @@ public class UpdateService : IUpdateService
     private readonly ILogger _logger;
     private const string Owner = "JamesCJ60";
     private const string RepositoryName = "Universal-x86-Tuning-Utility";
+    
+    public bool IsUpdateAvailable { get; private set; }
 
     public UpdateService(ILogger logger)
     {
         _logger = logger;
     }
 
-    public async Task<bool> IsUpdatesAvailable(string currentVersion)
+    public async Task<bool> CheckIsUpdatesAvailableAsync(string currentVersion)
     {
         try
         {
@@ -26,7 +28,9 @@ public class UpdateService : IUpdateService
             var latestRelease = releases[0];
             var latestVersion = new Version(latestRelease.TagName);
             
-            return latestVersion.CompareTo(Version.Parse(currentVersion)) > 0;
+            IsUpdateAvailable = latestVersion.CompareTo(Version.Parse(currentVersion)) > 0;
+
+            return IsUpdateAvailable;
         }
         catch (Exception ex)
         {
@@ -36,7 +40,7 @@ public class UpdateService : IUpdateService
         return false;
     }
     
-    public async Task DownloadNewestPackage(string downloadPath)
+    public async Task DownloadNewestPackageAsync(string downloadPath)
     {
         try
         {

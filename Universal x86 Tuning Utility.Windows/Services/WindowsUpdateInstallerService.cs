@@ -30,7 +30,7 @@ public class WindowsUpdateInstallerService : IUpdateInstallerService
                 File.Delete(packageFileName);
             }
 
-            await _updateService.DownloadNewestPackage(packageFileName);
+            await _updateService.DownloadNewestPackageAsync(packageFileName);
             
             using (var updaterProcess = new Process())
             {
