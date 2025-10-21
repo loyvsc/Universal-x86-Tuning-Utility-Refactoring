@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices;
 using ApplicationCore.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.Services.PresetServices;
@@ -11,11 +9,10 @@ public class PresetServiceFactory : IPresetServiceFactory
     
     public IPresetService GetPresetService(string presetsPath)
     {
-        var presetService =
-            CollectionsMarshal.GetValueRefOrAddDefault(_presetServices, presetsPath, out bool exists);
-        if (!exists)
+        if (!_presetServices.TryGetValue(presetsPath, out var presetService))
         {
-            presetService = new PresetService(presetsPath);
+            _presetServices.Add(presetsPath, new PresetService(presetsPath));
+            presetService = _presetServices[presetsPath];
         }
 
         return presetService;
