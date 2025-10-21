@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ApplicationCore.Enums;
@@ -105,6 +106,8 @@ public class MainWindowViewModel : ReactiveObject
         NavigationPageFactory = new NavigationFactory();
 
         NavigateCommand = ReactiveCommand.Create<string>(tag => OnNavigate(tag));
+
+        Task.Run(ApplyStartupSettings);
     }
 
     private async void OnPowerModeChange(PowerModeChangedEventArgs e)
