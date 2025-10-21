@@ -13,9 +13,14 @@ public class PremadePreset : Preset
         get => _ryzenAdjParameters;
         set => SetValue(ref _ryzenAdjParameters, value);
     }
-    
-    public string Description { get; set; }
+
+    public string Description
+    {
+        get => _description;
+        set => SetValue(ref _description, value);
+    }
 
     private string _name;
     private string _ryzenAdjParameters;
+    private string _description;
 }

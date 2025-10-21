@@ -45,7 +45,7 @@
                         
                         <TextBlock FontSize="14.5"
                                    TextWrapping="Wrap"
-                                   Text="{Binding CurrentPreset.Description}" />
+                                   Text="{Binding CurrentPreset.Description, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Bottom">
                         <TextBlock FontWeight="DemiBold"
