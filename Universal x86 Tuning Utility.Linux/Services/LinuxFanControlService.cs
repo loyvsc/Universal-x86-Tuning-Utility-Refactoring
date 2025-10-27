@@ -40,7 +40,7 @@ public class LinuxFanControlService : IFanControlService, IDisposable
 
     public void UpdateAddresses()
     {
-        string path = $"{FanConfigsFolderPath}/{_systemInfoService.Manufacturer.Value.ToUpper()}_{_systemInfoService.Product.Value.ToUpper()}.json";
+        string path = $"{FanConfigsFolderPath}/{_systemInfoService.Manufacturer.ToUpper()}_{_systemInfoService.Product.ToUpper()}.json";
 
         if (File.Exists(path))
         {

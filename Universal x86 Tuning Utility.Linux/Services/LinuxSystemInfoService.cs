@@ -9,7 +9,7 @@ using ApplicationCore.Models.LaptopInfo;
 using ApplicationCore.Utilities;
 using Hardware.Info;
 using Serilog;
-using Universal_x86_Tuning_Utility.Helpers;
+using Universal_x86_Tuning_Utility.Linux.Services.Readers;
 
 namespace Universal_x86_Tuning_Utility.Linux.Services;
 
@@ -20,14 +20,19 @@ public class LinuxSystemInfoService : ISystemInfoService
     private readonly List<BasicGpuInfo> _gpus = new List<BasicGpuInfo>();
     private readonly IHardwareInfo _hardwareInfo = new HardwareInfo();
     private readonly IIntelManagementService _intelManagementService;
+    private readonly ILaptopInfoFactory _laptopInfoFactory;
+    private readonly Lazy<string> _manufacturerLazy;
+    private readonly Lazy<string> _productLazy;
+    private readonly Lazy<string> _systemName;
 
-    public LinuxSystemInfoService(ILogger logger, IIntelManagementService intelManagementService)
+    public LinuxSystemInfoService(ILogger logger, IIntelManagementService intelManagementService, ILaptopInfoFactory laptopInfoFactory)
     {
         _logger = logger;
         _intelManagementService = intelManagementService;
+        _laptopInfoFactory = laptopInfoFactory;
 
         _hardwareInfo.RefreshMotherboardList();
-        Manufacturer = new Lazy<string>(() =>
+        _manufacturerLazy = new Lazy<string>(() =>
         {
             if (_hardwareInfo.MotherboardList.Count != 0)
             {
@@ -37,9 +42,8 @@ public class LinuxSystemInfoService : ISystemInfoService
             return string.Empty;
         });
 
-        Product = new Lazy<string>(() => ReadFromFile("/sys/class/dmi/id/product_name"));
-
-        SystemName = new Lazy<string>(() => ReadFromFile("/etc/hostname"));
+        _productLazy = new Lazy<string>(ReadFromFile("/sys/class/dmi/id/product_name"));
+        _systemName = new Lazy<string>(ReadFromFile("/etc/hostname"));
         
         Ram = new RamInfo();
         
@@ -135,7 +139,7 @@ public class LinuxSystemInfoService : ISystemInfoService
             _logger.Error(ex, "Error occurred when analyzing ram information");
         }
 
-        LaptopInfo = LaptopInfoFactory.Create(Manufacturer.Value.ToLower(), Product.Value.ToLower());
+        LaptopInfo = _laptopInfoFactory.Create();
     }
     
     private void AnalyzeRam()
@@ -486,55 +490,8 @@ public class LinuxSystemInfoService : ISystemInfoService
     public RamInfo Ram { get; private set; }
     public LaptopInfoBase? LaptopInfo { get; private set; }
     public IReadOnlyCollection<BasicGpuInfo> Gpus { get; private set; }
-    public Lazy<string> Manufacturer { get; }
-    public Lazy<string> Product { get; }
-    public Lazy<string> SystemName { get; }
-}
-
-public class LinuxMsrReader : IDisposable
-{
-    private FileStream? _stream;
-    private const string Path = "/dev/cpu/{0}/msr";
-    private readonly byte[] _buffer = new byte[8];
-
-    public bool TryOpen(int cpuId = 0)
-    {
-        try
-        {
-            if (_stream == null || !_stream.CanRead)
-            {
-                _stream = new FileStream(string.Format(Path, cpuId), FileMode.Open, FileAccess.Read);
-            }
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    public uint Read(ulong msrAddr)
-    {
-        if (_stream == null)
-            throw new Exception("Stream not opened");
-        
-        _stream.Seek((long)msrAddr, SeekOrigin.Begin);
-
-        try
-        {
-            int read = _stream.Read(_buffer, 0, 8);
-            if (read != 8)
-                throw new InvalidDataException();
-            return BitConverter.ToUInt32(_buffer, 0);
-        }
-        finally
-        {
-            Array.Clear(_buffer);
-        }
-    }
-    
-    public void Dispose()
-    {
-        _stream?.Dispose();
-    }
+    public string Manufacturer => _manufacturerLazy.Value;
+    public string Product => _productLazy.Value;
+    public string SystemName => _systemName.Value;
+    public ChassisType ChassisType { get; } //TODO IMPLEMENT
 }

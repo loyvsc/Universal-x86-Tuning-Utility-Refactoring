@@ -2,8 +2,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
-using OpenCvSharp;
-using Universal_x86_Tuning_Utility.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.Linux.Services;
 
