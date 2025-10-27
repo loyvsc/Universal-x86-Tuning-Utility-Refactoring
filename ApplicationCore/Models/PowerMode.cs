@@ -20,11 +20,6 @@ public class PowerMode : NotifyPropertyChangedBase
         set => SetValue(ref _name, value);
     }
 
-    public PowerMode()
-    {
-        
-    }
-
     public PowerMode(PowerPlan powerPlan, string name)
     {
         PowerPlan = powerPlan;

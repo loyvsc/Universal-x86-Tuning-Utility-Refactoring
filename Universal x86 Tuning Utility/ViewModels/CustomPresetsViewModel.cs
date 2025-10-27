@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -51,12 +52,6 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _availablePresets, value);
     }
 
-    public Preset CurrentPreset
-    {
-        get => _currentPreset;
-        set => this.RaiseAndSetIfChanged(ref _currentPreset, value);
-    }
-
     public bool UndoActionAvailable
     {
         get => _undoActionAvailable;
@@ -81,11 +76,22 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         set
         {
             this.RaiseAndSetIfChanged(ref _selectedDisplay, value);
+            if (_selectedDisplay != null)
+            {
+                SupportedRefreshRates = _selectedDisplay.SupportedRefreshRates;
+            }
+            
             if (SelectedPreset != null)
             {
                 SelectedPreset.DisplayIdentifier = value.Identifier;
             }
         }
+    }
+    
+    public ObservableCollection<int> SupportedRefreshRates
+    {
+        get => _supportedRefreshRates;
+        set => this.RaiseAndSetIfChanged(ref _supportedRefreshRates, value);
     }
 
     public bool IsIntelSettingsAvailable
@@ -217,7 +223,13 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
     public Preset? SelectedPreset
     {
         get => _selectedPreset;
-        set => this.RaiseAndSetIfChanged(ref _selectedPreset, value);
+        set
+        {
+            if (value != null)
+            {
+                this.RaiseAndSetIfChanged(ref _selectedPreset, value);
+            }
+        }
     }
 
     public List<PowerMode> PowerModes
@@ -251,7 +263,6 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
     private bool _isAsusGpuEcoModeSettingsAvailable;
     private List<AsusPowerProfile> _asusPowerProfiles;
     private AsusPowerProfile _selectedAsusPowerProfile;
-    private Preset _currentPreset;
     private List<Preset> _availablePresets;
     private bool _isUndoActionAvailable;
     private bool _isIntelSettingsAvailable;
@@ -272,6 +283,7 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
     private bool _isAmdApuVrmSettingAvailable;
     private List<AmdPowerProfile> _amdPowerProfiles;
     private List<PowerMode> _powerModes;
+    private ObservableCollection<int> _supportedRefreshRates;
 
     #endregion
 
@@ -318,7 +330,7 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
 
         ApplyPresetCommand = ReactiveCommand.CreateFromTask(ApplyPreset);
         ReloadPresetValuesCommand = ReactiveCommand.CreateFromTask(RestorePresetValues);
-        DeletePresetCommand = ReactiveCommand.CreateFromTask(DeleteCurrentPreset);
+        DeletePresetCommand = ReactiveCommand.CreateFromTask(DeleteSelectedPreset);
         UndoCommand = ReactiveCommand.CreateFromTask(Undo);
         SavePresetCommand = ReactiveCommand.CreateFromTask(SavePreset);
         IdentificateMonitorsCommand = ReactiveCommand.CreateFromTask(IdentificateMonitors);
@@ -401,6 +413,9 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
             IntelPl2 = 65,
             IntelBalCpu = 9,
             IntelBalGpu = 13,
+            
+            ResolutionScale = _uxtuSuperResolutionScales[0],
+            PowerMode = PowerModes[0]
         };
 
         IsRadeonGpuSettingsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) != 0;
@@ -541,6 +556,22 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
             IsAsusGpuUltimateSettingsAvailable = false;
             IsAsusGpuEcoModeSettingsAvailable = false;
         }
+        
+        var countOfNewPresets = AvailablePresets.Count(x => x.Name == "New preset");
+
+        if (countOfNewPresets > 1)
+        {
+            var sb = StringBuilderPool.Rent();
+            sb.Append("New preset (");
+            sb.Append(countOfNewPresets);
+            sb.Append(')');
+            SelectedPreset.Name = sb.ToString();
+            StringBuilderPool.Return(sb);
+        }
+        else
+        {
+            SelectedPreset.Name = "New preset";
+        }
     }
 
     private async Task AsusGpuUltimateModSwitched()
@@ -608,7 +639,7 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         }
     }
 
-    private async Task DeleteCurrentPreset()
+    private async Task DeleteSelectedPreset()
     {
         try
         {
