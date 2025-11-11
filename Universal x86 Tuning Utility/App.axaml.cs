@@ -22,6 +22,7 @@ using Universal_x86_Tuning_Utility.Services;
 using Universal_x86_Tuning_Utility.Services.GPUs;
 using Universal_x86_Tuning_Utility.Services.PresetServices;
 using Universal_x86_Tuning_Utility.ViewModels;
+using Universal_x86_Tuning_Utility.ViewModels.Dialogs;
 using Universal_x86_Tuning_Utility.Views.Windows;
 using Application = Avalonia.Application;
 using INotificationManager = DesktopNotifications.INotificationManager;
@@ -63,7 +64,7 @@ public class App : Application
         Locator.CurrentMutable.RegisterLazySingleton<IAdaptivePresetService>(() => new AdaptivePresetService("AdaptivePresets"));
         Locator.CurrentMutable.RegisterLazySingleton<IGameDataService>(() => new GameDataService(Settings.Default.Path + "gameData.json"));
         // Locator.CurrentMutable.RegisterLazySingleton<IDialogService>(() => new DialogService(new DialogManager(), type => Locator.Current.GetService(type)));
-        Locator.CurrentMutable.RegisterLazySingleton(() => (IDialogService)new DialogService(
+        Locator.CurrentMutable.RegisterLazySingleton<IDialogService>(() => new DialogService(
             new DialogManager(
                 viewLocator: new ViewLocator(),
                 dialogFactory: new DialogFactory().AddMessageBox()),
@@ -81,6 +82,9 @@ public class App : Application
         SplatRegistrations.RegisterLazySingleton<PremadePresetsViewModel>();
         SplatRegistrations.RegisterLazySingleton<SettingsViewModel>();
         SplatRegistrations.RegisterLazySingleton<SystemInfoViewModel>();
+        
+        //Dialog viewmodels
+        SplatRegistrations.RegisterLazySingleton<ReloadingGamesDialogViewModel>();
 
         SplatRegistrations.SetupIOC();
     }

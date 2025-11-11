@@ -16,6 +16,7 @@ using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
+using Universal_x86_Tuning_Utility.ViewModels.Dialogs;
 using ILogger = Serilog.ILogger;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
@@ -31,12 +32,6 @@ public class GamesViewModel : ReactiveObject, IDisposable
     {
         get => _games;
         set => this.RaiseAndSetIfChanged(ref _games, value);
-    }
-
-    public bool GamesListUpdating
-    {
-        get => _gamesListUpdating;
-        set => this.RaiseAndSetIfChanged(ref _gamesListUpdating, value);
     }
 
     public bool IsActionsAvailable
@@ -56,7 +51,6 @@ public class GamesViewModel : ReactiveObject, IDisposable
     private readonly IIconExtractor _iconExtractor;
     private EnhancedObservableCollection<GameLauncherItem> _games = new();
     private IDisposable? _updateFpsTimer;
-    private bool _gamesListUpdating;
     private bool _isActionsAvailable;
 
     public GamesViewModel(ILogger logger, 
@@ -209,7 +203,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
         _logger.Information("Games list reloading");
         
         IsActionsAvailable = false;
-        GamesListUpdating = true;
+        _dialogService.Show<ReloadingGamesDialogViewModel>(this, _reloadingGamesDialogViewModel);
 
         var installedGames = _gameLauncherService.ReSearchGames();
 
@@ -250,7 +244,7 @@ public class GamesViewModel : ReactiveObject, IDisposable
 
         var filteredGamesList = games.ToList().OrderBy(item => item.GameName).Distinct().ToList();
         Games.Reset(filteredGamesList);
-        GamesListUpdating = false;
+        _dialogService.Close(_reloadingGamesDialogViewModel);
         IsActionsAvailable = true;
         
         _logger.Information("Games list reloaded");

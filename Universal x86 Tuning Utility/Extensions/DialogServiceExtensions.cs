@@ -13,4 +13,9 @@ public static class DialogServiceExtensions
     {
         return dialogService.ShowOpenFileDialogAsync(Locator.Current.GetService<MainWindowViewModel>(), settings);
     }
+    
+    public static Task Show<TParent, TChild>(this IDialogService dialogService, TParent parent)
+    {
+        return dialogService.Show<TChild>(parent, Locator.Current.GetService<TChild>());
+    }
 }

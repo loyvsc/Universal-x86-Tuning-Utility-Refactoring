@@ -23,7 +23,6 @@
                      mc:Ignorable="d">
 
     <dialogHostAvalonia:DialogHost Identifier="Main">
-        <dialogHostAvalonia:DialogHost.DialogContent />
 
         <Grid x:Name="RootMainGrid"
               ColumnDefinitions="50, *"
