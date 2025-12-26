@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
@@ -85,36 +86,29 @@ public partial class DashboardViewModel : ReactiveObject
         {
             case "premade":
                 _navigationService.Navigate(typeof(PremadePresetsViewModel));
-                return;
-
+                break;
             case "custom":
                 _navigationService.Navigate(typeof(CustomPresetsViewModel));
-                return;
-
+                break;
             case "adaptive":
                 _navigationService.Navigate(typeof(AdaptiveViewModel));
-                return;
-
+                break;
             case "auto":
                 _navigationService.Navigate(typeof(AutomationsViewModel));
-                return;
-
+                break;
             case "info":
                 _navigationService.Navigate(typeof(SystemInfoViewModel));
-                return;
-
+                break;
             case "help":
                 Process.Start(new ProcessStartInfo("http://www.discord.gg/3EkYMZGJwq") { UseShellExecute = true });
-                return;
-
+                break;
             case "support":
                 Process.Start(new ProcessStartInfo("https://www.paypal.com/paypalme/JamesCJ60") { UseShellExecute = true });
                 Process.Start(new ProcessStartInfo("https://patreon.com/uxtusoftware") { UseShellExecute = true });
-                return;
-            
+                break;
             case "games":
                 _navigationService.Navigate(typeof(GamesViewModel));
-                return;
+                break;
         }
     }
 
