@@ -9,11 +9,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Avalonia.X11" Version="11.3.7" />
+      <PackageReference Include="Avalonia.X11" Version="11.3.10" />
       <PackageReference Include="DesktopNotificationsFixed.FreeDesktop" Version="1.0.1" />
-      <PackageReference Include="Hardware.Info" Version="101.1.0" />
+      <PackageReference Include="Hardware.Info" Version="101.1.0.1" />
       <PackageReference Include="NvAPIWrapper.Net" Version="0.8.1.101" />
-      <PackageReference Include="Tmds.DBus" Version="0.21.2" />
+      <PackageReference Include="Tmds.DBus" Version="0.22.0" />
     </ItemGroup>
 
     <ItemGroup>
