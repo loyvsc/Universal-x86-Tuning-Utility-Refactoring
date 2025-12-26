@@ -8,8 +8,9 @@ using ApplicationCore.Models;
 using ApplicationCore.Models.LaptopInfo;
 using ApplicationCore.Utilities;
 using Hardware.Info;
-using Serilog;
+using Splat;
 using Universal_x86_Tuning_Utility.Linux.Services.Readers;
+using ILogger = Serilog.ILogger;
 
 namespace Universal_x86_Tuning_Utility.Linux.Services;
 
@@ -20,16 +21,14 @@ public class LinuxSystemInfoService : ISystemInfoService
     private readonly List<BasicGpuInfo> _gpus = new List<BasicGpuInfo>();
     private readonly IHardwareInfo _hardwareInfo = new HardwareInfo();
     private readonly IIntelManagementService _intelManagementService;
-    private readonly ILaptopInfoFactory _laptopInfoFactory;
     private readonly Lazy<string> _manufacturerLazy;
     private readonly Lazy<string> _productLazy;
     private readonly Lazy<string> _systemName;
 
-    public LinuxSystemInfoService(ILogger logger, IIntelManagementService intelManagementService, ILaptopInfoFactory laptopInfoFactory)
+    public LinuxSystemInfoService(ILogger logger, IIntelManagementService intelManagementService)
     {
         _logger = logger;
         _intelManagementService = intelManagementService;
-        _laptopInfoFactory = laptopInfoFactory;
 
         _hardwareInfo.RefreshMotherboardList();
         _manufacturerLazy = new Lazy<string>(() =>
@@ -46,6 +45,9 @@ public class LinuxSystemInfoService : ISystemInfoService
         _systemName = new Lazy<string>(ReadFromFile("/etc/hostname"));
         
         Ram = new RamInfo();
+
+        _laptopInfoLazy =
+            new Lazy<LaptopInfoBase?>(() => Locator.Current.GetService<ILaptopInfoFactory>()?.Create());
         
         ReAnalyzeSystem();
     }
@@ -138,8 +140,6 @@ public class LinuxSystemInfoService : ISystemInfoService
         {
             _logger.Error(ex, "Error occurred when analyzing ram information");
         }
-
-        LaptopInfo = _laptopInfoFactory.Create();
     }
     
     private void AnalyzeRam()
@@ -486,10 +486,12 @@ public class LinuxSystemInfoService : ISystemInfoService
         };
     }
 
+    private readonly Lazy<LaptopInfoBase?> _laptopInfoLazy;
+
     public CpuInfo Cpu { get; private set; }
     public RamInfo Ram { get; private set; }
-    public LaptopInfoBase? LaptopInfo { get; private set; }
-    public IReadOnlyCollection<BasicGpuInfo> Gpus { get; private set; }
+    public LaptopInfoBase? LaptopInfo => _laptopInfoLazy.Value;
+    public IReadOnlyCollection<BasicGpuInfo> Gpus => _gpus.AsReadOnly();
     public string Manufacturer => _manufacturerLazy.Value;
     public string Product => _productLazy.Value;
     public string SystemName => _systemName.Value;
