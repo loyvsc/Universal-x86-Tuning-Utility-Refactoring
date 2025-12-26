@@ -1,4 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reactive.Disposables;
+using System.Threading.Tasks;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FileSystem;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
@@ -14,8 +18,16 @@ public static class DialogServiceExtensions
         return dialogService.ShowOpenFileDialogAsync(Locator.Current.GetService<MainWindowViewModel>(), settings);
     }
     
-    public static Task Show<TParent, TChild>(this IDialogService dialogService, TParent parent)
+    public static IDisposable Show<TChild>(this INotifyPropertyChanged parent) where TChild : INotifyPropertyChanged
     {
-        return dialogService.Show<TChild>(parent, Locator.Current.GetService<TChild>());
+        var dialogService = Locator.Current.GetService<IDialogService>();
+        var childViewModel = Locator.Current.GetService<TChild>();
+        
+        ArgumentNullException.ThrowIfNull(dialogService);
+        ArgumentNullException.ThrowIfNull(childViewModel);
+        
+        dialogService.Show<TChild>(parent, childViewModel);
+         
+        return Disposable.Create((dialogService, childViewModel), data => data.dialogService.Close(data.childViewModel));
     }
 }

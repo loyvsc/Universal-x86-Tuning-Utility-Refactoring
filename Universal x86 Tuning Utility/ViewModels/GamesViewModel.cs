@@ -203,48 +203,49 @@ public class GamesViewModel : ReactiveObject, IDisposable
         _logger.Information("Games list reloading");
         
         IsActionsAvailable = false;
-        _dialogService.Show<ReloadingGamesDialogViewModel>(this, _reloadingGamesDialogViewModel);
-
-        var installedGames = _gameLauncherService.ReSearchGames();
-
-        var games = await Task.WhenAll(installedGames.Select(async game =>
+        using (this.Show<ReloadingGamesDialogViewModel>())
         {
-            var gameData = _gameDataService.GetPreset(game.GameName);
+            var installedGames = _gameLauncherService.ReSearchGames();
 
-            if (gameData == null)
+            var games = await Task.WhenAll(installedGames.Select(async game =>
             {
-                gameData = new GameData();
-            }
-            else
-            {
-                game.SetAverageMs(gameData.MsData);
-                game.SetAverageFps(gameData.FpsData);
-            }
+                var gameData = _gameDataService.GetPreset(game.GameName);
 
-            _gameDataService.SavePreset(game.GameName, gameData);
-            
-            var iconPath = await _imageService.GetIconImageUrl(game.GameName);
-            if (string.IsNullOrWhiteSpace(iconPath))
-            {
-                var otherGames = installedGames.ToList();
-                otherGames.Remove(game);
-                
-                var levenshtein = new Levenshtein();
-                var sameGame = otherGames.FirstOrDefault(x => levenshtein.Distance(game.GameName, x.GameName) <= 20);
-                if (sameGame != null)
+                if (gameData == null)
                 {
-                    iconPath = string.IsNullOrWhiteSpace(sameGame.IconPath) ? await _imageService.GetIconImageUrl(sameGame.GameName) : sameGame.IconPath;
+                    gameData = new GameData();
                 }
-            }
+                else
+                {
+                    game.SetAverageMs(gameData.MsData);
+                    game.SetAverageFps(gameData.FpsData);
+                }
 
-            game.IconPath = iconPath;
+                _gameDataService.SavePreset(game.GameName, gameData);
+            
+                var iconPath = await _imageService.GetIconImageUrl(game.GameName);
+                if (string.IsNullOrWhiteSpace(iconPath))
+                {
+                    var otherGames = installedGames.ToList();
+                    otherGames.Remove(game);
+                
+                    var levenshtein = new Levenshtein();
+                    var sameGame = otherGames.FirstOrDefault(x => levenshtein.Distance(game.GameName, x.GameName) <= 20);
+                    if (sameGame != null)
+                    {
+                        iconPath = string.IsNullOrWhiteSpace(sameGame.IconPath) ? await _imageService.GetIconImageUrl(sameGame.GameName) : sameGame.IconPath;
+                    }
+                }
 
-            return game;
-        }));
+                game.IconPath = iconPath;
 
-        var filteredGamesList = games.ToList().OrderBy(item => item.GameName).Distinct().ToList();
-        Games.Reset(filteredGamesList);
-        _dialogService.Close(_reloadingGamesDialogViewModel);
+                return game;
+            }));
+
+            var filteredGamesList = games.ToList().OrderBy(item => item.GameName).Distinct().ToList();
+            Games.Reset(filteredGamesList);
+        }
+        
         IsActionsAvailable = true;
         
         _logger.Information("Games list reloaded");
