@@ -77,7 +77,7 @@ public class LinuxBatteryInfoService : IBatteryInfoService, IDisposable
                 {
                     var battery = _hardwareInfo.BatteryList[batteryId];
 
-                    // return battery.BatteryRate;
+                    return battery.EstimatedChargeRemaining;
                 }
             }
 
@@ -107,13 +107,12 @@ public class LinuxBatteryInfoService : IBatteryInfoService, IDisposable
                         1 => BatteryStatus.Charging,
                         2 or 4 => BatteryStatus.Low,
                         8 => BatteryStatus.Charging,
-                        128 => BatteryStatus.NoSystemBattery,
-                        _ => BatteryStatus.Unknown
+                        _ => BatteryStatus.NoSystemBattery
                     };
                 }
             }
 
-            return BatteryStatus.Unknown;
+            return BatteryStatus.NoSystemBattery;
         }
         catch
         {

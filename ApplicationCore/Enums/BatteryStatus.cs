@@ -4,7 +4,6 @@ namespace ApplicationCore.Enums;
 public enum BatteryStatus
 {
     NoSystemBattery,
-    Unknown,
     Low,
     Charging,
     Discharging,
