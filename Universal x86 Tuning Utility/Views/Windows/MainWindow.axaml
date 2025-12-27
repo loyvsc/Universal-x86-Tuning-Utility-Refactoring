@@ -10,20 +10,17 @@
                      xmlns:ui="using:FluentAvalonia.UI.Controls"
                      xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
                      xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-                     Title="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
-                     Width="1080"
-                     Height="640"
-                     MinWidth="980"
-                     MinHeight="420"
+                     mc:Ignorable="d"
                      x:DataType="viewModels:MainWindowViewModel"
+                     Title="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                     Width="1080" MinWidth="980"
+                     Height="640" MinHeight="420"
                      Background="#202020"
                      Icon="/Assets/applicationIcon-256.png"
                      TransparencyLevelHint="Mica"
-                     WindowStartupLocation="CenterScreen"
-                     mc:Ignorable="d">
+                     WindowStartupLocation="CenterScreen">
 
     <dialogHostAvalonia:DialogHost Identifier="Main">
-
         <Grid x:Name="RootMainGrid"
               ColumnDefinitions="50, *"
               RowDefinitions="50, *">
