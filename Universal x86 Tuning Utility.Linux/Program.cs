@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using Avalonia.Controls.ApplicationLifetimes;
 using DAL.Services;
+using DesktopNotifications;
 using DesktopNotifications.FreeDesktop;
 using Splat;
 using Universal_x86_Tuning_Utility.Interfaces;
@@ -47,7 +48,7 @@ class Program
                     }
                 });
                 
-                SplatRegistrations.RegisterConstant(manager!);
+                SplatRegistrations.RegisterConstant<INotificationManager>(manager);
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, LinuxAsusWmiService>();
                 SplatRegistrations.RegisterLazySingleton<ICliService, LinuxCliService>();
                 
