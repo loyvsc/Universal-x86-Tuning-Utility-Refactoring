@@ -154,7 +154,6 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
                 if (chargingRate > 0) return BatteryStatus.Charging;
                 if (remainingCapacity <= fullChargeCapacity * 0.15M) return BatteryStatus.Low;
                 if (chargingRate < 0) return BatteryStatus.Discharging;
-                return BatteryStatus.Unknown;
             }
 
             return BatteryStatus.NoSystemBattery;
