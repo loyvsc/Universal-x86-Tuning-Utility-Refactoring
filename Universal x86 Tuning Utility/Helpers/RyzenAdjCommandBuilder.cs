@@ -182,7 +182,7 @@ public class RyzenAdjCommandBuilder : IDisposable
         }
     }
 
-    public void AddNvidiaClocks(int maxCoreClock, int coreClock, int memClock)
+    public void AddNvidiaClocks(uint id, int maxCoreClock, int coreClock, int memClock)
     {
         if (_disposed)
         {
@@ -190,6 +190,8 @@ public class RyzenAdjCommandBuilder : IDisposable
         }
 
         _sb.Append("--NVIDIA-Clocks=");
+        _sb.Append(id);
+        _sb.Append('-');
         _sb.Append(maxCoreClock);
         _sb.Append('-');
         _sb.Append(coreClock);

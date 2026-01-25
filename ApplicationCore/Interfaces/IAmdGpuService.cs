@@ -1,4 +1,5 @@
 using ApplicationCore.Enums;
+using ApplicationCore.Models;
 
 namespace ApplicationCore.Interfaces;
 

@@ -21,6 +21,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
 {
     private readonly Serilog.ILogger _logger;
     private readonly IIntelManagementService _intelManagementService;
+    private readonly INvidiaGpuService _nvidiaGpuService;
 
     private readonly ManagementObjectSearcher _baseboardSearcher;
     private readonly ManagementObjectSearcher _motherboardSearcher;
@@ -48,10 +49,12 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
 
     public WindowsSystemInfoService(Serilog.ILogger logger,
                                     IIntelManagementService intelManagementService,
+                                    INvidiaGpuService nvidiaGpuService,
                                     IManagementEventService managementEventService)
     {
         _logger = logger;
         _intelManagementService = intelManagementService;
+        _nvidiaGpuService = nvidiaGpuService;
         _baseboardSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard");
         _motherboardSearcher =
             new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_MotherboardDevice");
@@ -164,11 +167,18 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                 {
                     if (Enum.TryParse<GpuManufacturer>(gpuName[0], true, out var gpuManufacturer))
                     {
-                        _gpus.Add(new BasicGpuInfo(gpuManufacturer, name));
-                        continue;
+                        switch (gpuManufacturer)
+                        {
+                            case GpuManufacturer.Nvidia:
+                            {
+                                _nvidiaGpuService.RefreshGpusList();
+                                var newGpus = _nvidiaGpuService.Gpus.Where(x => Gpus.All(y => y.Id != x.Id));
+                                _gpus.AddRange(newGpus);
+                                
+                                break;
+                            }
+                        }
                     }
-
-                    _gpus.Add(new BasicGpuInfo(GpuManufacturer.Unknown, name));
                 }
             }
         }
@@ -176,6 +186,7 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
 
     private void InitializeBasicGpuInfo()
     {
+        _gpus.AddRange(_nvidiaGpuService.Gpus);
         foreach (var device in _displayInfoSearcher.Get())
         {
             if (device["Name"] is string name)
@@ -185,6 +196,9 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
                 {
                     if (Enum.TryParse<GpuManufacturer>(gpuName[0], true, out var gpuManufacturer))
                     {
+                        if (gpuManufacturer == GpuManufacturer.Nvidia)
+                            continue;
+                        
                         _gpus.Add(new BasicGpuInfo(gpuManufacturer, name));
                         continue;
                     }

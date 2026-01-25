@@ -50,6 +50,8 @@ public class App : Application
 
         Locator.CurrentMutable.RegisterConstant(Log.Logger);
         
+        SplatRegistrations.RegisterLazySingleton<IGpuSpecsService, GpuSpecsService>();
+        SplatRegistrations.RegisterLazySingleton<IGpuOriginalityService, GpuOriginalityService>();
         SplatRegistrations.RegisterLazySingleton<IPremadePresets, PremadePresets>();
         SplatRegistrations.RegisterLazySingleton<IPresetService, PresetService>();
         SplatRegistrations.RegisterLazySingleton<IPresetServiceFactory, PresetServiceFactory>();

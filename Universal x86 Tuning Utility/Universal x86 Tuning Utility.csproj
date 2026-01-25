@@ -36,6 +36,7 @@
         <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.1.0" />
         <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.1.0" />
         <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.MessageBox" Version="2.1.0" />
+        <PackageReference Include="Hardware.Info.Core" Version="101.1.1" />
         <PackageReference Include="MessageBox.Avalonia" Version="3.3.1.1" />
         <PackageReference Include="FluentAvaloniaUI" Version="2.4.1" />
         <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="2.0.316.1" />
@@ -96,9 +97,6 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </AdditionalFiles>
         <AdditionalFiles Include="app.config">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </AdditionalFiles>
-        <AdditionalFiles Include="Assets\nvidiaGpusData.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </AdditionalFiles>
     </ItemGroup>

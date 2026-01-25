@@ -288,20 +288,21 @@ public class WindowsRyzenAdjService : IRyzenAdjService
         try
         {
             var args = value.Split('-');
-
+            
             if (command == "NVIDIA-Clocks")
             {
+                var id = uint.Parse(args[0]);
                 switch (args.Length)
                 {
                     case 2:
                     {
-                        _nvidiaGpuService.SetClocks(int.Parse(args[0]), int.Parse(args[1]));
+                        _nvidiaGpuService.SetClocks(id, int.Parse(args[1]), int.Parse(args[2]));
                         break;
                     }
                     case 3:
                     {
-                        _nvidiaGpuService.MaxGpuClock = int.Parse(args[0]);
-                        _nvidiaGpuService.SetClocks(int.Parse(args[1]), int.Parse(args[2]));
+                        _nvidiaGpuService.SetMaxGpuClock(id, int.Parse(args[1]));
+                        _nvidiaGpuService.SetClocks(id, int.Parse(args[2]), int.Parse(args[3]));
                         break;
                     }
                 }

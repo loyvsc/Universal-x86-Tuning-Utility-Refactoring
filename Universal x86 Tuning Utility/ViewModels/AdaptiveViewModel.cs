@@ -427,7 +427,7 @@ public class AdaptiveViewModel : ReactiveObject
 
             if (CurrentPreset.IsNvidia)
             {
-                adjCommandBuilder.AddNvidiaClocks(CurrentPreset.NvMaxCoreClock, CurrentPreset.NvCoreClock, CurrentPreset.NvMemClock);
+                adjCommandBuilder.AddNvidiaClocks(0, CurrentPreset.NvMaxCoreClock, CurrentPreset.NvCoreClock, CurrentPreset.NvMemClock);
             }
 
             await _ryzenAdjService.Translate(adjCommandBuilder.Build());

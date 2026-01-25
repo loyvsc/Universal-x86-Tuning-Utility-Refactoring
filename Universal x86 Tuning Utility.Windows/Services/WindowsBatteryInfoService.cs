@@ -65,7 +65,6 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when device changed");
-            throw;
         }
     }
 
@@ -99,7 +98,7 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when requesting battery info");
-            throw;
+            return [];
         }
     }
 
@@ -120,14 +119,13 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
 
                 return chargeRate > 0 ? chargeRate : -dischargeRate;
             }
-        
-            return 0;
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when requesting battery rate");
-            throw;
         }
+        
+        return 0;
     }
     
     public BatteryStatus GetBatteryStatus(string? deviceId = null)
@@ -155,14 +153,13 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
                 if (remainingCapacity <= fullChargeCapacity * 0.15M) return BatteryStatus.Low;
                 if (chargingRate < 0) return BatteryStatus.Discharging;
             }
-
-            return BatteryStatus.NoSystemBattery;
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when requesting battery status");
-            throw;
         }
+        
+        return BatteryStatus.NoSystemBattery;
     }
 
     public decimal GetFullChargeCapacity(string? deviceId = null)
@@ -179,7 +176,7 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when requesting battery full charge capacity");
-            throw;
+            return 0;
         }
     }
 
@@ -197,7 +194,7 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when requesting battery design capacity");
-            throw;
+            return 0;
         }
     }
 

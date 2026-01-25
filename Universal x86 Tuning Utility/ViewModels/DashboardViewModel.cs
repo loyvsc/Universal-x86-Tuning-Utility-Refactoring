@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Utilities;
 using Avalonia.Threading;
 using DesktopNotifications;
 using ReactiveUI;
@@ -17,7 +19,7 @@ public partial class DashboardViewModel : ReactiveObject
 {
     private readonly ISystemInfoService _systemInfoService;
     private readonly INotificationManager _notificationManager;
-    private readonly INvidiaGpuService _nvidiaGpuService;
+    private readonly IGpuOriginalityService _gpuOriginalityService;
     private readonly INavigationService _navigationService;
     public ICommand OpenWindowCommand { get; }
     public ICommand NavigateCommand { get; }
@@ -33,12 +35,12 @@ public partial class DashboardViewModel : ReactiveObject
     
     public DashboardViewModel(ISystemInfoService systemInfoService,
                              INotificationManager notificationManager,
-                             INvidiaGpuService nvidiaGpuService,
+                             IGpuOriginalityService gpuOriginalityService,
                              INavigationService navigationService)
     {
         _systemInfoService = systemInfoService;
         _notificationManager = notificationManager;
-        _nvidiaGpuService = nvidiaGpuService;
+        _gpuOriginalityService = gpuOriginalityService;
         _navigationService = navigationService;
         IsAmdSettingsAvailable = systemInfoService.Cpu.Manufacturer == Manufacturer.AMD;
 
@@ -52,22 +54,36 @@ public partial class DashboardViewModel : ReactiveObject
 
     private void AutoAdaptive_Tick(object? sender, EventArgs e)
     {
-        if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.Nvidia) != 0)
+        _autoAdaptive.Stop();
+        var checkResults = _gpuOriginalityService.CheckIsGpusOriginal();
+        foreach (var checkResult in checkResults.results)
         {
-            foreach (var checkResult in _nvidiaGpuService.CheckIsGpusOriginal())
+            if (!checkResult.IsGpuOriginal)
             {
-                if (!checkResult.IsGpuOriginal)
+                var sb = StringBuilderPool.Rent();
+                sb.Append($"Possible fake or modified GPU detected on {checkResult.GpuName}");
+                if (checkResults.results.Count() > 1)
                 {
-                    _notificationManager.ShowTextNotification("NVIDIA GPU Warning", $"ROP count is lower than expected on {checkResult.GpuName} (#{checkResult.GpuNumber}) ({checkResult.ActualRopCount } ROPs out of {checkResult.ExpectedRopCount} ROPs)");
+                    sb.Append($" (№{checkResult.GpuNumber})");
                 }
+                
+                _notificationManager.ShowTextNotification("GPU Warning", sb.ToString());
+                
+                StringBuilderPool.Return(sb);
             }
+        }
+        
+        if (checkResults.notFoundNames.Any())
+        {
+            _notificationManager.ShowTextNotification("GPU Warning",
+                $"GPU specification not found in reference database for {string.Join(", ", checkResults.notFoundNames)}"
+            );
         }
         
         if (Settings.Default.isStartAdpative)
         {
             _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));
         }
-        _autoAdaptive.Stop();
     }
 
     public void OnNavigatedTo()

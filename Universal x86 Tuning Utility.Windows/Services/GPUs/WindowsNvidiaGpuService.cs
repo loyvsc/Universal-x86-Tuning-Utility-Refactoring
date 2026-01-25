@@ -5,12 +5,17 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using NvAPIWrapper.GPU;
 using NvAPIWrapper.Native;
 using NvAPIWrapper.Native.GPU;
 using NvAPIWrapper.Native.GPU.Structures;
+using Universal_x86_Tuning_Utility.Helpers;
+using Universal_x86_Tuning_Utility.Windows.Helpers;
 using static NvAPIWrapper.Native.GPU.Structures.PerformanceStates20InfoV1;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services.GPUs;
@@ -27,20 +32,78 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
     private const int MaxMemoryOffset = 4000;
     
     private readonly Serilog.ILogger _logger;
-    private readonly Lazy<Dictionary<string, int>> _ropCountDictionary = new Lazy<Dictionary<string, int>>(() =>
-    {
-        var data = File.ReadAllText("./Assets/nvidiaGpusData.json");
-        var deserializedData = JsonSerializer.Deserialize<Dictionary<string, int>>(data);
-        return deserializedData ?? new Dictionary<string, int>();
-    });
+    private readonly List<BasicGpuInfo> _gpuList = [];
+    private readonly Lock _lock = new Lock();
     
     public WindowsNvidiaGpuService(Serilog.ILogger logger)
     {
         _logger = logger;
     }
-    
+
+    public IReadOnlyCollection<BasicGpuInfo> Gpus
+    {
+        get
+        {
+            lock (_lock)
+            {
+                if (_gpuList.Count == 0)
+                {
+                    RefreshGpusList();
+                }
+            }
+
+            return _gpuList;
+        }
+    }
+
+    public async Task SetMaxGpuClock(uint gpuId, int value)
+    {
+        if (value is < MinClockLimit or >= MaxClockLimit)
+        {
+            if (GetMaxGpuClock(gpuId) != value)
+            {
+                if (value > 0)
+                {
+                    await ProcessHelpers.RunCmd("powershell", $"nvidia-smi -lgc 0,{value}");
+                }
+                else
+                {
+                    await ProcessHelpers.RunCmd("powershell", "nvidia-smi -rgc");
+                }
+            }
+        }
+    }
+
+    public int GetMaxGpuClock(uint gpuId)
+    {
+        var internalGpu = PhysicalGPU.FromGPUId(gpuId);
+        if (internalGpu == null) return -1;
+        try
+        {
+            var clockBoostLock = GPUApi.GetClockBoostLock(internalGpu.Handle);
+            int limit = (int)clockBoostLock.ClockBoostLocks[0].VoltageInMicroV / 1000;
+            return limit;
+        }
+        catch
+        {
+            return -1;
+        }
+    }
+
+    public void RefreshGpusList()
+    {
+        _gpuList.Clear();
+        _gpuList.AddRange(PhysicalGPU.GetPhysicalGPUs().Select(x => new BasicGpuInfo(x.GPUId,
+            GpuManufacturer.Nvidia,
+            x.FullName,
+            x.ArchitectInformation.NumberOfROPs,
+            NvidiaHelper.CalculateTMU(x.ArchitectInformation.ShortName, x.ArchitectInformation.NumberOfCores),
+            x.ArchitectInformation.NumberOfCores,
+            (int) Math.Round(x.MemoryInformation.PhysicalFrameBufferSizeInkB / 1024d))));
+    }
+
     /// <exception cref="AggregateException">Throws when no nvidia gpu installed or failed to set clocks</exception>
-    public void SetClocks(int core, int memory, int coreVoltage = 0)
+    public void SetClocks(uint gpuId, int core, int memory, int coreVoltage = 0)
     {
         if (core is < MinCoreOffset or > MaxCoreOffset)
             throw new ArgumentOutOfRangeException(nameof(core), "Core clock must be between MinCoreOffset and MaxCoreOffset");
@@ -48,7 +111,7 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
         if (memory is < MinMemoryOffset or > MaxMemoryOffset)
             throw new ArgumentOutOfRangeException(nameof(memory), "Memory clock must be between MinMemoryOffset and MaxMemoryOffset");
 
-        var internalGpu = PhysicalGPU.GetPhysicalGPUs().FirstOrDefault();
+        var internalGpu = PhysicalGPU.FromGPUId(gpuId);
 
         if (internalGpu == null) throw new AggregateException("No Nvidia gpu found");
         
@@ -57,28 +120,19 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
             var coreClock = new PerformanceStates20ClockEntryV1(PublicClockDomain.Graphics, new PerformanceStates20ParameterDelta(core * 1000));
             var memoryClock = new PerformanceStates20ClockEntryV1(PublicClockDomain.Memory, new PerformanceStates20ParameterDelta(memory * 1000));
                 
-            PerformanceStates20ClockEntryV1[] clocks =
-            {
-                coreClock, memoryClock
-            };
+            PerformanceStates20ClockEntryV1[] clocks = [coreClock, memoryClock];
             
-            PerformanceStates20BaseVoltageEntryV1[] voltages = { };
+            PerformanceStates20BaseVoltageEntryV1[] voltages = [];
             if (coreVoltage != 0)
             {
                 var voltageEntry = new PerformanceStates20BaseVoltageEntryV1(
                     PerformanceVoltageDomain.Core,
                     new PerformanceStates20ParameterDelta(coreVoltage));
                 
-                voltages = new[]
-                {
-                    voltageEntry
-                };
+                voltages = [voltageEntry];
             }
             
-            PerformanceState20[] performanceStates =
-            {
-                new(PerformanceStateId.P0_3DPerformance, clocks, voltages)
-            };
+            PerformanceState20[] performanceStates = [new(PerformanceStateId.P0_3DPerformance, clocks, voltages)];
 
             var overclock = new PerformanceStates20InfoV1(performanceStates, 2, 0);
 
@@ -89,98 +143,5 @@ public class WindowsNvidiaGpuService : INvidiaGpuService
             _logger.Error(ex, "Failed to set clocks");
             throw new AggregateException("Failed to set clocks");
         }
-    }
-
-    public int MaxGpuClock
-    {
-        get
-        {
-            var internalGpu = PhysicalGPU.GetPhysicalGPUs().FirstOrDefault();
-            if (internalGpu == null) return -1;
-            try
-            {
-                var clockBoostLock = GPUApi.GetClockBoostLock(internalGpu.Handle);
-                int limit = (int)clockBoostLock.ClockBoostLocks[0].VoltageInMicroV / 1000;
-                return limit;
-            }
-            catch
-            {
-                return -1;
-            }
-        }
-        set
-        {
-            if (value is < MinClockLimit or >= MaxClockLimit)
-            {
-                if (MaxGpuClock != value)
-                {
-                    if (value > 0)
-                    {
-                        RunPowershellCommand($"nvidia-smi -lgc 0,{value}");
-                    }
-                    else
-                    {
-                        RunPowershellCommand("nvidia-smi -rgc");
-                    }
-                }
-            }
-        }
-    }
-    
-    private void RunPowershellCommand(string script)
-    {
-        RunCmd("powershell", script);
-    }
-
-    private void RunCmd(string name, string args)
-    {
-        var cmd = new Process();
-        cmd.StartInfo.UseShellExecute = false;
-        cmd.StartInfo.CreateNoWindow = true;
-        cmd.StartInfo.RedirectStandardOutput = true;
-        cmd.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-        cmd.StartInfo.FileName = name;
-        cmd.StartInfo.Arguments = args;
-        cmd.Start();
-
-        cmd.WaitForExit();
-    }
-
-    public IReadOnlyCollection<CheckIsGpuOriginalResult> CheckIsGpusOriginal()
-    {
-        var gpus = PhysicalGPU.GetPhysicalGPUs();
-        
-        var results = new List<CheckIsGpuOriginalResult>();
-        for (var i = 0; i < gpus.Length; i++)
-        {
-            var gpu = gpus[i];
-            var gpuName = gpu.ArchitectInformation.PhysicalGPU.ToString();
-
-            var expectedRopCount = GetRopCount(gpuName);
-            var actualRopCount = gpu.ArchitectInformation.NumberOfROPs;
-
-            var result = new CheckIsGpuOriginalResult()
-            {
-                GpuName = gpuName,
-                GpuNumber = i + 1,
-                IsGpuOriginal = expectedRopCount == actualRopCount,
-                ExpectedRopCount = expectedRopCount,
-                ActualRopCount = actualRopCount
-            };
-            results.Add(result);
-        }
-
-        return new ReadOnlyCollection<CheckIsGpuOriginalResult>(results);
-    }
-    
-    private int GetRopCount(string gpuName)
-    {
-        var index = gpuName.IndexOf("Geforce", StringComparison.InvariantCulture);
-        if (index != -1)
-        {
-            gpuName = gpuName.Remove(index, 8);
-        }
-
-        return _ropCountDictionary.Value.GetValueOrDefault(gpuName, -1);
     }
 }

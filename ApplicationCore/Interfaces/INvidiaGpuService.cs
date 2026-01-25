@@ -1,14 +1,16 @@
-using System.Collections.ObjectModel;
 using ApplicationCore.Models;
 
 namespace ApplicationCore.Interfaces;
 
 public interface INvidiaGpuService
 {
-    /// <exception cref="AggregateException">Throws when no nvidia gpu installed or failed to set clocks</exception>
-    public void SetClocks(int core, int memory, int coreVoltage = 0);
+    public IReadOnlyCollection<BasicGpuInfo> Gpus { get; }
 
-    public int MaxGpuClock { get; set; }
+    public void RefreshGpusList();
     
-    public IReadOnlyCollection<CheckIsGpuOriginalResult> CheckIsGpusOriginal(); 
+    /// <exception cref="AggregateException">Throws when <paramref name="gpuId"/> incorrect or failed to set clocks</exception>
+    public void SetClocks(uint gpuId, int core, int memory, int coreVoltage = 0);
+
+    public Task SetMaxGpuClock(uint gpuId, int value);
+    public int GetMaxGpuClock(uint gpuId);
 }

@@ -67,13 +67,15 @@ public class LinuxSystemInfoService : ISystemInfoService
         _hardwareInfo.RefreshVideoControllerList();
         foreach (var device in _hardwareInfo.VideoControllerList)
         {
-            if (Enum.TryParse<GpuManufacturer>(device.Manufacturer, true, out var gpuManufacturer))
-            {
-                _gpus.Add(new BasicGpuInfo(gpuManufacturer, device.Name));
-                continue;
-            }
+            var isManufacturerValid =
+                Enum.TryParse<GpuManufacturer>(device.Manufacturer, true, out var gpuManufacturer);
                 
-            _gpus.Add(new BasicGpuInfo(GpuManufacturer.Unknown, device.Name));
+            _gpus.Add(new BasicGpuInfo(manufacturer: isManufacturerValid ? gpuManufacturer : GpuManufacturer.Unknown,
+                name: device.Name,
+                ropCount: 0,
+                tmusCount: 0,
+                shadersCount: 0,
+                memorySize: 0));
         }
     }
     

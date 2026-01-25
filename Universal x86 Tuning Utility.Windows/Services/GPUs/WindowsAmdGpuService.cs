@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services.GPUs;
 

@@ -11,9 +11,11 @@ using NvAPIWrapper.GPU;
 using NvAPIWrapper.Native;
 using NvAPIWrapper.Native.GPU;
 using NvAPIWrapper.Native.GPU.Structures;
+using Universal_x86_Tuning_Utility.Linux.Helpers;
 
 namespace Universal_x86_Tuning_Utility.Linux.Services.GPUs;
 
+//TODO: IMPLEMENT
 public class LinuxNvidiaGpuService : INvidiaGpuService
 {
     private const int MinCoreOffset = -900;
@@ -125,61 +127,24 @@ public class LinuxNvidiaGpuService : INvidiaGpuService
             }
         }
     }
-    
+
+    public int GetRopCount(uint gpuId)
+    {
+        return -1;
+    }
+
+    public int GetTmusCount(uint gpuId)
+    {
+        return -1;
+    }
+
+    public int GetShadersCount(uint gpuId)
+    {
+        return -1;
+    }
+
     private void RunPowershellCommand(string script)
     {
-        RunCmd("/bin/bash", script);
-    }
-
-    private void RunCmd(string name, string args)
-    {
-        var cmd = new Process();
-        cmd.StartInfo.UseShellExecute = false;
-        cmd.StartInfo.CreateNoWindow = true;
-        cmd.StartInfo.RedirectStandardOutput = true;
-        cmd.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-        cmd.StartInfo.FileName = name;
-        cmd.StartInfo.Arguments = args;
-        cmd.Start();
-
-        cmd.WaitForExit();
-    }
-
-    public IReadOnlyCollection<CheckIsGpuOriginalResult> CheckIsGpusOriginal()
-    {
-        var gpus = PhysicalGPU.GetPhysicalGPUs();
-        
-        var results = new List<CheckIsGpuOriginalResult>();
-        for (var i = 0; i < gpus.Length; i++)
-        {
-            var gpu = gpus[i];
-            var gpuName = gpu.ArchitectInformation.PhysicalGPU.ToString();
-
-            var expectedRopCount = GetRopCount(gpuName);
-            var actualRopCount = gpu.ArchitectInformation.NumberOfROPs;
-
-            var result = new CheckIsGpuOriginalResult()
-            {
-                GpuName = gpuName,
-                GpuNumber = i + 1,
-                IsGpuOriginal = expectedRopCount == actualRopCount,
-                ExpectedRopCount = expectedRopCount,
-                ActualRopCount = actualRopCount
-            };
-            results.Add(result);
-        }
-
-        return new ReadOnlyCollection<CheckIsGpuOriginalResult>(results);
-    }
-    
-    private int GetRopCount(string gpuName)
-    {
-        var index = gpuName.IndexOf("Geforce", StringComparison.InvariantCulture);
-        if (index != -1)
-        {
-            gpuName = gpuName.Remove(index, 8);
-        }
-
-        return _ropCountDictionary.Value.GetValueOrDefault(gpuName, -1);
+        // RunCmd("/bin/bash", script);
     }
 }
