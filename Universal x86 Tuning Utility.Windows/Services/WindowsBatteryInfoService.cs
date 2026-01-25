@@ -88,12 +88,20 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
                         designCapacity: () => GetDesignCapacity(deviceId),
                         cycleCount: () => GetBatteryCycle(deviceId),
                         health: () => GetBatteryHealth(deviceId));
-                
+
                     batteries.Add(batteryInfo);
                 }
             }
 
             return batteries;
+        }
+        catch (ManagementException mEx)
+        {
+            if (mEx.ErrorCode != ManagementStatus.InvalidClass)
+            {
+                _logger.Error(mEx, "Error occurred when requesting battery info");
+            }
+            return [];
         }
         catch (Exception ex)
         {
@@ -118,6 +126,13 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
                 var dischargeRate = targetBattery.Get<decimal>("DischargeRate");
 
                 return chargeRate > 0 ? chargeRate : -dischargeRate;
+            }
+        }
+        catch (ManagementException mEx)
+        {
+            if (mEx.ErrorCode != ManagementStatus.InvalidClass)
+            {
+                _logger.Error(mEx, "Error occurred when requesting battery rate");
             }
         }
         catch (Exception ex)
@@ -154,6 +169,13 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
                 if (chargingRate < 0) return BatteryStatus.Discharging;
             }
         }
+        catch (ManagementException mEx)
+        {
+            if (mEx.ErrorCode != ManagementStatus.InvalidClass)
+            {
+                _logger.Error(mEx, "Error occurred when requesting battery status");
+            }
+        }
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when requesting battery status");
@@ -173,11 +195,18 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
                 })
                 ?.Get<decimal>("FullChargedCapacity") ?? 0;
         }
+        catch (ManagementException mEx)
+        {
+            if (mEx.ErrorCode != ManagementStatus.InvalidClass)
+            {
+                _logger.Error(mEx, "Error occurred when requesting battery full charge capacity");
+            }
+        }
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when requesting battery full charge capacity");
-            return 0;
         }
+        return 0;
     }
 
     public decimal GetDesignCapacity(string? deviceId = null)
@@ -191,11 +220,18 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
                 })
                 ?.Get<decimal>("DesignedCapacity") ?? 0;
         }
+        catch (ManagementException mEx)
+        {
+            if (mEx.ErrorCode != ManagementStatus.InvalidClass)
+            {
+                _logger.Error(mEx, "Error occurred when requesting battery design capacity");
+            }
+        }
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when requesting battery design capacity");
-            return 0;
         }
+        return 0;
     }
 
     public int GetBatteryCycle(string? deviceId = null)
@@ -209,11 +245,18 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
                 })
                 ?.Get<int>("CycleCount") ?? 0;
         }
+        catch (ManagementException mEx)
+        {
+            if (mEx.ErrorCode != ManagementStatus.InvalidClass)
+            {
+                _logger.Error(mEx, "Error occurred when requesting battery cycle count");
+            }
+        }
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when requesting battery cycle count");
-            return 0;
         }
+        return 0;
     }
 
     public decimal GetBatteryHealth(string? deviceId = null)
@@ -231,11 +274,18 @@ public class WindowsBatteryInfoService : IBatteryInfoService, IDisposable
 
             return 0;
         }
+        catch (ManagementException mEx)
+        {
+            if (mEx.ErrorCode != ManagementStatus.InvalidClass)
+            {
+                _logger.Error(mEx, "Error occurred when requesting battery health");
+            }
+        }
         catch (Exception ex)
         {
             _logger.Error(ex, "Error occurred when requesting battery health");
-            return 0;
         }
+        return 0;
     }
 
     public void Dispose()
