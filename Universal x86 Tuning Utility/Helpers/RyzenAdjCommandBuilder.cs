@@ -32,7 +32,7 @@ public class RyzenAdjCommandBuilder : IDisposable
         _sb.Append('-');
         _sb.Append(sharpness);
         _sb.Append('-');
-        _sb.Append(scale);
+        _sb.Append((int)scale);
         _sb.Append('-');
         _sb.Append(isRecap);
         _sb.Append(CommandSeparator);
