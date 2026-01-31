@@ -23,6 +23,12 @@ public class DisplayModel : ReactiveObject
     
     public string Name { get; }
     public string Identifier { get; }
+
+    public int CurrentRefreshRate
+    {
+        get => _display.CurrentRefreshRate;
+        set => _display.UpdateRefreshRate(value);
+    }
     
     public ObservableCollection<int> SupportedRefreshRates { get; }
     public DisplayOutputTechnology SupportedOutputTechnology { get; }

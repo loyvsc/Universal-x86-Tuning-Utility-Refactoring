@@ -59,11 +59,9 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
     {
         if (_displays.IsValueCreated)
         {
-            _displays.Value.Clear();
-
             foreach (var display in GetDisplays())
             {
-                if (_displays.Value.All(d => d.Identifier != display.Identifier))
+                if (_displays.Value.FirstOrDefault(d => d.Identifier == display.Identifier) == null)
                 {
                     _displays.Value.Add(display);
                     DisplayAttached?.Invoke(display);
@@ -76,11 +74,10 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
     {
         if (_displays.IsValueCreated)
         {
-            _displays.Value.Clear();
-
-            foreach (var display in GetDisplays())
+            var currentDisplays = GetDisplays();
+            foreach (var display in _displays.Value)
             {
-                if (_displays.Value.All(d => d.Identifier != display.Identifier))
+                if (currentDisplays.FirstOrDefault(d => d.Identifier != display.Identifier) == null)
                 {
                     _displays.Value.Remove(display);
                     DisplayRemoved?.Invoke(display);
@@ -91,78 +88,97 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
 
     private List<Display> GetDisplays()
     {
-        var displays = new List<Display>();
+        var displays = new Dictionary<string, Display>();
 
-        foreach (var pathInfo in PathInfo.GetAllPaths())
+        foreach (var display in WindowsDisplayAPI.Display.GetDisplays())
         {
-            if (!pathInfo.IsInUse)
-                continue;
-                
-            foreach (var displayDevice in pathInfo.DisplaySource.Adapter.ToDisplayAdapter().GetDisplayDevices())
+            if (display.IsAvailable)
             {
-                var identifier = displayDevice.DevicePath;
+                var identifier = display.DevicePath;
                 var supportedResolutions = new List<DisplayResolution>();
-                var supportedRefreshRates = new HashSet<int>();
-                    
-                if (displayDevice.IsAvailable)
+                var supportedRefreshRates = new SortedSet<int>();
+                
+                foreach (var possibleSetting in display.GetPossibleSettings())
                 {
-                    foreach (var possibleSetting in displayDevice.GetPossibleSettings())
-                    {
-                        var width = possibleSetting.Resolution.Width;
-                        var height = possibleSetting.Resolution.Height;
-                        var frequency = possibleSetting.Frequency;
+                    var width = possibleSetting.Resolution.Width;
+                    var height = possibleSetting.Resolution.Height;
+                    var frequency = possibleSetting.Frequency;
                     
-                        if (supportedResolutions.FirstOrDefault(x => x.Width == width && x.Height == height) == null)
-                        {
-                            supportedResolutions.Add(new DisplayResolution(width, height));
-                        }
-                        supportedRefreshRates.Add(frequency);
-                    }
-                        
-                    if (supportedResolutions.Count != 0)
+                    if (supportedResolutions.FirstOrDefault(x => x.Width == width && x.Height == height) == null)
                     {
-                        var connectionInfo = pathInfo.TargetsInfo.FirstOrDefault(x => x.DisplayTarget.DevicePath == displayDevice.DevicePath);
-                            
-                        if (connectionInfo != null)
+                        supportedResolutions.Add(new DisplayResolution(width, height));
+                    }
+                    supportedRefreshRates.Add(frequency);
+                }
+                        
+                if (supportedResolutions.Count != 0)
+                {
+                    var pathInfo = PathInfo.GetActivePaths().FirstOrDefault(x =>
+                    {
+                        return x.TargetsInfo.Any(y =>
                         {
-                            var currentWidth = connectionInfo.SignalInfo.ActiveSize.Width;
-                            var currentHeight = connectionInfo.SignalInfo.ActiveSize.Height;
-                            var currentRefreshRate = (int) connectionInfo.SignalInfo.VerticalSyncFrequencyInMillihertz / 1000;
-                            var outputTechnology = connectionInfo.OutputTechnology switch
+                            try
                             {
-                                DisplayConfigVideoOutputTechnology.HD15 => DisplayOutputTechnology.VGA,
-                                DisplayConfigVideoOutputTechnology.SVideo => DisplayOutputTechnology.SVideo,
-                                DisplayConfigVideoOutputTechnology.CompositeVideo => DisplayOutputTechnology.Composite,
-                                DisplayConfigVideoOutputTechnology.ComponentVideo => DisplayOutputTechnology.Component,
-                                DisplayConfigVideoOutputTechnology.DVI => DisplayOutputTechnology.DVI,
-                                DisplayConfigVideoOutputTechnology.HDMI => DisplayOutputTechnology.HDMI,
-                                DisplayConfigVideoOutputTechnology.LVDS => DisplayOutputTechnology.LVDS,
-                                DisplayConfigVideoOutputTechnology.DJPN => DisplayOutputTechnology.D_JPN,
-                                DisplayConfigVideoOutputTechnology.SDI => DisplayOutputTechnology.SDI,
-                                DisplayConfigVideoOutputTechnology.DisplayPortExternal => DisplayOutputTechnology.DisplayPort,
-                                DisplayConfigVideoOutputTechnology.DisplayPortEmbedded => DisplayOutputTechnology.DisplayPort,
-                                DisplayConfigVideoOutputTechnology.UDIExternal => DisplayOutputTechnology.UDI,
-                                DisplayConfigVideoOutputTechnology.UDIEmbedded => DisplayOutputTechnology.UDI,
-                                DisplayConfigVideoOutputTechnology.SDTVDongle => DisplayOutputTechnology.SDTV,
-                                DisplayConfigVideoOutputTechnology.Miracast => DisplayOutputTechnology.Miracast,
-                                DisplayConfigVideoOutputTechnology.Internal => DisplayOutputTechnology.Internal,
-                                _ => DisplayOutputTechnology.Unknown
-                            };
-                    
-                            displays.Add(new Display(identifier, 
-                                name: displayDevice.DisplayName,
-                                supportedResolutions, 
-                                currentResolution: supportedResolutions.First(x => x.Width == currentWidth && x.Height == currentHeight), 
-                                supportedRefreshRates, 
-                                currentRefreshRate: currentRefreshRate + 1,
-                                outputTechnology: outputTechnology));
-                        }
-                    }
+                                return y.DisplayTarget.DevicePath == display.DevicePath;
+                            }
+                            catch
+                            {
+                                return false;
+                            }
+                        });
+                    });
+                            
+                    if (pathInfo != null)
+                    {
+                        var connectionInfo = pathInfo.TargetsInfo.First(x =>
+                        {
+                            try
+                            {
+                                return x.DisplayTarget.DevicePath == display.DevicePath;
+                            }
+                            catch
+                            {
+                                return false;
+                            }
+                        });
                         
+                        var currentWidth = connectionInfo.SignalInfo.ActiveSize.Width;
+                        var currentHeight = connectionInfo.SignalInfo.ActiveSize.Height;
+                        var currentRefreshRate = (int) connectionInfo.SignalInfo.VerticalSyncFrequencyInMillihertz / 1000;
+                        var outputTechnology = connectionInfo.OutputTechnology switch
+                        {
+                            DisplayConfigVideoOutputTechnology.HD15 => DisplayOutputTechnology.VGA,
+                            DisplayConfigVideoOutputTechnology.SVideo => DisplayOutputTechnology.SVideo,
+                            DisplayConfigVideoOutputTechnology.CompositeVideo => DisplayOutputTechnology.Composite,
+                            DisplayConfigVideoOutputTechnology.ComponentVideo => DisplayOutputTechnology.Component,
+                            DisplayConfigVideoOutputTechnology.DVI => DisplayOutputTechnology.DVI,
+                            DisplayConfigVideoOutputTechnology.HDMI => DisplayOutputTechnology.HDMI,
+                            DisplayConfigVideoOutputTechnology.LVDS => DisplayOutputTechnology.LVDS,
+                            DisplayConfigVideoOutputTechnology.DJPN => DisplayOutputTechnology.D_JPN,
+                            DisplayConfigVideoOutputTechnology.SDI => DisplayOutputTechnology.SDI,
+                            DisplayConfigVideoOutputTechnology.DisplayPortExternal => DisplayOutputTechnology.DisplayPort,
+                            DisplayConfigVideoOutputTechnology.DisplayPortEmbedded => DisplayOutputTechnology.DisplayPort,
+                            DisplayConfigVideoOutputTechnology.UDIExternal => DisplayOutputTechnology.UDI,
+                            DisplayConfigVideoOutputTechnology.UDIEmbedded => DisplayOutputTechnology.UDI,
+                            DisplayConfigVideoOutputTechnology.SDTVDongle => DisplayOutputTechnology.SDTV,
+                            DisplayConfigVideoOutputTechnology.Miracast => DisplayOutputTechnology.Miracast,
+                            DisplayConfigVideoOutputTechnology.Internal => DisplayOutputTechnology.Internal,
+                            _ => DisplayOutputTechnology.Unknown
+                        };
+
+                        displays.TryAdd(identifier, new Display(identifier,
+                            name: display.DeviceName,
+                            supportedResolutions,
+                            currentResolution: supportedResolutions.First(x => x.Width == currentWidth && x.Height == currentHeight),
+                            supportedRefreshRates,
+                            currentRefreshRate: currentRefreshRate + 1,
+                            outputTechnology: outputTechnology));
+                    }
                 }
             }
         }
-        return displays;
+        
+        return displays.Values.ToList();
     }
 
     public void ApplySettings(Display targetDisplay, DisplayResolution targetDisplayResolution, int targetHz)
@@ -171,25 +187,19 @@ public class WindowsDisplayInfoService : IDisplayInfoService, IDisposable
         {
             lock (_displaysLock)
             {
-                foreach (var displayAdapter in DisplayAdapter.GetDisplayAdapters())
+                foreach (var display in WindowsDisplayAPI.Display.GetDisplays())
                 {
-                    var displayDevice = displayAdapter.GetDisplayDevices()
-                        .FirstOrDefault(x => x.DevicePath == targetDisplay.Identifier && x.IsAvailable);
-
-                    if (displayDevice != null)
+                    if (display.DevicePath == targetDisplay.Identifier && display.IsAvailable)
                     {
-                        var possibleSetting = displayDevice.GetPossibleSettings().FirstOrDefault(x => x.Resolution.Width == targetDisplayResolution.Width && x.Resolution.Height == targetDisplayResolution.Height && x.Frequency == targetHz);
+                        var possibleSetting = display.GetPossibleSettings().FirstOrDefault(x => x.Resolution.Width == targetDisplayResolution.Width && x.Resolution.Height == targetDisplayResolution.Height && x.Frequency == targetHz);
                         if (possibleSetting != null)
                         {
-                            var settingsToSave = new Dictionary<DisplayDevice, DisplaySetting>();
-                            settingsToSave.Add(displayDevice, new DisplaySetting(possibleSetting));
-                    
-                            DisplaySetting.SaveDisplaySettings(settingsToSave, true);
+                            display.SetSettings(new DisplaySetting(possibleSetting), true);
 
                             var changedDisplay = _displays.Value.FirstOrDefault(x => x.Identifier == targetDisplay.Identifier);
                             if (changedDisplay != null)
                             {
-                                changedDisplay.UpdateCurrentResolution(targetDisplayResolution, targetHz);
+                                changedDisplay.UpdateRefreshRate(targetHz);
                                 CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, _displays));
                             }
                             break;

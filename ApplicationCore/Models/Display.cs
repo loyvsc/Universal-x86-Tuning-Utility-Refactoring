@@ -25,9 +25,8 @@ public class Display
         OutputTechnology = outputTechnology;
     }
 
-    public void UpdateCurrentResolution(DisplayResolution currentResolution, int currentRefreshRate)
+    public void UpdateRefreshRate(int currentRefreshRate)
     {
-        CurrentRefreshRate = currentRefreshRate;
         CurrentRefreshRate = currentRefreshRate;
     }
 
