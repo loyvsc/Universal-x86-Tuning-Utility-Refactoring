@@ -82,9 +82,10 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
                 SupportedRefreshRates = _selectedDisplay.SupportedRefreshRates;
             }
             
-            if (SelectedPreset != null)
+            if (SelectedPreset != null && _selectedDisplay != null)
             {
-                SelectedPreset.DisplayIdentifier = value.Identifier;
+                SelectedPreset.DisplayHz = _selectedDisplay.CurrentRefreshRate;
+                SelectedPreset.DisplayIdentifier = _selectedDisplay.Identifier;
             }
         }
     }
