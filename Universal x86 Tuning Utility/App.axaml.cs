@@ -5,6 +5,7 @@ using ApplicationCore.Utilities;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using DAL.Services;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
@@ -69,7 +70,7 @@ public class App : Application
         Locator.CurrentMutable.RegisterLazySingleton<IDialogService>(() => new DialogService(
             new DialogManager(
                 viewLocator: new ViewLocator(),
-                dialogFactory: new DialogFactory().AddMessageBox()),
+                dialogFactory: new DialogFactory().AddDialogHost().AddMessageBox()),
             viewModelFactory: x => Locator.Current.GetService(x)));
 
         //Viewmodels
@@ -91,10 +92,17 @@ public class App : Application
         SplatRegistrations.SetupIOC();
     }
 
-    private class ViewLocator : ViewLocatorBase
+    public class ViewLocator : ViewLocatorBase
     {
         /// <inheritdoc />
-        protected override string GetViewName(object viewModel) => viewModel.GetType().FullName!.Replace("ViewModel", "");
+        protected override string GetViewName(object viewModel) => viewModel.GetType().FullName!.Replace("ViewModel", "View");
+
+        public override Control Build(object? data)
+        {
+            var view = base.Build(data);
+            view.DataContext = data;
+            return view;
+        }
     }
 
     public override void OnFrameworkInitializationCompleted()

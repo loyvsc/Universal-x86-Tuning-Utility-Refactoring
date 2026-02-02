@@ -34,6 +34,7 @@
         <PackageReference Include="DialogHost.Avalonia" Version="0.10.3" />
         <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.1.0" />
         <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.1.0" />
+        <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.DialogHost" Version="2.1.0" />
         <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.1.0" />
         <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.MessageBox" Version="2.1.0" />
         <PackageReference Include="Hardware.Info.Core" Version="101.1.1" />

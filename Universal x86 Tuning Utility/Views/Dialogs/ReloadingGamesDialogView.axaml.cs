@@ -2,9 +2,9 @@
 
 namespace Universal_x86_Tuning_Utility.Views.Dialogs;
 
-public partial class ReloadingGamesDialog : UserControl
+public partial class ReloadingGamesDialogView : UserControl
 {
-    public ReloadingGamesDialog()
+    public ReloadingGamesDialogView()
     {
         InitializeComponent();
     }

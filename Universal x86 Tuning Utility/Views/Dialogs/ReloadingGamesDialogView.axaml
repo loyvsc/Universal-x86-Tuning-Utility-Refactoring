@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Universal_x86_Tuning_Utility.Views.Dialogs.ReloadingGamesDialog"
+﻿<UserControl x:Class="Universal_x86_Tuning_Utility.Views.Dialogs.ReloadingGamesDialogView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
@@ -7,8 +7,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
              xmlns:dialogs="clr-namespace:Universal_x86_Tuning_Utility.ViewModels.Dialogs"
-             d:DesignHeight="450"
-             d:DesignWidth="800"
              mc:Ignorable="d"
              x:DataType="dialogs:ReloadingGamesDialogViewModel">
     <controls:CardControl Height="NaN"
