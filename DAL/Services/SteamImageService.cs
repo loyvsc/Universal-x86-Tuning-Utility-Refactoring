@@ -9,6 +9,7 @@ namespace DAL.Services;
 public class ImageService : IImageService
 {
     private const string SteamApiKey = "33006ae9737e547251b1cff96e9e6ec9";
+    private const string GameImagesDirectory = @"Assets\GameImages";
     
     public async Task<string> GetIconImageUrl(string gameName)
     {
@@ -157,6 +158,10 @@ public class ImageService : IImageService
             response.EnsureSuccessStatusCode();
             await using (var stream = await response.Content.ReadAsStreamAsync())
             {
+                if (!Directory.Exists(GameImagesDirectory))
+                {
+                    Directory.CreateDirectory(GameImagesDirectory);
+                }
                 await using (var fileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write))
                 {
                     await stream.CopyToAsync(fileStream);
