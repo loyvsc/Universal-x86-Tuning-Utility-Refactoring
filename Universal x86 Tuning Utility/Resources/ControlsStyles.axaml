@@ -95,7 +95,8 @@
                                                Margin="0,0,14,0"
                                                VerticalAlignment="Center"
                                                FontSize="{TemplateBinding IconSize}"
-                                               Icon="{TemplateBinding Icon}" />
+                                               Icon="{TemplateBinding Icon}"
+                                               IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                             <ContentPresenter Grid.Column="1"
                                               x:Name="ContentPresenter"
                                               Margin="0,0,14,0"
