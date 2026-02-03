@@ -46,6 +46,11 @@ public class AdaptivePresetService : IAdaptivePresetService
 
     public void SavePreset(string name, AdaptivePreset preset)
     {
+        if (string.IsNullOrWhiteSpace(preset.Name))
+        {
+            preset.Name = name;
+        }
+        
         _presets.Value[name] = preset;
         SavePresets();
     }

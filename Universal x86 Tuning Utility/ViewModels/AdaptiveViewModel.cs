@@ -219,7 +219,10 @@ public class AdaptiveViewModel : ReactiveObject
         var defaultPreset = _adaptivePresetService.GetPreset("Default");
         if (defaultPreset == null)
         {
-            defaultPreset = new AdaptivePreset();
+            defaultPreset = new AdaptivePreset()
+            {
+                Name = "Default"
+            };
         
             if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop ||
                 _systemInfoService.Cpu is RyzenCpuInfo { RyzenFamily: RyzenFamily.DragonRange })
@@ -236,7 +239,7 @@ public class AdaptiveViewModel : ReactiveObject
             defaultPreset.Temp = 95;
             defaultPreset.MinCpuClock = 1500;
             defaultPreset.NvMaxCoreClock = 4000;
-            _adaptivePresetService.SavePreset("Default", defaultPreset);
+            _adaptivePresetService.SavePreset(defaultPreset.Name, defaultPreset);
         } 
         AvailablePresets.Add(defaultPreset);
         
