@@ -53,6 +53,63 @@
         </Setter>
     </Style>
     
+    <Style Selector="controls|IconCardControl">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefault}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimary}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,16,14,16" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="CornerRadius" Value="4,4,4,4" />
+        <Setter Property="Height" Value="70"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:IconCardControl}">
+                    <Border
+                        x:Name="ContentBorder"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        MinWidth="{TemplateBinding MinWidth}"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        Padding="{TemplateBinding Padding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                        <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              ColumnDefinitions="Auto, *, Auto">
+                            <fluent:FluentIcon Grid.Column="0"
+                                               Margin="0,0,14,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="{TemplateBinding IconSize}"
+                                               Icon="{TemplateBinding Icon}" />
+                            <ContentPresenter Grid.Column="1"
+                                              x:Name="ContentPresenter"
+                                              Margin="0,0,14,0"
+                                              VerticalAlignment="Center"
+                                              Content="{TemplateBinding Content}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                            
+                            <ContentPresenter Grid.Column="2"
+                                              x:Name="RightContentPresenter"
+                                              Margin="0,0,8,0"
+                                              VerticalAlignment="Center"
+                                              Content="{TemplateBinding RightMenuContent}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <Style Selector="Button.Transparent">
         <Setter Property="Background" Value="Transparent" />
     </Style>
