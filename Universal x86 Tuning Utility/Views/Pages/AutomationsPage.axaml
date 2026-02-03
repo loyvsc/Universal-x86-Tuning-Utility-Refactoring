@@ -11,26 +11,25 @@
              x:DataType="viewModels:AutomationsViewModel"
              mc:Ignorable="d">
 
-    <DockPanel Margin="15,0,15,0" LastChildFill="False">
+    <DockPanel Margin="15,0,15,0" 
+               LastChildFill="False">
         <TextBlock Margin="3,10,0,0"
                    DockPanel.Dock="Top"
                    FontSize="{StaticResource HeaderFontSize}"
                    FontWeight="Medium"
                    Text="Automations" />
 
-        <controls:CardControl Margin="0,9,0,0" DockPanel.Dock="Top">
-            <Grid ColumnDefinitions="Auto, *, Auto">
-                <fluent:FluentIcon Grid.Column="0" Icon="BatteryCharge" />
-                <StackPanel Grid.Column="1"
-                            Margin="9,0,0,0"
-                            VerticalAlignment="Center">
-                    <TextBlock FontSize="14"
-                               FontWeight="Medium"
-                               Text="Preset on Battery Charge" />
-                    <TextBlock FontSize="12" Text="Provides the ability to set a preset to apply when the battery is charging." />
-                </StackPanel>
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
+        <controls:IconCardControl Margin="0,9,0,0"
+                                  DockPanel.Dock="Top"
+                                  Icon="BatteryCharge">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock FontSize="14"
+                           FontWeight="Medium"
+                           Text="Preset on Battery Charge" />
+                <TextBlock FontSize="12" Text="Provides the ability to set a preset to apply when the battery is charging." />
+            </StackPanel>
+            <controls:IconCardControl.RightMenuContent>
+                <StackPanel Orientation="Horizontal"
                             Spacing="9">
                     <ComboBox Height="37"
                               MinWidth="134"
@@ -48,22 +47,20 @@
                         <fluent:FluentIcon FontSize="20" Icon="ArrowSync" />
                     </Button>
                 </StackPanel>
-
-            </Grid>
-        </controls:CardControl>
-        <controls:CardControl Margin="0,9,0,0" DockPanel.Dock="Top">
-            <Grid ColumnDefinitions="Auto, *,Auto">
-                <fluent:FluentIcon Grid.Column="0" Icon="Battery7" />
-                <StackPanel Grid.Column="1"
-                            Margin="9,0,0,0"
-                            VerticalAlignment="Center">
-                    <TextBlock FontSize="14"
-                               FontWeight="Medium"
-                               Text="Preset on Battery Discharge" />
-                    <TextBlock FontSize="12" Text="Provides the ability to set a preset to apply when the battery is discharging." />
-                </StackPanel>
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
+            </controls:IconCardControl.RightMenuContent>
+        </controls:IconCardControl>
+        <controls:IconCardControl Margin="0,9,0,0" 
+                                  DockPanel.Dock="Top"
+                                  Icon="Battery7">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock FontSize="14"
+                           FontWeight="Medium"
+                           Text="Preset on Battery Discharge" />
+                <TextBlock FontSize="12" 
+                           Text="Provides the ability to set a preset to apply when the battery is discharging." />
+            </StackPanel>
+            <controls:IconCardControl.RightMenuContent>
+                <StackPanel Orientation="Horizontal"
                             Spacing="9">
                     <ComboBox Height="37"
                               MinWidth="134"
@@ -83,24 +80,20 @@
                         <fluent:FluentIcon FontSize="24" Icon="ArrowSync" />
                     </Button>
                 </StackPanel>
-            </Grid>
-        </controls:CardControl>
+            </controls:IconCardControl.RightMenuContent>
+        </controls:IconCardControl>
 
-        <controls:CardControl Margin="0,9,0,0" DockPanel.Dock="Top">
-            <Grid ColumnDefinitions="Auto,*,Auto">
-                <fluent:FluentIcon Grid.Column="0"
-                                   FontSize="20"
-                                   Icon="Sleep" />
-                <StackPanel Grid.Column="1"
-                            Margin="9,0,0,0"
-                            VerticalAlignment="Center">
-                    <TextBlock FontSize="14"
-                               FontWeight="Medium"
-                               Text="Preset on System Resume" />
-                    <TextBlock FontSize="12" Text="Provides the ability to set a preset to apply on system resume from sleep/hibernation." />
-                </StackPanel>
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
+        <controls:IconCardControl Margin="0,9,0,0"
+                                  DockPanel.Dock="Top"
+                                  Icon="Sleep">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock FontSize="14"
+                           FontWeight="Medium"
+                           Text="Preset on System Resume" />
+                <TextBlock FontSize="12" Text="Provides the ability to set a preset to apply on system resume from sleep/hibernation." />
+            </StackPanel>
+            <controls:IconCardControl.RightMenuContent>
+                <StackPanel Orientation="Horizontal"
                             Spacing="9">
                     <ComboBox Height="37"
                               MinWidth="134"
@@ -119,7 +112,7 @@
                         <fluent:FluentIcon FontSize="24" Icon="ArrowSync" />
                     </Button>
                 </StackPanel>
-            </Grid>
-        </controls:CardControl>
+            </controls:IconCardControl.RightMenuContent>
+        </controls:IconCardControl>
     </DockPanel>
 </UserControl>

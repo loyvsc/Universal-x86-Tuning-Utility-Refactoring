@@ -102,25 +102,18 @@
                         Spacing="8"
                         Margin="0,0,15,0">
                 <!-- Auto Switch -->
-                <controls:CardControl>
-                    <Grid ColumnDefinitions="*, Auto">
-                        <StackPanel Grid.Column="0"
-                                    VerticalAlignment="Center"
-                                    Orientation="Horizontal"
-                                    Spacing="14">
-                            <avalonia:FluentIcon Icon="PresenceAvailable"
-                                                 FontSize="24"/>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="Auto Switch" />
-                                <TextBlock FontSize="12" Text="Enable this preset for automatic switching. Can be used to exclude games/apps from auto switch." />
-                            </StackPanel>
-                        </StackPanel>
-                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding CurrentPreset.IsAutoSwitch, UpdateSourceTrigger=PropertyChanged}"
+                <controls:IconCardControl Icon="PresenceAvailable">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock FontSize="14"
+                                   FontWeight="Medium"
+                                   Text="Auto Switch" />
+                        <TextBlock FontSize="12" Text="Enable this preset for automatic switching. Can be used to exclude games/apps from auto switch." />
+                    </StackPanel>
+                    <controls:IconCardControl.RightMenuContent>
+                        <ToggleSwitch IsChecked="{Binding CurrentPreset.IsAutoSwitch, UpdateSourceTrigger=PropertyChanged}"
                                       VerticalAlignment="Center"/>
-                    </Grid>
-                </controls:CardControl>
+                    </controls:IconCardControl.RightMenuContent>
+                </controls:IconCardControl>
 
                 <!-- Basic Adaptive Mode Settings -->
                 <controls:IconExpander Icon="Book">
@@ -688,19 +681,14 @@
                 </controls:IconExpander>
 
                 <!--  ASUS Power profile settings !  -->
-                <controls:CardControl>
-                    <Grid ColumnDefinitions="Auto, *,Auto">
-                        <avalonia:FluentIcon Grid.Column="0"
-                                             Margin="0,0,6,0"
-                                             FontSize="24"
-                                             Icon="Power" />
-                        <StackPanel Grid.Column="1" 
-                                    VerticalAlignment="Center">
-                            <TextBlock FontSize="14"
-                                       FontWeight="Medium"
-                                       Text="ASUS Power Profile" />
-                            <TextBlock FontSize="12" Text="Provides the ability to set an ASUS power profile. This will override Armoury Crate!" />
-                        </StackPanel>
+                <controls:IconCardControl Icon="Power">
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock FontSize="14"
+                                   FontWeight="Medium"
+                                   Text="ASUS Power Profile" />
+                        <TextBlock FontSize="12" Text="Provides the ability to set an ASUS power profile. This will override Armoury Crate!" />
+                    </StackPanel>
+                    <controls:IconCardControl.RightMenuContent>
                         <ComboBox Grid.Column="2"
                                   Height="37"
                                   MinWidth="164"
@@ -711,8 +699,8 @@
                             <ComboBoxItem>Performance</ComboBoxItem>
                             <ComboBoxItem>Turbo</ComboBoxItem>
                         </ComboBox>
-                    </Grid>
-                </controls:CardControl>
+                    </controls:IconCardControl.RightMenuContent>
+                </controls:IconCardControl>
 
                 <!-- Static RTSS Frame Rate -->
                 <controls:IconExpander IsVisible="False"

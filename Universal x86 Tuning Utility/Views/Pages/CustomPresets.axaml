@@ -2188,45 +2188,36 @@
                     </controls:IconExpander>
 
                     <!-- Amd power (boost) profile settings !-->
-                    <controls:CardControl IsVisible="{Binding IsAmdPowerProfileSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
-                        <Grid ColumnDefinitions="Auto, *, Auto">
-                            <avalonia:FluentIcon Grid.Column="0"
-                                                 Margin="4,0,14,0"
-                                                 Icon="FastAcceleration"
-                                                 FontSize="24" />
-                            <StackPanel Grid.Column="1"
-                                        VerticalAlignment="Center">
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="AMD Boost Profile" />
-                                <TextBlock FontSize="12"
-                                           Text="Provides the ability to set a manual boost profile which impact on boost delay." />
-                            </StackPanel>
+                    <controls:IconCardControl IsVisible="{Binding IsAmdPowerProfileSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
+                                              Icon="FastAcceleration">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock FontSize="14"
+                                       FontWeight="Medium"
+                                       Text="AMD Boost Profile" />
+                            <TextBlock FontSize="12"
+                                       Text="Provides the ability to set a manual boost profile which impact on boost delay." />
+                        </StackPanel>
+                        <controls:IconCardControl.RightMenuContent>
                             <ComboBox Grid.Column="2"
-                                      VerticalAlignment="Center"
                                       ItemsSource="{Binding AmdPowerProfiles}"
                                       SelectedValue="{Binding SelectedPreset.BoostProfile, UpdateSourceTrigger=PropertyChanged}"
                                       MinWidth="164" 
                                       Height="37"/>
-                        </Grid>
-                    </controls:CardControl>
+                        </controls:IconCardControl.RightMenuContent>
+                    </controls:IconCardControl>
 
                     <!-- Display settings !-->
-                    <controls:CardControl IsVisible="{Binding IsChangeRefreshRateAvailable, UpdateSourceTrigger=PropertyChanged}">
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <avalonia:FluentIcon Grid.Column="0"
-                                                 Icon="Desktop"
-                                                 Margin="4,0,14,0"
-                                                 FontSize="20" />
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="Display Refresh Rate" />
-                                <TextBlock FontSize="12"
-                                           Text="Provides the ability to set a custom supported display refresh rate. May not work for everyone!" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2"
-                                        Orientation="Horizontal"
+                    <controls:IconCardControl IsVisible="{Binding IsChangeRefreshRateAvailable, UpdateSourceTrigger=PropertyChanged}"
+                                              Icon="Desktop">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock FontSize="14"
+                                       FontWeight="Medium"
+                                       Text="Display Refresh Rate" />
+                            <TextBlock FontSize="12"
+                                       Text="Provides the ability to set a custom supported display refresh rate. May not work for everyone!" />
+                        </StackPanel>
+                        <controls:IconCardControl.RightMenuContent>
+                            <StackPanel Orientation="Horizontal"
                                         Spacing="8">
                                 <ComboBox ItemsSource="{Binding AvailableDisplays, UpdateSourceTrigger=PropertyChanged}"
                                           SelectedValue="{Binding SelectedDisplay, UpdateSourceTrigger=PropertyChanged}"
@@ -2249,108 +2240,79 @@
                                           MinWidth="164"
                                           Height="37" />
                             </StackPanel>
-                        </Grid>
-                    </controls:CardControl>
+                        </controls:IconCardControl.RightMenuContent>
+                    </controls:IconCardControl>
 
                     <!-- Power mode settings !-->
-                    <controls:CardControl>
-                        <Grid ColumnDefinitions="Auto, *, Auto">
-                            <avalonia:FluentIcon Grid.Column="0" 
-                                                 Icon="Power"
-                                                 Margin="4,0,14,0"
-                                                 FontSize="20" />
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="Power Mode" />
-                                <TextBlock FontSize="12"
-                                           Text="Provides the ability to change the Windows power mode from a preset." />
-                            </StackPanel>
-                            <ComboBox Grid.Column="2"
-                                      VerticalAlignment="Center"
+                    <controls:IconCardControl Icon="Power">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock FontSize="14"
+                                       FontWeight="Medium"
+                                       Text="Power Mode" />
+                            <TextBlock FontSize="12"
+                                       Text="Provides the ability to change the Windows power mode from a preset." />
+                        </StackPanel>
+                        <controls:IconCardControl.RightMenuContent>
+                            <ComboBox VerticalAlignment="Center"
                                       ItemsSource="{Binding PowerModes}"
                                       DisplayMemberBinding="{Binding Name}"
                                       SelectedValue="{Binding SelectedPreset.PowerMode, UpdateSourceTrigger=PropertyChanged}"
                                       MinWidth="164"
                                       Height="37"/>
-
-                        </Grid>
-                    </controls:CardControl>
+                        </controls:IconCardControl.RightMenuContent>
+                    </controls:IconCardControl>
 
                     <!-- Asus power settings !-->
-                    <controls:CardControl IsVisible="{Binding IsAsusPowerSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
-                        <Grid ColumnDefinitions="Auto, *, Auto">
-                            <avalonia:FluentIcon Icon="Power"
-                                                 Margin="4,0,14,0"
-                                                 FontSize="20" />
-                            <StackPanel Grid.Column="1"
-                                        VerticalAlignment="Center">
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="ASUS Power Profile" />
-                                <TextBlock FontSize="12"
-                                           Text="Provides the ability to set an ASUS power profile. This will override Armoury Crate!" />
-                            </StackPanel>
-                            <ComboBox Grid.Column="2"
-                                      VerticalAlignment="Center"
+                    <controls:IconCardControl IsVisible="{Binding IsAsusPowerSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
+                                              Icon="Power">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock FontSize="14"
+                                       FontWeight="Medium"
+                                       Text="ASUS Power Profile" />
+                            <TextBlock FontSize="12"
+                                       Text="Provides the ability to set an ASUS power profile. This will override Armoury Crate!" />
+                        </StackPanel>
+                        <controls:IconCardControl.RightMenuContent>
+                            <ComboBox VerticalAlignment="Center"
                                       SelectedValue="{Binding SelectedAsusPowerProfile, UpdateSourceTrigger=PropertyChanged}"
                                       ItemsSource="{Binding AsusPowerProfiles, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberBinding="{Binding Title}"
                                       MinWidth="164"
-                                      Height="37">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type models:AsusPowerProfile}">
-                                        <Label Content="{Binding Title}" />
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                        </Grid>
-                    </controls:CardControl>
+                                      Height="37"/>
+                        </controls:IconCardControl.RightMenuContent>
+                    </controls:IconCardControl>
 
                     <!-- Asus gpu mode !-->
-                    <controls:CardControl IsVisible="{Binding IsAsusGpuUltimateSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
-                        <Grid ColumnDefinitions="Auto, *, Auto">
-                            <avalonia:FluentIcon Icon="FastAcceleration"
-                                                 Margin="4,0,14,0"
-                                                 FontSize="20" />
-                            <StackPanel Grid.Column="1"
-                                        VerticalAlignment="Center">
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="ASUS GPU Ultimate Mode" />
-                                <TextBlock FontSize="12"
-                                           Text="Provides the ability to manually toggle MUX switch on/off. This will override Armoury Crate!" />
-                            </StackPanel>
+                    <controls:IconCardControl IsVisible="{Binding IsAsusGpuUltimateSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
+                                              Icon="FastAcceleration">
+                        <StackPanel>
+                            <TextBlock FontSize="14"
+                                       FontWeight="Medium"
+                                       Text="ASUS GPU Ultimate Mode" />
+                            <TextBlock FontSize="12"
+                                       Text="Provides the ability to manually toggle MUX switch on/off. This will override Armoury Crate!" />
+                        </StackPanel>
 
-                            <StackPanel Grid.Column="2"
-                                        Orientation="Horizontal">
-                                <ToggleSwitch IsChecked="{Binding SelectedPreset.IsAsusGpuUlti, UpdateSourceTrigger=PropertyChanged}" 
-                                              Command="{Binding AsusGpuUltimateModSwitchedCommand}"
-                                              Margin="0,0,9,0" />
-                            </StackPanel>
-                        </Grid>
-                    </controls:CardControl>
+                        <controls:IconCardControl.RightMenuContent>
+                            <ToggleSwitch IsChecked="{Binding SelectedPreset.IsAsusGpuUlti, UpdateSourceTrigger=PropertyChanged}" 
+                                          Command="{Binding AsusGpuUltimateModSwitchedCommand}" />
+                        </controls:IconCardControl.RightMenuContent>
+                    </controls:IconCardControl>
 
                     <!-- Asus eco-mode settings !-->
-                    <controls:CardControl IsVisible="{Binding IsAsusEcoModeAvailable, UpdateSourceTrigger=PropertyChanged}">
-                        <Grid ColumnDefinitions="Auto, *, Auto">
-                            <avalonia:FluentIcon Icon="LeafTwo"
-                                                 Margin="4,0,14,0"
-                                                 FontSize="20" />
-                            <StackPanel Grid.Column="1"
-                                        VerticalAlignment="Center">
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="ASUS iGPU Only Mode" />
-                                <TextBlock FontSize="12"
-                                           Text="Provides the ability to toggle iGPU only mode on/off. This will override Armoury Crate!" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2"
-                                        Orientation="Horizontal">
-                                <ToggleSwitch IsChecked="{Binding SelectedPreset.AsusIGpu, UpdateSourceTrigger=PropertyChanged}"
-                                              Margin="0,0,9,0" />
-                            </StackPanel>
-                        </Grid>
-                    </controls:CardControl>
+                    <controls:IconCardControl IsVisible="{Binding IsAsusEcoModeAvailable, UpdateSourceTrigger=PropertyChanged}"
+                                              Icon="LeafTwo">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock FontSize="14"
+                                       FontWeight="Medium"
+                                       Text="ASUS iGPU Only Mode" />
+                            <TextBlock FontSize="12"
+                                       Text="Provides the ability to toggle iGPU only mode on/off. This will override Armoury Crate!" />
+                        </StackPanel>
+                        <controls:IconCardControl.RightMenuContent>
+                            <ToggleSwitch IsChecked="{Binding SelectedPreset.AsusIGpu, UpdateSourceTrigger=PropertyChanged}" />
+                        </controls:IconCardControl.RightMenuContent>
+                    </controls:IconCardControl>
                 </StackPanel>
             </ScrollViewer>
         </DockPanel>
