@@ -11,6 +11,13 @@
         </Border>
     </Design.PreviewWith>
     
+    <Style Selector="ComboBox">
+        <Style Selector="^ /template/ ContentPresenter#ContentPresenter">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Style>
+    
     <Style Selector="ToggleSwitch">
         <Style Selector="^ /template/ Grid > ContentPresenter#PART_ContentPresenter">
             <Setter Property="IsVisible" Value="False"/>
