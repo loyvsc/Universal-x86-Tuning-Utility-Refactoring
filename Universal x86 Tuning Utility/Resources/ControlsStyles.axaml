@@ -11,10 +11,15 @@
         </Border>
     </Design.PreviewWith>
     
+    <Style Selector="ToggleSwitch">
+        <Style Selector="^ /template/ Grid > ContentPresenter#PART_ContentPresenter">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+    </Style>
+    
     <Style Selector="controls|CardControl">
         <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefault}" />
         <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimary}" />
-        <Setter Property="BorderBrush" Value="#190000" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="14,16,14,16" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -24,6 +29,7 @@
         <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="CornerRadius" Value="4,4,4,4" />
+        <Setter Property="Height" Value="70"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:CardControl}">
@@ -116,10 +122,6 @@
     
     <Style Selector="fluent|FluentIcon">
         <Setter Property="FontSize" Value="{DynamicResource DefaultIconExpanderSize}"/>
-    </Style>
-    
-    <Style Selector="controls|CardControl">
-        <Setter Property="Height" Value="70"/>
     </Style>
     
     <Style Selector="Border.Card">
