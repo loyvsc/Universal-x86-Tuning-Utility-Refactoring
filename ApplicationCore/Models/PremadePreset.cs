@@ -2,12 +2,6 @@ namespace ApplicationCore.Models;
 
 public class PremadePreset : Preset
 {
-    public string Name
-    {
-        get => _name;
-        set => SetValue(ref _name, value);
-    }
-
     public string RyzenAdjParameters
     {
         get => _ryzenAdjParameters;
@@ -19,8 +13,7 @@ public class PremadePreset : Preset
         get => _description;
         set => SetValue(ref _description, value);
     }
-
-    private string _name;
+    
     private string _ryzenAdjParameters;
     private string _description;
 }
