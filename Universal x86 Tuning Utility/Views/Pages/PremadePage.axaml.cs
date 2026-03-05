@@ -9,6 +9,6 @@ public partial class PremadePage : UserControl
 {
     public PremadePage()
     {
-        InitializeIfNeeded();
+        InitializeComponent();
     }
 }

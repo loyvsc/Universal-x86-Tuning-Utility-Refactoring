@@ -4,5 +4,6 @@ public enum SensorType
 {
     Load,
     Clock,
-    Temperature
+    Temperature,
+    Power
 }

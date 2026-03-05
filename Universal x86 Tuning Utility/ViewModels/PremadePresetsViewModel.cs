@@ -1,9 +1,12 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
+using ApplicationCore.Models.LaptopInfo;
 using ApplicationCore.Utilities;
 using DesktopNotifications;
 using Microsoft.Extensions.Logging;
@@ -13,55 +16,106 @@ using Universal_x86_Tuning_Utility.Properties;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class PremadePresetsViewModel : NotifyPropertyChangedBase
+public class PremadePresetsViewModel : ReactiveObject
 {
-    private readonly ILogger<PremadePresetsViewModel> _logger;
+    private readonly Serilog.ILogger _logger;
+    private readonly ISystemInfoService _systemInfoService;
     private readonly IPremadePresets _premadePresets;
     private readonly IRyzenAdjService _ryzenAdjService;
     private readonly INotificationManager _notificationManager;
+    private readonly IBatteryInfoService _batteryInfoService;
+    private readonly ISensorsService _sensorsService;
     public ICommand ApplyPresetCommand { get; }
+
+    public string Header
+    {
+        get => _header;
+        set => this.RaiseAndSetIfChanged(ref _header, value);
+    }
+
+    public bool IsCertifiedBadgeVisible
+    {
+        get => _isCertifiedBadgeVisible;
+        set => this.RaiseAndSetIfChanged(ref _isCertifiedBadgeVisible, value);
+    }
 
     public PremadePreset? CurrentPreset
     {
         get => _currentPreset;
-        set => SetValue(ref _currentPreset, value);
+        set
+        {
+            if (_currentPreset != value && value != null)
+            {
+                _currentPreset = value;
+                this.RaisePropertyChanged();
+                ApplyPreset(_currentPreset);
+            }
+        }
     }
 
     public EnhancedObservableCollection<PremadePreset> AvailablePresets
     {
         get => _availablePresets;
-        set => SetValue(ref _availablePresets, value);
+        set => this.RaiseAndSetIfChanged(ref _availablePresets, value);
     }
 
     private PremadePreset? _currentPreset;
     private EnhancedObservableCollection<PremadePreset> _availablePresets;
+    private string _header;
+    private bool _isCertifiedBadgeVisible;
 
-    public PremadePresetsViewModel(ILogger<PremadePresetsViewModel> logger,
+    public PremadePresetsViewModel(Serilog.ILogger logger,
+                                   ISystemInfoService systemInfoService,
                                    IPremadePresets premadePresets,
                                    IRyzenAdjService ryzenAdjService,
-                                   INotificationManager notificationManager)
+                                   INotificationManager notificationManager,
+                                   IBatteryInfoService batteryInfoService,
+                                   ISensorsService sensorsService)
     {
         _logger = logger;
+        _systemInfoService = systemInfoService;
         _premadePresets = premadePresets;
         _ryzenAdjService = ryzenAdjService;
         _notificationManager = notificationManager;
-        
+        _batteryInfoService = batteryInfoService;
+        _sensorsService = sensorsService;
+
         AvailablePresets = new EnhancedObservableCollection<PremadePreset>(_premadePresets.PremadePresetsList);
-        ApplyPresetCommand = ReactiveCommand.CreateFromTask(ApplyPreset);
+        ApplyPresetCommand = ReactiveCommand.CreateFromTask((PremadePreset? x) => ApplyPreset(x));
+
+        Header = "Premade Presets";
+
+        if (_batteryInfoService.Batteries.Count != 0)
+        {
+            if (_batteryInfoService.Batteries.All(x => x.Status.Value is BatteryStatus.FullCharged or BatteryStatus.Charging))
+            {
+                Task.Run(() => CurrentPreset = AvailablePresets[2]);
+            }
+            else
+            {
+                Task.Run(() => CurrentPreset = AvailablePresets[1]);
+            }
+        }
+        else
+        {
+            if (_sensorsService.GetCPUInfo(SensorType.Temperature, "Package") <= 70)
+            {
+                Task.Run(() => CurrentPreset = AvailablePresets[3]);
+            }
+        }
     }
 
-    private async Task ApplyPreset(CancellationToken cancellationToken)
+    private async Task ApplyPreset(PremadePreset? premadePreset)
     {
-        if (CurrentPreset == null) return;
+        if (premadePreset == null) return;
         try
         {
-            //ReloadValue();
+            ReloadValue();
 
-            await _ryzenAdjService.Translate(CurrentPreset.RyzenAdjParameters);
+            await _ryzenAdjService.Translate(premadePreset.RyzenAdjParameters);
 
             await _notificationManager.ShowTextNotification(title: $"{CurrentPreset.Name} Preset Applied!",
-                text: $"The {CurrentPreset.Name.ToLower()} premade power preset has been applied!",
-                cancellationToken: cancellationToken);
+                text: $"The {CurrentPreset.Name.ToLower()} premade power preset has been applied!");
 
             Settings.Default.CommandString = CurrentPreset.RyzenAdjParameters;
             Settings.Default.premadePreset =
@@ -72,52 +126,44 @@ public class PremadePresetsViewModel : NotifyPropertyChangedBase
         {
             await _notificationManager.ShowTextNotification(title: "Error", 
                                                             text: "Error occured while applying preset",
-                                                            notificationType: NotificationManagerExtensions.NotificationType.Error,
-                                                            cancellationToken: cancellationToken);
-            _logger.LogError(ex, "Error while applying preset");
+                                                            notificationType: NotificationManagerExtensions.NotificationType.Error);
+            _logger.Error(ex, "Error while applying preset");
         }
     }
 
-    // private void ReloadValue()
-    // {
-    //     try
-    //     {
-    //         if (_systemInfoService.CpuInfo.AmdProcessorType is AmdProcessorType.Apu or AmdProcessorType.Desktop)
-    //         {
-    //             var cpuName = _systemInfoService.CpuInfo.Name.Replace("AMD", null)
-    //                                                          .Replace("with", null)
-    //                                                          .Replace("Mobile", null)
-    //                                                          .Replace("Ryzen", null)
-    //                                                          .Replace("Radeon", null)
-    //                                                          .Replace("Graphics", null)
-    //                                                          .Replace("Vega", null)
-    //                                                          .Replace("Gfx", null);
-    //
-    //             var productName = _systemInfoService.Product.ToLower();
-    //             var manufacturer = _systemInfoService.Manufacturer.ToLower();
-    //
-    //             if (productName.Contains("laptop 16 (amd ryzen 7040") &&
-    //                manufacturer.Contains("framework"))
-    //             {
-    //                 tbxMessage.Text = "Premade Presets - Framework Laptop 16 (AMD Ryzen 7040HS Series)";
-    //                 bdgCertified.Visibility = Visibility.Visible;
-    //             }
-    //             else if (productName.Contains("laptop 13 (amd ryzen 7040") &&
-    //                     manufacturer.Contains("framework"))
-    //             {
-    //                 tbxMessage.Text = "Premade Presets - Framework Laptop 13 (AMD Ryzen 7040U Series)";
-    //                 bdgCertified.Visibility = Visibility.Visible;
-    //             }
-    //             else bdgCertified.Visibility = Visibility.Collapsed;
-    //             
-    //             _premadePresets.InitializePremadePresets();
-    //
-    //             int selectedPreset = Settings.Default.premadePreset;
-    //         }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Failed to update Premade page");
-    //     }
-    // }
+    private void ReloadValue()
+    {
+        try
+        {
+            if (_systemInfoService.Cpu.ProcessorType is ProcessorType.Apu or ProcessorType.Desktop)
+            {
+                if (_systemInfoService.LaptopInfo is FrameworkLaptopInfo frameworkLaptopInfo)
+                {
+                    if (frameworkLaptopInfo.CpuSeries == "7040")
+                    {
+                        if (frameworkLaptopInfo.LaptopSeries == 16)
+                        {
+                            Header = "Premade Presets - Framework Laptop 16 (AMD Ryzen 7040HS Series)";
+                            IsCertifiedBadgeVisible = true;
+                        }
+                        else if (frameworkLaptopInfo.LaptopSeries == 13)
+                        {
+                            Header = "Premade Presets - Framework Laptop 13 (AMD Ryzen 7040U Series)";
+                            IsCertifiedBadgeVisible = true;
+                        }
+                    }
+                }
+                else
+                {
+                    IsCertifiedBadgeVisible = false;
+                }
+    
+                int selectedPreset = Settings.Default.premadePreset;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to update Premade page");
+        }
+    }
 }

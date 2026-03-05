@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using ApplicationCore.Interfaces;
@@ -9,59 +10,60 @@ namespace Universal_x86_Tuning_Utility.Services.PresetServices;
 public class AdaptivePresetService : IAdaptivePresetService
 {
     private readonly string _filePath;
-    private Dictionary<string, AdaptivePreset> _presets;
+    private readonly Lazy<Dictionary<string, AdaptivePreset>> _presets;
 
     public AdaptivePresetService(string filePath)
     {
         _filePath = filePath;
-        _presets = new Dictionary<string, AdaptivePreset>();
-        
-        LoadPresets();
+        _presets = new Lazy<Dictionary<string, AdaptivePreset>>(() =>
+        {
+            if (!File.Exists(_filePath))
+            {
+                return [];
+            }
+
+            try
+            {
+                var serializedPresets = File.ReadAllText(_filePath);
+                return JsonSerializer.Deserialize<Dictionary<string, AdaptivePreset>>(serializedPresets) ?? [];
+            }
+            catch
+            {
+                return [];
+            }
+        });
     }
 
     public IEnumerable<string> GetPresetNames()
     {
-        return _presets.Keys;
+        return _presets.Value.Keys;
     }
 
     public AdaptivePreset? GetPreset(string presetName)
     {
-        return _presets.GetValueOrDefault(presetName);
+        return _presets.Value.GetValueOrDefault(presetName);
     }
 
     public void SavePreset(string name, AdaptivePreset preset)
     {
-        _presets[name] = preset;
+        if (string.IsNullOrWhiteSpace(preset.Name))
+        {
+            preset.Name = name;
+        }
+        
+        _presets.Value[name] = preset;
         SavePresets();
     }
 
     public void DeletePreset(string name)
     {
-        _presets.Remove(name);
+        _presets.Value.Remove(name);
         SavePresets();
     }
 
-    private void LoadPresets()
-    {
-        if (File.Exists(_filePath))
-        {
-            var serializedPresets = File.ReadAllText(_filePath);
-            var readPresets = JsonSerializer.Deserialize<Dictionary<string, AdaptivePreset>>(serializedPresets);
-            if (readPresets != null)
-            {
-                _presets = readPresets;
-            }
-        }
-        else
-        {
-            _presets.Clear();
-        }
-    }
-
-
     private void SavePresets()
     {
-        var serializedPresets = JsonSerializer.Serialize(_presets);
+        var serializedPresets = JsonSerializer.Serialize(_presets.Value);
         File.WriteAllText(_filePath, serializedPresets);
     }
 }

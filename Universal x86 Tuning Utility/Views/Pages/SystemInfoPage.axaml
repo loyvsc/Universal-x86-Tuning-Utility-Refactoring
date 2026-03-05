@@ -1,374 +1,652 @@
 ﻿<UserControl x:Class="Universal_x86_Tuning_Utility.Views.Pages.SystemInfoPage"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:ic="using:FluentAvalonia.FluentIcons"
-             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:models="clr-namespace:ApplicationCore.Models;assembly=ApplicationCore"
+             xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             d:DesignHeight="720"
+             d:DesignWidth="1280"
              x:DataType="viewModels:SystemInfoViewModel"
-             mc:Ignorable="d"
-             d:DesignHeight="1500"
-             d:DesignWidth="800">
-    <Grid>
-        <DockPanel Margin="15,0,0,0">
-            <TextBlock FontSize="26"
-                       FontWeight="Medium"
-                       Text="System Info"
-                       DockPanel.Dock="Top" Margin="3,10,0,0" />
+             mc:Ignorable="d">
+    <DockPanel Margin="15,0,0,0">
+        <TextBlock Margin="3,10,0,0"
+                   DockPanel.Dock="Top"
+                   FontSize="{StaticResource HeaderFontSize}"
+                   FontWeight="Medium"
+                   Text="System Info" />
 
-            <ScrollViewer Margin="0,12,0,0"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto"
-                          IsDeferredScrollingEnabled="False"
-                          DockPanel.Dock="Top">
-                <StackPanel>
-                    <Expander IsExpanded="True"
-                              VerticalAlignment="Top"
-                              Margin="0,0,15,0">
-                        <Expander.Header>
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                <controls:SymbolIcon Symbol="{ic:FluentIcon Desktop20Regular}" />
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="Device Information" />
+        <ScrollViewer Margin="0,12,0,0"
+                      DockPanel.Dock="Top"
+                      HorizontalScrollBarVisibility="Auto"
+                      IsDeferredScrollingEnabled="False"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,15,15" Spacing="9">
+                <controls:IconExpander VerticalAlignment="Top"
+                                       FontWeight="Medium"
+                                       Header="Device Information"
+                                       Icon="Desktop"
+                                       IsExpanded="True">
+
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Width="80"
+                                    Margin="24,0,12,0"
+                                    Spacing="8">
+                            <TextBlock FontWeight="DemiBold" Text="Name" />
+                            <TextBlock FontWeight="DemiBold" Text="Producer" />
+                            <TextBlock FontWeight="DemiBold" Text="Model" />
+                        </StackPanel>
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="{Binding DeviceName, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="{Binding DeviceManufacturer, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="{Binding DeviceModel, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </StackPanel>
+                </controls:IconExpander>
+                <controls:IconExpander VerticalAlignment="Top"
+                                       FontWeight="Medium"
+                                       Header="Processor Information"
+                                       Icon="DeveloperBoard"
+                                       IsExpanded="True">
+
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Width="80"
+                                        Margin="24,0,12,0"
+                                        Spacing="8">
+                                <TextBlock FontWeight="DemiBold" Text="Processor" />
+                                <TextBlock FontWeight="DemiBold" Text="Producer" />
+                                <TextBlock FontWeight="DemiBold" Text="Codename" />
+                                <TextBlock FontWeight="DemiBold" Text="Caption" />
+                                <TextBlock FontWeight="DemiBold" Text="Cores" />
+                                <TextBlock FontWeight="DemiBold" Text="Threads" />
+                                <TextBlock FontWeight="DemiBold" Text="Base Clock" />
+                                <TextBlock FontWeight="DemiBold" Text="L1 Cache" />
+                                <TextBlock FontWeight="DemiBold" Text="L2 Cache" />
+                                <TextBlock FontWeight="DemiBold" Text="L3 Cache" />
+                                <TextBlock FontWeight="DemiBold" Text="Instructions" />
                             </StackPanel>
-                        </Expander.Header>
-                        <!--  Expander content  -->
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel Margin="24,0,12,0" Width="80">
-                                    <TextBlock FontWeight="DemiBold"
-                                               Text="Name" />
-                                    <TextBlock FontWeight="DemiBold"
-                                               Margin="0,8,0,0"
-                                               Text="Producer" />
-                                    <TextBlock FontWeight="DemiBold"
-                                               Margin="0,8,0,0"
-                                               Text="Model" />
-                                </StackPanel>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding DeviceName, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Text="{Binding DeviceManufacturer, UpdateSourceTrigger=PropertyChanged}"
-                                               Margin="0,8,0,0" />
-                                    <TextBlock Text="{Binding DeviceModel, UpdateSourceTrigger=PropertyChanged}"
-                                               Margin="0,8,0,0" />
-                                </StackPanel>
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{Binding CpuInfo.Name}" />
+                                <TextBlock Text="{Binding CpuInfo.Manufacturer}" />
+                                <TextBlock Text="{Binding CpuInfo.CodeName}" />
+                                <TextBlock Text="{Binding CpuInfo.Description}" />
+                                <TextBlock Text="{Binding CpuCoresInfo, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding CpuInfo.LogicalCoresCount}" />
+                                <TextBlock Text="{Binding CpuBaseClock, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding CpuL1Cache, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding CpuL2Cache, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding CpuL3Cache, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding CpuInstructions, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                         </StackPanel>
-                    </Expander>
-                    <Expander IsExpanded="True"
-                              VerticalAlignment="Top"
-                              Margin="0,9,15,0">
-                        <Expander.Header>
-                            <StackPanel VerticalAlignment="Center">
-                                <controls:SymbolIcon Symbol="{ic:FluentIcon DeveloperBoard20Regular}" />
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="Processor Information" />
+                    </StackPanel>
+                </controls:IconExpander>
+                <controls:IconExpander VerticalAlignment="Top"
+                                       FontWeight="Medium"
+                                       Header="Memory Information"
+                                       Icon="Ram"
+                                       IsExpanded="True">
+
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Width="80"
+                                        Margin="24,0,12,0"
+                                        Spacing="8">
+                                <TextBlock FontWeight="DemiBold" Text="Memory" />
+                                <TextBlock FontWeight="DemiBold" Text="Producer" />
+                                <TextBlock FontWeight="DemiBold" Text="Model" />
+                                <TextBlock FontWeight="DemiBold" Text="Width" />
+                                <TextBlock FontWeight="DemiBold" Text="Modules" />
                             </StackPanel>
-                        </Expander.Header>
-                        <!--  Expander content  -->
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel Margin="24,0,12,0" Width="80">
-                                    <TextBlock FontWeight="DemiBold" Text="Processor" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Producer" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Codename" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Caption" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Cores" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Threads" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Base Clock" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="L1 Cache" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="L2 Cache" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="L3 Cache" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Instructions" />
-                                </StackPanel>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding CpuInfo.Name}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding CpuInfo.Manufacturer}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding CpuInfo.CodeName}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding CpuInfo.Description}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding CpuCoresInfo, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding CpuInfo.LogicalCoresCount}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding CpuBaseClock, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding CpuL1Cache, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding CpuL2Cache, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding CpuL3Cache, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding CpuInstructions, UpdateSourceTrigger=PropertyChanged}" />
-                                </StackPanel>
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{Binding RamInfo, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding RamProducer, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding RamModel, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding RamWidth, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding RamSlots, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                         </StackPanel>
-                    </Expander>
-                    <Expander IsExpanded="True"
-                              VerticalAlignment="Top" Margin="0,9,15,0">
-                        <Expander.Header>
-                            <StackPanel VerticalAlignment="Center">
-                                <controls:SymbolIcon Symbol="{ic:FluentIcon Ram20Regular}" />
-                                <TextBlock
-                                    FontSize="14"
-                                    FontWeight="Medium"
-                                    Text="Memory Information" />
-                            </StackPanel>
-                        </Expander.Header>
-                        <!--  Expander content  -->
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel Margin="24,0,12,0"
-                                            Width="80">
-                                    <TextBlock FontWeight="DemiBold" Text="Memory" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Producer" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Model" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Width" />
-                                    <TextBlock FontWeight="DemiBold" Margin="0,8,0,0" Text="Modules" />
-                                </StackPanel>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding RamInfo, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding RamProducer, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding RamModel, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding RamWidth, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding RamSlots, UpdateSourceTrigger=PropertyChanged}" />
-                                </StackPanel>
-                            </StackPanel>
 
-                            <StackPanel Margin="24,8,12,0">
-                                <TextBlock FontWeight="DemiBold"
-                                           Text="RAM Timings:" />
+                        <StackPanel Margin="24,8,12,0">
+                            <TextBlock FontWeight="DemiBold" Text="RAM Timings:" />
 
-                                <Grid DataContext="{Binding $parent.((viewModels:SystemInfoViewModel)DataContext).RamTimings}">
-                                    <Grid.DataTemplates>
-                                        <DataTemplate DataType="models:RyzenMemoryTimings">
-                                            <Grid Margin="-5,8,0,0" ColumnDefinitions="2*,*,2*,*"
-                                                  RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                            <ContentControl Content="{Binding RamTimings, UpdateSourceTrigger=PropertyChanged}">
+                                <ContentControl.DataTemplates>
+                                    <DataTemplate DataType="models:RyzenMemoryTimings">
+                                        <Grid Margin="-5,8,0,0"
+                                              ColumnDefinitions="2*,*,2*,*"
+                                              RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
 
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="BGS:" Margin="5" />
-                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding BGS}" Margin="5" />
-                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="BGSA:" Margin="5" />
-                                                <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding BGSA}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="0"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="BGS:" />
+                                            <TextBlock Grid.Row="0"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding BGS}" />
+                                            <TextBlock Grid.Row="0"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="BGSA:" />
+                                            <TextBlock Grid.Row="0"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding BGSA}" />
 
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Preamble2T:" Margin="5" />
-                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Preamble2T}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="GDM:" Margin="5" />
-                                                <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding GDM}" Margin="5" />
+                                            <TextBlock Grid.Row="1"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="Preamble2T:" />
+                                            <TextBlock Grid.Row="1"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding Preamble2T}" />
+                                            <TextBlock Grid.Row="1"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="GDM:" />
+                                            <TextBlock Grid.Row="1"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding GDM}" />
 
-                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Command Rate:" Margin="5" />
-                                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CommandRate}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="tRCDWR:" Margin="5" />
-                                                <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding tRCDWR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="2"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="Command Rate:" />
+                                            <TextBlock Grid.Row="2"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding CommandRate}" />
+                                            <TextBlock Grid.Row="2"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRCDWR:" />
+                                            <TextBlock Grid.Row="2"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRCDWR}" />
 
-                                                <TextBlock Grid.Row="3" Grid.Column="0" Text="tRCDRD:" Margin="5" />
-                                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding tRCDRD}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="3" Grid.Column="2" Text="tRAS:" Margin="5" />
-                                                <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding tRAS}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="3"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRCDRD:" />
+                                            <TextBlock Grid.Row="3"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRCDRD}" />
+                                            <TextBlock Grid.Row="3"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRAS:" />
+                                            <TextBlock Grid.Row="3"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRAS}" />
 
-                                                <TextBlock Grid.Row="4" Grid.Column="0" Text="tCL:" Margin="5" />
-                                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding tCL}" Margin="5" />
-                                                <TextBlock Grid.Row="4" Grid.Column="2" Text="tRPPB:" Margin="5" />
-                                                <TextBlock Grid.Row="4" Grid.Column="3" Text="{Binding tRPPB}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="4"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tCL:" />
+                                            <TextBlock Grid.Row="4"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tCL}" />
+                                            <TextBlock Grid.Row="4"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRPPB:" />
+                                            <TextBlock Grid.Row="4"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRPPB}" />
 
-                                                <TextBlock Grid.Row="5" Grid.Column="0" Text="tRP:" Margin="5" />
-                                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding tRP}" Margin="5" />
-                                                <TextBlock Grid.Row="5" Grid.Column="2" Text="tRCPB:" Margin="5" />
-                                                <TextBlock Grid.Row="5" Grid.Column="3" Text="{Binding tRCPB}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="5"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRP:" />
+                                            <TextBlock Grid.Row="5"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRP}" />
+                                            <TextBlock Grid.Row="5"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRCPB:" />
+                                            <TextBlock Grid.Row="5"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRCPB}" />
 
-                                                <TextBlock Grid.Row="6" Grid.Column="0" Text="tRC:" Margin="5" />
-                                                <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding tRC}" Margin="5" />
-                                                <TextBlock Grid.Row="6" Grid.Column="2" Text="tRTP:" Margin="5" />
-                                                <TextBlock Grid.Row="6" Grid.Column="3" Text="{Binding tRTP}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="6"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRC:" />
+                                            <TextBlock Grid.Row="6"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRC}" />
+                                            <TextBlock Grid.Row="6"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRTP:" />
+                                            <TextBlock Grid.Row="6"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRTP}" />
 
-                                                <TextBlock Grid.Row="7" Grid.Column="0" Text="tRRDDLR:" Margin="5" />
-                                                <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding tRRDDLR}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="7" Grid.Column="2" Text="tRRDL:" Margin="5" />
-                                                <TextBlock Grid.Row="7" Grid.Column="3" Text="{Binding tRRDL}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="7"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRRDDLR:" />
+                                            <TextBlock Grid.Row="7"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRRDDLR}" />
+                                            <TextBlock Grid.Row="7"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRRDL:" />
+                                            <TextBlock Grid.Row="7"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRRDL}" />
 
-                                                <TextBlock Grid.Row="8" Grid.Column="0" Text="tRRDS:" Margin="5" />
-                                                <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding tRRDS}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="8" Grid.Column="2" Text="tFAWDLR:" Margin="5" />
-                                                <TextBlock Grid.Row="8" Grid.Column="3" Text="{Binding tFAWDLR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="8"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRRDS:" />
+                                            <TextBlock Grid.Row="8"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRRDS}" />
+                                            <TextBlock Grid.Row="8"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tFAWDLR:" />
+                                            <TextBlock Grid.Row="8"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tFAWDLR}" />
 
-                                                <TextBlock Grid.Row="9" Grid.Column="0" Text="tFAWSLR:" Margin="5" />
-                                                <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding tFAWSLR}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="9" Grid.Column="2" Text="tFAW:" Margin="5" />
-                                                <TextBlock Grid.Row="9" Grid.Column="3" Text="{Binding tFAW}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="9"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tFAWSLR:" />
+                                            <TextBlock Grid.Row="9"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tFAWSLR}" />
+                                            <TextBlock Grid.Row="9"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tFAW:" />
+                                            <TextBlock Grid.Row="9"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tFAW}" />
 
-                                                <TextBlock Grid.Row="10" Grid.Column="0" Text="tWTRL:" Margin="5" />
-                                                <TextBlock Grid.Row="10" Grid.Column="1" Text="{Binding tWTRL}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="10" Grid.Column="2" Text="tWTRS:" Margin="5" />
-                                                <TextBlock Grid.Row="10" Grid.Column="3" Text="{Binding tWTRS}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="10"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tWTRL:" />
+                                            <TextBlock Grid.Row="10"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tWTRL}" />
+                                            <TextBlock Grid.Row="10"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWTRS:" />
+                                            <TextBlock Grid.Row="10"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWTRS}" />
 
-                                                <TextBlock Grid.Row="11" Grid.Column="0" Text="tCWL:" Margin="5" />
-                                                <TextBlock Grid.Row="11" Grid.Column="1" Text="{Binding tCWL}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="11" Grid.Column="2" Text="tWR:" Margin="5" />
-                                                <TextBlock Grid.Row="11" Grid.Column="3" Text="{Binding tWR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="11"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tCWL:" />
+                                            <TextBlock Grid.Row="11"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tCWL}" />
+                                            <TextBlock Grid.Row="11"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWR:" />
+                                            <TextBlock Grid.Row="11"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWR}" />
 
-                                                <TextBlock Grid.Row="12" Grid.Column="0" Text="tRCPage:" Margin="5" />
-                                                <TextBlock Grid.Row="12" Grid.Column="1" Text="{Binding tRCPage}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="12" Grid.Column="2" Text="tRDRDBAN:" Margin="5" />
-                                                <TextBlock Grid.Row="12" Grid.Column="3" Text="{Binding tRDRDBAN}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="12"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRCPage:" />
+                                            <TextBlock Grid.Row="12"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRCPage}" />
+                                            <TextBlock Grid.Row="12"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRDRDBAN:" />
+                                            <TextBlock Grid.Row="12"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRDRDBAN}" />
 
-                                                <TextBlock Grid.Row="13" Grid.Column="0" Text="tRDRDSCL:" Margin="5" />
-                                                <TextBlock Grid.Row="13" Grid.Column="1" Text="{Binding tRDRDSCL}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="13" Grid.Column="2" Text="tRDRDSCDLR:" Margin="5" />
-                                                <TextBlock Grid.Row="13" Grid.Column="3" Text="{Binding tRDRDSCDLR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="13"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRDRDSCL:" />
+                                            <TextBlock Grid.Row="13"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRDRDSCL}" />
+                                            <TextBlock Grid.Row="13"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRDRDSCDLR:" />
+                                            <TextBlock Grid.Row="13"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRDRDSCDLR}" />
 
-                                                <TextBlock Grid.Row="14" Grid.Column="0" Text="tRDRDSC:" Margin="5" />
-                                                <TextBlock Grid.Row="14" Grid.Column="1" Text="{Binding tRDRDSC}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="14" Grid.Column="2" Text="tRDRDSD:" Margin="5" />
-                                                <TextBlock Grid.Row="14" Grid.Column="3" Text="{Binding tRDRDSD}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="14"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRDRDSC:" />
+                                            <TextBlock Grid.Row="14"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRDRDSC}" />
+                                            <TextBlock Grid.Row="14"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRDRDSD:" />
+                                            <TextBlock Grid.Row="14"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRDRDSD}" />
 
-                                                <TextBlock Grid.Row="15" Grid.Column="0" Text="tRDRDDD:" Margin="5" />
-                                                <TextBlock Grid.Row="15" Grid.Column="1" Text="{Binding tRDRDDD}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="15" Grid.Column="2" Text="tWRWRBAN:" Margin="5" />
-                                                <TextBlock Grid.Row="15" Grid.Column="3" Text="{Binding tWRWRBAN}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="15"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRDRDDD:" />
+                                            <TextBlock Grid.Row="15"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRDRDDD}" />
+                                            <TextBlock Grid.Row="15"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWRWRBAN:" />
+                                            <TextBlock Grid.Row="15"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWRWRBAN}" />
 
-                                                <TextBlock Grid.Row="16" Grid.Column="0" Text="tWRWRSCL:" Margin="5" />
-                                                <TextBlock Grid.Row="16" Grid.Column="1" Text="{Binding tWRWRSCL}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="16" Grid.Column="2" Text="tWRWRSCDLR:" Margin="5" />
-                                                <TextBlock Grid.Row="16" Grid.Column="3" Text="{Binding tWRWRSCDLR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="16"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tWRWRSCL:" />
+                                            <TextBlock Grid.Row="16"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tWRWRSCL}" />
+                                            <TextBlock Grid.Row="16"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWRWRSCDLR:" />
+                                            <TextBlock Grid.Row="16"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWRWRSCDLR}" />
 
-                                                <TextBlock Grid.Row="17" Grid.Column="0" Text="tWRWRSC:" Margin="5" />
-                                                <TextBlock Grid.Row="17" Grid.Column="1" Text="{Binding tWRWRSC}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="17" Grid.Column="2" Text="tWRWRSD:" Margin="5" />
-                                                <TextBlock Grid.Row="17" Grid.Column="3" Text="{Binding tWRWRSD}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="17"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tWRWRSC:" />
+                                            <TextBlock Grid.Row="17"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tWRWRSC}" />
+                                            <TextBlock Grid.Row="17"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWRWRSD:" />
+                                            <TextBlock Grid.Row="17"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWRWRSD}" />
 
-                                                <TextBlock Grid.Row="18" Grid.Column="0" Text="tWRWRDD:" Margin="5" />
-                                                <TextBlock Grid.Row="18" Grid.Column="1" Text="{Binding tWRWRDD}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="18" Grid.Column="2" Text="tWRRDSCDLR:" Margin="5" />
-                                                <TextBlock Grid.Row="18" Grid.Column="3" Text="{Binding tWRRDSCDLR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="18"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tWRWRDD:" />
+                                            <TextBlock Grid.Row="18"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tWRWRDD}" />
+                                            <TextBlock Grid.Row="18"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWRRDSCDLR:" />
+                                            <TextBlock Grid.Row="18"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWRRDSCDLR}" />
 
-                                                <TextBlock Grid.Row="19" Grid.Column="0" Text="tRDWR:" Margin="5" />
-                                                <TextBlock Grid.Row="19" Grid.Column="1" Text="{Binding tRDWR}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="19" Grid.Column="2" Text="tWRRD:" Margin="5" />
-                                                <TextBlock Grid.Row="19" Grid.Column="3" Text="{Binding tWRRD}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="19"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRDWR:" />
+                                            <TextBlock Grid.Row="19"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRDWR}" />
+                                            <TextBlock Grid.Row="19"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWRRD:" />
+                                            <TextBlock Grid.Row="19"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWRRD}" />
 
-                                                <TextBlock Grid.Row="20" Grid.Column="0" Text="tREF:" Margin="5" />
-                                                <TextBlock Grid.Row="20" Grid.Column="1" Text="{Binding tREF}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="20" Grid.Column="2" Text="tREFCT:" Margin="5" />
-                                                <TextBlock Grid.Row="20" Grid.Column="3" Text="{Binding tREFCT}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="20"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tREF:" />
+                                            <TextBlock Grid.Row="20"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tREF}" />
+                                            <TextBlock Grid.Row="20"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tREFCT:" />
+                                            <TextBlock Grid.Row="20"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tREFCT}" />
 
-                                                <TextBlock Grid.Row="21" Grid.Column="0" Text="tMODPDA:" Margin="5" />
-                                                <TextBlock Grid.Row="21" Grid.Column="1" Text="{Binding tMODPDA}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="21" Grid.Column="2" Text="tMRDPDA:" Margin="5" />
-                                                <TextBlock Grid.Row="21" Grid.Column="3" Text="{Binding tMRDPDA}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="21"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tMODPDA:" />
+                                            <TextBlock Grid.Row="21"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tMODPDA}" />
+                                            <TextBlock Grid.Row="21"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tMRDPDA:" />
+                                            <TextBlock Grid.Row="21"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tMRDPDA}" />
 
-                                                <TextBlock Grid.Row="22" Grid.Column="0" Text="tMOD:" Margin="5" />
-                                                <TextBlock Grid.Row="22" Grid.Column="1" Text="{Binding tMOD}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="22" Grid.Column="2" Text="tMRD:" Margin="5" />
-                                                <TextBlock Grid.Row="22" Grid.Column="3" Text="{Binding tMRD}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="22"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tMOD:" />
+                                            <TextBlock Grid.Row="22"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tMOD}" />
+                                            <TextBlock Grid.Row="22"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tMRD:" />
+                                            <TextBlock Grid.Row="22"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tMRD}" />
 
-                                                <TextBlock Grid.Row="23" Grid.Column="0" Text="tSTAG:" Margin="5" />
-                                                <TextBlock Grid.Row="23" Grid.Column="1" Text="{Binding tSTAG}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="23" Grid.Column="2" Text="tCKE:" Margin="5" />
-                                                <TextBlock Grid.Row="23" Grid.Column="3" Text="{Binding tCKE}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="23"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tSTAG:" />
+                                            <TextBlock Grid.Row="23"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tSTAG}" />
+                                            <TextBlock Grid.Row="23"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tCKE:" />
+                                            <TextBlock Grid.Row="23"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tCKE}" />
 
-                                                <TextBlock Grid.Row="24" Grid.Column="0" Text="tPHYWRD:" Margin="5" />
-                                                <TextBlock Grid.Row="24" Grid.Column="1" Text="{Binding tPHYWRD}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="24" Grid.Column="2" Text="tPHYRDLAT:" Margin="5" />
-                                                <TextBlock Grid.Row="24" Grid.Column="3" Text="{Binding tPHYRDLAT}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="24"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tPHYWRD:" />
+                                            <TextBlock Grid.Row="24"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tPHYWRD}" />
+                                            <TextBlock Grid.Row="24"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tPHYRDLAT:" />
+                                            <TextBlock Grid.Row="24"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tPHYRDLAT}" />
 
-                                                <TextBlock Grid.Row="25" Grid.Column="0" Text="tPHYWRLAT:" Margin="5" />
-                                                <TextBlock Grid.Row="25" Grid.Column="1" Text="{Binding tPHYWRLAT}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="25" Grid.Column="2" Text="tRDDATA:" Margin="5" />
-                                                <TextBlock Grid.Row="25" Grid.Column="3" Text="{Binding tRDDATA}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="25"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tPHYWRLAT:" />
+                                            <TextBlock Grid.Row="25"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tPHYWRLAT}" />
+                                            <TextBlock Grid.Row="25"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRDDATA:" />
+                                            <TextBlock Grid.Row="25"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRDDATA}" />
 
-                                                <TextBlock Grid.Row="26" Grid.Column="0" Text="tRFC4:" Margin="5" />
-                                                <TextBlock Grid.Row="26" Grid.Column="1" Text="{Binding tRFC4}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="26" Grid.Column="2" Text="tRFC4CT:" Margin="5" />
-                                                <TextBlock Grid.Row="26" Grid.Column="3" Text="{Binding tRFC4CT}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="26"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRFC4:" />
+                                            <TextBlock Grid.Row="26"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRFC4}" />
+                                            <TextBlock Grid.Row="26"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRFC4CT:" />
+                                            <TextBlock Grid.Row="26"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRFC4CT}" />
 
-                                                <TextBlock Grid.Row="27" Grid.Column="0" Text="tRFC2:" Margin="5" />
-                                                <TextBlock Grid.Row="27" Grid.Column="1" Text="{Binding tRFC2}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="27" Grid.Column="2" Text="tRFC2CT:" Margin="5" />
-                                                <TextBlock Grid.Row="27" Grid.Column="3" Text="{Binding tRFC2CT}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="27"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRFC2:" />
+                                            <TextBlock Grid.Row="27"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRFC2}" />
+                                            <TextBlock Grid.Row="27"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRFC2CT:" />
+                                            <TextBlock Grid.Row="27"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRFC2CT}" />
 
-                                                <TextBlock Grid.Row="28" Grid.Column="0" Text="tRFC:" Margin="5" />
-                                                <TextBlock Grid.Row="28" Grid.Column="1" Text="{Binding tRFC}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="28" Grid.Column="2" Text="tRFCCT:" Margin="5" />
-                                                <TextBlock Grid.Row="28" Grid.Column="3" Text="{Binding tRFCCT}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="28"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRFC:" />
+                                            <TextBlock Grid.Row="28"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRFC}" />
+                                            <TextBlock Grid.Row="28"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRFCCT:" />
+                                            <TextBlock Grid.Row="28"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRFCCT}" />
 
-                                                <TextBlock Grid.Row="29" Grid.Column="0" Text="tSTAG4LR:" Margin="5" />
-                                                <TextBlock Grid.Row="29" Grid.Column="1" Text="{Binding tSTAG4LR}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="29" Grid.Column="2" Text="tSTAG2LR:" Margin="5" />
-                                                <TextBlock Grid.Row="29" Grid.Column="3" Text="{Binding tSTAG2LR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="29"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tSTAG4LR:" />
+                                            <TextBlock Grid.Row="29"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tSTAG4LR}" />
+                                            <TextBlock Grid.Row="29"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tSTAG2LR:" />
+                                            <TextBlock Grid.Row="29"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tSTAG2LR}" />
 
-                                                <TextBlock Grid.Row="30" Grid.Column="0" Text="tSTAGLR:" Margin="5" />
-                                                <TextBlock Grid.Row="30" Grid.Column="1" Text="{Binding tSTAGLR}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="30" Grid.Column="2" Text="tWRMPR:" Margin="5" />
-                                                <TextBlock Grid.Row="30" Grid.Column="3" Text="{Binding tWRMPR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="30"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tSTAGLR:" />
+                                            <TextBlock Grid.Row="30"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tSTAGLR}" />
+                                            <TextBlock Grid.Row="30"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWRMPR:" />
+                                            <TextBlock Grid.Row="30"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWRMPR}" />
 
-                                                <!--<TextBlock Grid.Row="31" Grid.Column="0" Text="ProcODT (Ω):" Margin="5"/>
+                                            <!--<TextBlock Grid.Row="31" Grid.Column="0" Text="ProcODT (Ω):" Margin="5"/>
                                     <TextBlock Grid.Row="31" Grid.Column="1" Text="{Binding ProcODT}" Margin="5"/>
                                     <TextBlock Grid.Row="31" Grid.Column="2" Text="RttNom (Ω):" Margin="5"/>
                                     <TextBlock Grid.Row="31" Grid.Column="3" Text="{Binding RttNom}" Margin="5"/>
@@ -395,161 +673,306 @@
 
                                     <TextBlock Grid.Row="36" Grid.Column="0" Text="CkeDrvStrength (Ω):" Margin="5"/>
                                     <TextBlock Grid.Row="36" Grid.Column="1" Text="{Binding CkeDrvStrength}" Margin="5"/>-->
-                                            </Grid>
-                                        </DataTemplate>
-                                        <DataTemplate DataType="models:IntelMemoryTimings">
-                                            <Grid Margin="-5,8,0,0" ColumnDefinitions="2*,*,2*,*"
-                                                  RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                                        </Grid>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="models:IntelMemoryTimings">
+                                        <Grid Margin="-5,8,0,0"
+                                              ColumnDefinitions="2*,*,2*,*"
+                                              RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
 
-                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="tRCDWR:" Margin="5" />
-                                                <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding tRCDWR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="2"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRCDWR:" />
+                                            <TextBlock Grid.Row="2"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRCDWR}" />
 
-                                                <TextBlock Grid.Row="3" Grid.Column="0" Text="tRCDRD:" Margin="5" />
-                                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding tRCDRD}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="3" Grid.Column="2" Text="tRAS:" Margin="5" />
-                                                <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding tRAS}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="3"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRCDRD:" />
+                                            <TextBlock Grid.Row="3"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRCDRD}" />
+                                            <TextBlock Grid.Row="3"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRAS:" />
+                                            <TextBlock Grid.Row="3"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRAS}" />
 
-                                                <TextBlock Grid.Row="4" Grid.Column="0" Text="tCL:" Margin="5" />
-                                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding tCL}" Margin="5" />
+                                            <TextBlock Grid.Row="4"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tCL:" />
+                                            <TextBlock Grid.Row="4"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tCL}" />
 
-                                                <TextBlock Grid.Row="5" Grid.Column="0" Text="tRP:" Margin="5" />
-                                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding tRP}" Margin="5" />
+                                            <TextBlock Grid.Row="5"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRP:" />
+                                            <TextBlock Grid.Row="5"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRP}" />
 
-                                                <TextBlock Grid.Row="6" Grid.Column="0" Text="tRC:" Margin="5" />
-                                                <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding tRC}" Margin="5" />
-                                                <TextBlock Grid.Row="6" Grid.Column="2" Text="tRTP:" Margin="5" />
-                                                <TextBlock Grid.Row="6" Grid.Column="3" Text="{Binding tRTP}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="6"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRC:" />
+                                            <TextBlock Grid.Row="6"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRC}" />
+                                            <TextBlock Grid.Row="6"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRTP:" />
+                                            <TextBlock Grid.Row="6"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRTP}" />
 
-                                                <TextBlock Grid.Row="7" Grid.Column="2" Text="tRRDL:" Margin="5" />
-                                                <TextBlock Grid.Row="7" Grid.Column="3" Text="{Binding tRRDL}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="7"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRRDL:" />
+                                            <TextBlock Grid.Row="7"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRRDL}" />
 
-                                                <TextBlock Grid.Row="8" Grid.Column="0" Text="tRRDS:" Margin="5" />
-                                                <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding tRRDS}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="8"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRRDS:" />
+                                            <TextBlock Grid.Row="8"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRRDS}" />
 
-                                                <TextBlock Grid.Row="9" Grid.Column="2" Text="tFAW:" Margin="5" />
-                                                <TextBlock Grid.Row="9" Grid.Column="3" Text="{Binding tFAW}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="9"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tFAW:" />
+                                            <TextBlock Grid.Row="9"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tFAW}" />
 
-                                                <TextBlock Grid.Row="10" Grid.Column="0" Text="tWTRL:" Margin="5" />
-                                                <TextBlock Grid.Row="10" Grid.Column="1" Text="{Binding tWTRL}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="10" Grid.Column="2" Text="tWTRS:" Margin="5" />
-                                                <TextBlock Grid.Row="10" Grid.Column="3" Text="{Binding tWTRS}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="10"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tWTRL:" />
+                                            <TextBlock Grid.Row="10"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tWTRL}" />
+                                            <TextBlock Grid.Row="10"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWTRS:" />
+                                            <TextBlock Grid.Row="10"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWTRS}" />
 
-                                                <TextBlock Grid.Row="11" Grid.Column="0" Text="tCWL:" Margin="5" />
-                                                <TextBlock Grid.Row="11" Grid.Column="1" Text="{Binding tCWL}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="11" Grid.Column="2" Text="tWR:" Margin="5" />
-                                                <TextBlock Grid.Row="11" Grid.Column="3" Text="{Binding tWR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="11"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tCWL:" />
+                                            <TextBlock Grid.Row="11"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tCWL}" />
+                                            <TextBlock Grid.Row="11"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWR:" />
+                                            <TextBlock Grid.Row="11"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWR}" />
 
-                                                <TextBlock Grid.Row="20" Grid.Column="0" Text="tREF:" Margin="5" />
-                                                <TextBlock Grid.Row="20" Grid.Column="1" Text="{Binding tREF}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="20" Grid.Column="2" Text="tREFCT:" Margin="5" />
-                                                <TextBlock Grid.Row="20" Grid.Column="3" Text="{Binding tREFCT}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="20"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tREF:" />
+                                            <TextBlock Grid.Row="20"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tREF}" />
+                                            <TextBlock Grid.Row="20"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tREFCT:" />
+                                            <TextBlock Grid.Row="20"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tREFCT}" />
 
-                                                <TextBlock Grid.Row="21" Grid.Column="0" Text="tMODPDA:" Margin="5" />
-                                                <TextBlock Grid.Row="21" Grid.Column="1" Text="{Binding tMODPDA}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="21" Grid.Column="2" Text="tMRDPDA:" Margin="5" />
-                                                <TextBlock Grid.Row="21" Grid.Column="3" Text="{Binding tMRDPDA}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="21"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tMODPDA:" />
+                                            <TextBlock Grid.Row="21"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tMODPDA}" />
+                                            <TextBlock Grid.Row="21"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tMRDPDA:" />
+                                            <TextBlock Grid.Row="21"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tMRDPDA}" />
 
-                                                <TextBlock Grid.Row="22" Grid.Column="0" Text="tMOD:" Margin="5" />
-                                                <TextBlock Grid.Row="22" Grid.Column="1" Text="{Binding tMOD}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="22" Grid.Column="2" Text="tMRD:" Margin="5" />
-                                                <TextBlock Grid.Row="22" Grid.Column="3" Text="{Binding tMRD}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="22"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tMOD:" />
+                                            <TextBlock Grid.Row="22"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tMOD}" />
+                                            <TextBlock Grid.Row="22"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tMRD:" />
+                                            <TextBlock Grid.Row="22"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tMRD}" />
 
-                                                <TextBlock Grid.Row="23" Grid.Column="0" Text="tSTAG:" Margin="5" />
-                                                <TextBlock Grid.Row="23" Grid.Column="1" Text="{Binding tSTAG}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="23" Grid.Column="2" Text="tCKE:" Margin="5" />
-                                                <TextBlock Grid.Row="23" Grid.Column="3" Text="{Binding tCKE}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="23"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tSTAG:" />
+                                            <TextBlock Grid.Row="23"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tSTAG}" />
+                                            <TextBlock Grid.Row="23"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tCKE:" />
+                                            <TextBlock Grid.Row="23"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tCKE}" />
 
-                                                <TextBlock Grid.Row="25" Grid.Column="2" Text="tRDDATA:" Margin="5" />
-                                                <TextBlock Grid.Row="25" Grid.Column="3" Text="{Binding tRDDATA}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="25"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tRDDATA:" />
+                                            <TextBlock Grid.Row="25"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tRDDATA}" />
 
-                                                <TextBlock Grid.Row="28" Grid.Column="0" Text="tRFC:" Margin="5" />
-                                                <TextBlock Grid.Row="28" Grid.Column="1" Text="{Binding tRFC}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="28"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tRFC:" />
+                                            <TextBlock Grid.Row="28"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tRFC}" />
 
-                                                <TextBlock Grid.Row="29" Grid.Column="0" Text="tSTAG4LR:" Margin="5" />
-                                                <TextBlock Grid.Row="29" Grid.Column="1" Text="{Binding tSTAG4LR}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="29" Grid.Column="2" Text="tSTAG2LR:" Margin="5" />
-                                                <TextBlock Grid.Row="29" Grid.Column="3" Text="{Binding tSTAG2LR}"
-                                                           Margin="5" />
+                                            <TextBlock Grid.Row="29"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tSTAG4LR:" />
+                                            <TextBlock Grid.Row="29"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tSTAG4LR}" />
+                                            <TextBlock Grid.Row="29"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tSTAG2LR:" />
+                                            <TextBlock Grid.Row="29"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tSTAG2LR}" />
 
-                                                <TextBlock Grid.Row="30" Grid.Column="0" Text="tSTAGLR:" Margin="5" />
-                                                <TextBlock Grid.Row="30" Grid.Column="1" Text="{Binding tSTAGLR}"
-                                                           Margin="5" />
-                                                <TextBlock Grid.Row="30" Grid.Column="2" Text="tWRMPR:" Margin="5" />
-                                                <TextBlock Grid.Row="30" Grid.Column="3" Text="{Binding tWRMPR}"
-                                                           Margin="5" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </Grid.DataTemplates>
-                                </Grid>
-                            </StackPanel>
+                                            <TextBlock Grid.Row="30"
+                                                       Grid.Column="0"
+                                                       Margin="5"
+                                                       Text="tSTAGLR:" />
+                                            <TextBlock Grid.Row="30"
+                                                       Grid.Column="1"
+                                                       Margin="5"
+                                                       Text="{Binding tSTAGLR}" />
+                                            <TextBlock Grid.Row="30"
+                                                       Grid.Column="2"
+                                                       Margin="5"
+                                                       Text="tWRMPR:" />
+                                            <TextBlock Grid.Row="30"
+                                                       Grid.Column="3"
+                                                       Margin="5"
+                                                       Text="{Binding tWRMPR}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ContentControl.DataTemplates>
+                            </ContentControl>
                         </StackPanel>
-                    </Expander>
-                    <Expander IsVisible="{Binding IsBatteryInfoAvailable, UpdateSourceTrigger=PropertyChanged}"
-                              IsExpanded="True"
-                              VerticalAlignment="Top"
-                              Margin="0,9,15,15">
-                        <Expander.Header>
-                            <StackPanel Grid.Column="0"
-                                        VerticalAlignment="Center">
-                                <controls:SymbolIcon Symbol="{ic:FluentIcon Battery920Regular}" />
-                                <TextBlock
-                                    FontSize="14"
-                                    FontWeight="Medium"
-                                    Text="Battery Information" />
-                            </StackPanel>
-                        </Expander.Header>
-                        <!--  Expander content  -->
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel Margin="24,0,12,0" Width="80">
-                                    <TextBlock FontWeight="DemiBold"
-                                               Text="Health" />
-                                    <TextBlock FontWeight="DemiBold"
-                                               Margin="0,8,0,0"
-                                               Text="Cycles" />
-                                    <TextBlock FontWeight="DemiBold"
-                                               Margin="0,8,0,0"
-                                               Text="Capacity" />
-                                    <TextBlock FontWeight="DemiBold"
-                                               Margin="0,8,0,0"
-                                               Text="Charge Rate" />
-                                </StackPanel>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding BatteryHealth, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding BatteryCycle, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding BatteryCapacity, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Text="{Binding BatteryChargeRate, UpdateSourceTrigger=PropertyChanged}" />
-                                </StackPanel>
-                            </StackPanel>
-                        </StackPanel>
-                    </Expander>
-                </StackPanel>
-            </ScrollViewer>
-        </DockPanel>
-    </Grid>
+                    </StackPanel>
+                </controls:IconExpander>
+                <controls:IconExpander VerticalAlignment="Top"
+                                       FontWeight="Medium"
+                                       Header="Battery Information"
+                                       Icon="Battery9"
+                                       IsExpanded="True"
+                                       IsVisible="{Binding IsBatteryInfoAvailable, UpdateSourceTrigger=PropertyChanged}">
+
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding Batteries}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"
+                                                Spacing="12"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid RowDefinitions="Auto, *">
+                                        <TextBlock Grid.Row="0"
+                                                   Text="{Binding Index, StringFormat={}#{0}}"/>
+                                        
+                                        <StackPanel Grid.Row="1"
+                                                    Orientation="Horizontal">
+                                            <StackPanel Width="80"
+                                                        Margin="24,0,12,0"
+                                                        Spacing="8">
+                                                <TextBlock FontWeight="DemiBold" Text="Health" />
+                                                <TextBlock FontWeight="DemiBold" Text="Cycles" />
+                                                <TextBlock FontWeight="DemiBold" Text="Capacity" />
+                                                <TextBlock FontWeight="DemiBold" Text="Charge Rate" />
+                                            </StackPanel>
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Text="{Binding BatteryHealth, UpdateSourceTrigger=PropertyChanged}" />
+                                                <TextBlock Text="{Binding BatteryCycle, UpdateSourceTrigger=PropertyChanged}" />
+                                                <TextBlock Text="{Binding BatteryCapacity, UpdateSourceTrigger=PropertyChanged}" />
+                                                <TextBlock Text="{Binding BatteryChargeRate, UpdateSourceTrigger=PropertyChanged}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </controls:IconExpander>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
 </UserControl>

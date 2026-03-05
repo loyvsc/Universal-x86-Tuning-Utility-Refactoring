@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
@@ -8,15 +11,15 @@ using Avalonia.Threading;
 using DesktopNotifications;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
-using Universal_x86_Tuning_Utility.Services.GameLauncherServices;
 using Settings = Universal_x86_Tuning_Utility.Properties.Settings;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public partial class DashboardViewModel : NotifyPropertyChangedBase
+public partial class DashboardViewModel : ReactiveObject
 {
+    private readonly ISystemInfoService _systemInfoService;
     private readonly INotificationManager _notificationManager;
-    private readonly INvidiaGpuService _nvidiaGpuService;
+    private readonly IGpuOriginalityService _gpuOriginalityService;
     private readonly INavigationService _navigationService;
     public ICommand OpenWindowCommand { get; }
     public ICommand NavigateCommand { get; }
@@ -24,7 +27,7 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
     public bool IsAmdSettingsAvailable
     {
         get => _isAmdSettingsAvailable;
-        set => SetValue(ref _isAmdSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdSettingsAvailable, value);
     }
 
     private readonly DispatcherTimer _autoAdaptive = new();
@@ -32,11 +35,12 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
     
     public DashboardViewModel(ISystemInfoService systemInfoService,
                              INotificationManager notificationManager,
-                             INvidiaGpuService nvidiaGpuService,
+                             IGpuOriginalityService gpuOriginalityService,
                              INavigationService navigationService)
     {
+        _systemInfoService = systemInfoService;
         _notificationManager = notificationManager;
-        _nvidiaGpuService = nvidiaGpuService;
+        _gpuOriginalityService = gpuOriginalityService;
         _navigationService = navigationService;
         IsAmdSettingsAvailable = systemInfoService.Cpu.Manufacturer == Manufacturer.AMD;
 
@@ -48,20 +52,38 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
         NavigateCommand = ReactiveCommand.Create<string>(OnNavigate);
     }
 
-    private void AutoAdaptive_Tick(object sender, EventArgs e)
+    private void AutoAdaptive_Tick(object? sender, EventArgs e)
     {
-        foreach (var checkResult in _nvidiaGpuService.CheckIsGpusOriginal())
+        _autoAdaptive.Stop();
+        var checkResults = _gpuOriginalityService.CheckIsGpusOriginal();
+        foreach (var checkResult in checkResults.results)
         {
             if (!checkResult.IsGpuOriginal)
             {
-                _notificationManager.ShowTextNotification("NVIDIA GPU Warning", $"ROP count is lower than expected on {checkResult.GpuName} (#{checkResult.GpuNumber}) ({checkResult.ActualRopCount } ROPs out of {checkResult.ExpectedRopCount} ROPs)");
+                var sb = StringBuilderPool.Rent();
+                sb.Append($"Possible fake or modified GPU detected on {checkResult.GpuName}");
+                if (checkResults.results.Count() > 1)
+                {
+                    sb.Append($" (№{checkResult.GpuNumber})");
+                }
+                
+                _notificationManager.ShowTextNotification("GPU Warning", sb.ToString());
+                
+                StringBuilderPool.Return(sb);
             }
         }
+        
+        if (checkResults.notFoundNames.Any())
+        {
+            _notificationManager.ShowTextNotification("GPU Warning",
+                $"GPU specification not found in reference database for {string.Join(", ", checkResults.notFoundNames)}"
+            );
+        }
+        
         if (Settings.Default.isStartAdpative)
         {
             _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));
         }
-        _autoAdaptive.Stop();
     }
 
     public void OnNavigatedTo()
@@ -79,39 +101,32 @@ public partial class DashboardViewModel : NotifyPropertyChangedBase
         switch (parameter)
         {
             case "premade":
-                _navigationService.Navigate(typeof(Views.Pages.PremadePage));
-                return;
-
+                _navigationService.Navigate(typeof(PremadePresetsViewModel));
+                break;
             case "custom":
-                _navigationService.Navigate(typeof(Views.Pages.CustomPresetsPage));
-                return;
-
+                _navigationService.Navigate(typeof(CustomPresetsViewModel));
+                break;
             case "adaptive":
-                _navigationService.Navigate(typeof(Views.Pages.AdaptivePage));
-                return;
-
+                _navigationService.Navigate(typeof(AdaptiveViewModel));
+                break;
             case "auto":
-                _navigationService.Navigate(typeof(Views.Pages.AutomationsPage));
-                return;
-
+                _navigationService.Navigate(typeof(AutomationsViewModel));
+                break;
             case "info":
-                _navigationService.Navigate(typeof(Views.Pages.SystemInfoPage));
-                return;
-
+                _navigationService.Navigate(typeof(SystemInfoViewModel));
+                break;
             case "help":
                 Process.Start(new ProcessStartInfo("http://www.discord.gg/3EkYMZGJwq") { UseShellExecute = true });
-                return;
-
+                break;
             case "support":
                 Process.Start(new ProcessStartInfo("https://www.paypal.com/paypalme/JamesCJ60") { UseShellExecute = true });
                 Process.Start(new ProcessStartInfo("https://patreon.com/uxtusoftware") { UseShellExecute = true });
-                return;
+                break;
             case "games":
-                _navigationService.Navigate(typeof(Views.Pages.GamesPage));
-                return;
+                _navigationService.Navigate(typeof(GamesViewModel));
+                break;
         }
     }
-
 
     private void OnOpenWindow(string parameter)
     {

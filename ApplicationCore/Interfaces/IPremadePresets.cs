@@ -8,5 +8,4 @@ public interface IPremadePresets
     public PrematePresetType PrematePresetType { get; }
     
     public List<PremadePreset> PremadePresetsList { get; }
-    public void InitializePremadePresets();
 }

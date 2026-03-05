@@ -2,19 +2,17 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
-using ApplicationCore.Utilities;
 using Avalonia.Threading;
 using DesktopNotifications;
-using LibreHardwareMonitor.Hardware;
-using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Interfaces;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class FanControlViewModel : NotifyPropertyChangedBase
+public class FanControlViewModel : ReactiveObject
 {
     public ICommand EnableFanControlCommand { get; }
     public ICommand DisableFanControlCommand { get; }
@@ -26,25 +24,25 @@ public class FanControlViewModel : NotifyPropertyChangedBase
     public string ConfigName
     {
         get => _configName;
-        set => SetValue(ref _configName, value);
+        set => this.RaiseAndSetIfChanged(ref _configName, value);
     }
     
     public string Status
     {
         get => _status;
-        set => SetValue(ref _status, value);
+        set => this.RaiseAndSetIfChanged(ref _status, value);
     }
     
     public bool IsFanControlEnabled
     {
         get => _isFanControlEnabled;
-        set => SetValue(ref _isFanControlEnabled, value);
+        set => this.RaiseAndSetIfChanged(ref _isFanControlEnabled, value);
     }
 
     public decimal FanSpeed
     {
         get => _fanSpeed;
-        set => SetValue(ref _fanSpeed, value);
+        set => this.RaiseAndSetIfChanged(ref _fanSpeed, value);
     }
 
     private string _configName;
@@ -54,22 +52,25 @@ public class FanControlViewModel : NotifyPropertyChangedBase
     
     private readonly DispatcherTimer _timer;
     
-    private readonly ILogger<FanControlViewModel> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly IFanControlService _fanControlService;
     private readonly ISystemInfoService _systemInfoService;
     private readonly INotificationManager _notificationManager;
+    private readonly ISensorsService _sensorsService;
     private readonly IPlatformServiceAccessor _platformServiceAccessor;
 
-    public FanControlViewModel(ILogger<FanControlViewModel> logger,
+    public FanControlViewModel(Serilog.ILogger logger,
                                IFanControlService fanControlService,
                                ISystemInfoService systemInfoService,
                                INotificationManager notificationManager,
+                               ISensorsService sensorsService,
                                IPlatformServiceAccessor platformServiceAccessor)
     {
         _logger = logger;
         _fanControlService = fanControlService;
         _systemInfoService = systemInfoService;
         _notificationManager = notificationManager;
+        _sensorsService = sensorsService;
         _platformServiceAccessor = platformServiceAccessor;
 
         ReloadCommand = ReactiveCommand.CreateFromTask(Reload);
@@ -80,7 +81,7 @@ public class FanControlViewModel : NotifyPropertyChangedBase
         CopyCommand = ReactiveCommand.CreateFromTask(Copy);
 
         FanSpeed = 50;
-        ConfigName = $"{_systemInfoService.Manufacturer.Value.ToUpper()}_{_systemInfoService.Product.Value.ToUpper()}.json";
+        ConfigName = $"{_systemInfoService.Manufacturer.ToUpper()}_{_systemInfoService.Product.ToUpper()}.json";
         
         _timer = new DispatcherTimer
         {
@@ -109,7 +110,7 @@ public class FanControlViewModel : NotifyPropertyChangedBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to enable FanControl");
+            _logger.Error(ex, "Failed to enable FanControl");
             await _notificationManager.ShowTextNotification("Failed to enable FanControl", $"Failed to enable FanControl: {ex.Message}");
         }
     }
@@ -125,7 +126,7 @@ public class FanControlViewModel : NotifyPropertyChangedBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to disable FanControl");
+            _logger.Error(ex, "Failed to disable FanControl");
             await _notificationManager.ShowTextNotification("Failed to disable FanControl", $"Failed to disable FanControl: {ex.Message}");
         }
     }
@@ -138,7 +139,7 @@ public class FanControlViewModel : NotifyPropertyChangedBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to reload");
+            _logger.Error(ex, "Failed to reload");
             await _notificationManager.ShowTextNotification("Failed to reload", $"Failed to reload: {ex.Message}");
         }
     }
@@ -194,7 +195,7 @@ public class FanControlViewModel : NotifyPropertyChangedBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to get cpu temperature");
+            _logger.Error(ex, "Failed to get cpu temperature");
             await _notificationManager.ShowTextNotification("Error occurred", "Failed to get cpu temperature", NotificationManagerExtensions.NotificationType.Error);
         }
     }
@@ -203,26 +204,11 @@ public class FanControlViewModel : NotifyPropertyChangedBase
     {
         try
         {
-            var computer = new Computer
-            {
-                IsCpuEnabled = true
-            };
-            computer.Open();
-            
-            var cpu = computer.Hardware.FirstOrDefault(h => h.HardwareType == HardwareType.Cpu);
-            cpu.Update();
-            
-            var temperature = cpu.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Temperature);
-            if (temperature != null)
-            {
-                return (int)temperature.Value;
-            }
-
-            return 0;
+            return (int) _sensorsService.GetCPUInfo(SensorType.Temperature, _systemInfoService.Cpu.Manufacturer == Manufacturer.Intel ? "Package" : "Core");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to get cpu temperature");
+            _logger.Error(ex, "Failed to get cpu temperature");
             await _notificationManager.ShowTextNotification("Error occurred", "Failed to get cpu temperature", NotificationManagerExtensions.NotificationType.Error);
             return 0;
         }

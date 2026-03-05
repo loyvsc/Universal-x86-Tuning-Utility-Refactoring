@@ -1,9 +1,10 @@
 namespace ApplicationCore.Enums;
 
+[Flags]
 public enum ProcessorType
 {
-    Unknown = -1,
-    Apu,
+    Unknown,
     Desktop,
+    Apu,
     Laptop,
 }

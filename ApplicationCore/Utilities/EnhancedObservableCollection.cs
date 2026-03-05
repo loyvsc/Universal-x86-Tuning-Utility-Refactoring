@@ -18,6 +18,16 @@ public class EnhancedObservableCollection<T> : ObservableCollection<T>
     public virtual void AddRange(IEnumerable<T> items)
     {
         ((List<T>)items).AddRange(items);
-        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add));
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items));
+    }
+    
+    public virtual void Reset(IEnumerable<T> items)
+    {
+        if (Items is List<T> list)
+        {
+            list.Clear();
+            list.AddRange(items);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
     }
 }

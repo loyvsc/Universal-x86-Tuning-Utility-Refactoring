@@ -1,0 +1,201 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
+                    xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent">
+   
+    <ControlTheme x:Key="{x:Type controls:FluentIconButton}" TargetType="controls:FluentIconButton"
+                  BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Height" Value="60"/>
+        <Setter Property="Padding" Value="14,16,14,16"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:FluentIconButton">
+                <Border Name="PART_Border"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Width="{TemplateBinding Width}"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <fluent:FluentIcon Name="PART_Icon"
+                                           Grid.Column="0"
+                                           Icon="{TemplateBinding Icon}"
+                                           IconVariant="{TemplateBinding IconVariant}"
+                                           FontSize="{TemplateBinding IconSize}"
+                                           Margin="0,0,14,0"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                        
+                        <Label Name="PART_Content"
+                               Grid.Column="1"
+                               Foreground="{TemplateBinding Foreground}"
+                               FontSize="{TemplateBinding FontSize}"
+                               FontWeight="{TemplateBinding FontWeight}"
+                               Content="{TemplateBinding Content}"
+                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        
+                        <fluent:FluentIcon Name="PART_Chevron"
+                                           Grid.Column="2" 
+                                           Icon="ChevronRight"
+                                           FontSize="24"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Margin="4,0,0,0"/>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+        </Style>
+
+        <Style Selector="^:pressed">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPressed}" />
+        </Style>
+
+        <Style Selector="^:disabled">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundDisabled}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushDisabled}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundDisabled}" />
+        </Style>
+    </ControlTheme>
+    
+    
+    <ControlTheme x:Key="{x:Type controls:IconExpander}" TargetType="controls:IconExpander"
+                  BasedOn="{StaticResource {x:Type Expander}}">
+        <Setter Property="MinHeight" Value="70"/>
+        
+        <Setter Property="Template">
+            <ControlTemplate TargetType="controls:IconExpander">
+                <DockPanel MinWidth="{TemplateBinding MinWidth}"
+                           MaxWidth="{TemplateBinding MaxWidth}">
+                    <ToggleButton Name="ExpanderHeader"
+                                  MinHeight="{TemplateBinding MinHeight}"
+                                  IsEnabled="{TemplateBinding IsEnabled}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
+                                  ContentTemplate="{TemplateBinding HeaderTemplate}">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <fluent:FluentIcon Name="ControlIcon"
+                                               Grid.Column="0"
+                                               Margin="0,0,14,0"
+                                               VerticalAlignment="Center"
+                                               Icon="{TemplateBinding Icon}"
+                                               IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                               FontSize="{TemplateBinding IconSize}"
+                                               Foreground="{TemplateBinding Foreground}"
+                                               Focusable="False"
+                                               KeyboardNavigation.IsTabStop="False" />
+
+                            <ContentPresenter Name="HeaderContentPresenter"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              Content="{TemplateBinding Header}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Grid>
+                    </ToggleButton>
+
+                    <Border Name="ExpanderContent"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            BackgroundSizing="InnerBorderEdge"
+                            MinHeight="{TemplateBinding MinHeight}"
+                            MinWidth="{TemplateBinding MinWidth}"
+                            IsVisible="False">
+                        
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          Margin="0"
+                                          IsVisible="{TemplateBinding IsExpanded}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Padding="{TemplateBinding Padding}" />
+                    </Border>
+                </DockPanel>
+                
+            </ControlTemplate>
+        </Setter>
+        
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+        </Style>
+
+        <Style Selector="^:pressed">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPressed}" />
+        </Style>
+
+        <Style Selector="^:disabled">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundDisabled}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushDisabled}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundDisabled}" />
+        </Style>
+    </ControlTheme>
+    
+    <ControlTheme x:Key="EditImageButton"
+                  TargetType="Button"
+                  BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Style Selector="^:pointerover">
+            <Style Selector="^ /template/ Border#PART_Background">
+                <Setter Property="Opacity" Value="0"/>
+        
+                <Style Selector="^:pointerover">
+                    <Setter Property="Opacity" Value="0.75"/>
+                </Style>
+        
+                <Setter Property="Transitions">
+                    <Transitions>
+                        <DoubleTransition Property="Opacity"
+                                          Easing="LinearEasing"
+                                          Duration="0:0:0.2"/>
+                    </Transitions>
+                </Setter>
+            </Style>
+        </Style>
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border CornerRadius="{TemplateBinding CornerRadius}">
+                    <Border.Styles>
+                        <Style Selector="Border#PART_Background">
+                            <Setter Property="Opacity" Value="0"/>
+                        </Style>
+                    </Border.Styles>
+                    <Grid>
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          Margin="{TemplateBinding Padding}"
+                                          CornerRadius="{TemplateBinding CornerRadius}"/>
+                        <Border Name="PART_Background" 
+                                Background="Black"
+                                CornerRadius="{TemplateBinding CornerRadius}">
+                            <Image Name="PART_EditImage"
+                                   Source="/Assets/edit.png"
+                                   Margin="10"/>
+                        </Border>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+    
+</ResourceDictionary>

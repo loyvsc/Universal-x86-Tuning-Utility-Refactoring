@@ -4,32 +4,30 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using ApplicationCore.Utilities;
+using ApplicationCore.Models.LaptopInfo;
 using Avalonia.Threading;
 using DesktopNotifications;
-using FluentAvalonia.FluentIcons;
 using FluentAvalonia.UI.Controls;
-using Microsoft.Extensions.Logging;
+using FluentIcons.Common;
 using ReactiveUI;
-using RTSSSharedMemoryNET;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Navigation;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.Services.PresetServices;
-using Universal_x86_Tuning_Utility.Services.RyzenAdj;
-using Universal_x86_Tuning_Utility.Services.SuperResolutionServices.Windows;
 using PowerMode = ApplicationCore.Enums.PowerMode;
 using PowerModeChangedEventArgs = ApplicationCore.Events.PowerModeChangedEventArgs;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class MainWindowViewModel : NotifyPropertyChangedBase
+public class MainWindowViewModel : ReactiveObject
 {
+    private readonly Serilog.ILogger _logger;
     private readonly ISystemInfoService _systemInfoService;
     private readonly IBatteryInfoService _batteryInfoService;
     private readonly INotificationManager _toastNotificationManager;
@@ -38,21 +36,28 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
     private readonly IPowerPlanService _powerPlanService;
     private readonly IGameLauncherService _gameLauncherService;
     private readonly IImageService _imageService;
-    private readonly IFanControlService _fanControlService;
     private readonly IPremadePresets _premadePresets;
-    private readonly IGameDataService _gameDataService;
     private string _lastAppliedState = "";
 
     public ObservableCollection<NavigationViewModel> NavigationItems { get; set; }
+    
+    public NavigationViewModel SettingsItem { get; set; }
+
+    public NavigationViewModel SelectedNavigationItem
+    {
+        get => _selectedNavigationItem;
+        set => this.RaiseAndSetIfChanged(ref _selectedNavigationItem, value);
+    }
+
     public INavigationPageFactory NavigationPageFactory { get; set; }
 
     public string Title
     {
         get => _title;
-        set => SetValue(ref _title, value);
+        set => this.RaiseAndSetIfChanged(ref _title, value);
     }
-
-    public string ProductManufacturer { get; }
+    
+    public bool IsPortableConsole { get; }
 
     private readonly DispatcherTimer _miscTimer;
     private readonly DispatcherTimer _autoReapplyTimer;
@@ -61,8 +66,9 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
     private string _title;
     private bool _firstRun = true;
     private IReadOnlyCollection<GameLauncherItem> _gamesList;
+    private NavigationViewModel _selectedNavigationItem;
 
-    public MainWindowViewModel(ILogger<MainWindowViewModel> logger,
+    public MainWindowViewModel(Serilog.ILogger logger,
         ISystemInfoService systemInfoService,
         IBatteryInfoService batteryInfoService,
         INotificationManager toastNotificationManager,
@@ -75,6 +81,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
         IPremadePresets premadePresets,
         IGameDataService gameDataService)
     {
+        _logger = logger;
         _systemInfoService = systemInfoService;
         _batteryInfoService = batteryInfoService;
         _toastNotificationManager = toastNotificationManager;
@@ -83,12 +90,10 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
         _powerPlanService = powerPlanService;
         _gameLauncherService = gameLauncherService;
         _imageService = imageService;
-        _fanControlService = fanControlService;
         _premadePresets = premadePresets;
-        _gameDataService = gameDataService;
         _powerPlanService.PowerModeChanged += OnPowerModeChange;
 
-        ProductManufacturer = _systemInfoService.Manufacturer.Value;
+        IsPortableConsole = _systemInfoService.LaptopInfo is PortableConsoleInfo;
 
         _miscTimer = CreateTimer(1, (s, e) => HandleMiscellaneousTasks(s, e));
         _autoReapplyTimer = CreateTimer(Settings.Default.AutoReapplyTime, (s, e) => AutoReapplySettings(s, e));
@@ -101,6 +106,8 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
         NavigationPageFactory = new NavigationFactory();
 
         NavigateCommand = ReactiveCommand.Create<string>(tag => OnNavigate(tag));
+
+        Task.Run(ApplyStartupSettings);
     }
 
     private async void OnPowerModeChange(PowerModeChangedEventArgs e)
@@ -266,79 +273,87 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
             new NavigationViewModel()
             {
                 Title = "Home",
-                //Tag = "dashboard",    
-                IconSymbol = FluentIconSymbol.Home20Regular,
+                // Tag = "dashboard",    
+                IconSymbol = Icon.Home,
                 ViewModelType = typeof(DashboardViewModel)
             },
-            // new NavigationViewItem()
-            // {
-            //     Content = "Premade",
-            //     Tag = "premade",
-            //     Icon = SymbolRegular.Predictions20,
-            //     PageType = typeof(Views.Pages.PremadePage),
-            //     IsVisible = _systemInfoService.Cpu.Manufacturer == Manufacturer.AMD
-            // },
-            // new NavigationViewItemBase()
-            // {
-            //     Content = "Custom",
-            //     Tag = "custom",
-            //     Icon = SymbolRegular.Book20,
-            //     PageType = typeof(Views.Pages.CustomPresetsPage)
-            // },
-            // new NavigationViewItemBase()
-            // {
-            //     Content = "Adaptive",
-            //     Tag = "adaptive",
-            //     Icon = SymbolRegular.Radar20,
-            //     PageType = typeof(Views.Pages.AdaptivePage)
-            // },
-            // new NavigationViewItemBase()
-            // {
-            //     Content = "Games",
-            //     Tag = "games",
-            //     Icon = SymbolRegular.Games20,
-            //     PageType = typeof(Views.Pages.GamesPage)
-            // },
-            // new NavigationViewItemBase()
-            // {
-            //     Content = "Auto",
-            //     Tag = "auto",
-            //     Icon = SymbolRegular.Transmission20,
-            //     PageType = typeof(Views.Pages.AutomationsPage)
-            // },
+            new NavigationViewModel()
+            {
+                Title = "Premade",
+                // Tag = "premade",
+                IconSymbol = Icon.Predictions,
+                ViewModelType = typeof(PremadePresetsViewModel),
+                // IsVisible = _systemInfoService.Cpu.Manufacturer == Manufacturer.AMD
+            },
+            new NavigationViewModel()
+            {
+                Title = "Custom",
+                // Tag = "custom",
+                IconSymbol = Icon.Book,
+                ViewModelType = typeof(CustomPresetsViewModel)
+            },
+            new NavigationViewModel()
+            {
+                Title = "Adaptive",
+                // Tag = "adaptive",
+                IconSymbol = Icon.Radar,
+                ViewModelType = typeof(AdaptiveViewModel)
+            },
+            new NavigationViewModel()
+            {
+                Title = "Games",
+                // Tag = "games",
+                IconSymbol = Icon.Games,
+                ViewModelType = typeof(GamesViewModel)
+            },
+            new NavigationViewModel()
+            {
+                Title = "Auto",
+                // Tag = "auto",
+                IconSymbol = Icon.Transmission,
+                ViewModelType = typeof(AutomationsViewModel)
+            },
             // // todo: remove this todos later
-            // //new NavigationViewItemBase()
+            // //new NavigationViewModel()
             // //{
-            // //    Content = "Fan",
-            // //    Tag = "fan",
-            // //    Icon = SymbolRegular.WeatherDuststorm20,
-            // //    PageType = typeof(Views.Pages.FanControl)
+            // //    Title = "Fan",
+            // //    // Tag = "fan",
+            // //    IconSymbol = Icon.WeatherDuststorm20,
+            // //    ViewModelType = typeof(Views.Pages.FanControl)
             // //},
             // // todo: remove later
-            // // new NavigationViewItemBase()
+            // // new NavigationViewModel()
             // //{
-            // //    Content = "Magpie",
-            // //    Tag = "magpie",
-            // //    Icon = SymbolRegular.FullScreenMaximize20,
-            // //    PageType = typeof(Views.Pages.DataPage)
+            // //    Title = "Magpie",
+            // //    // Tag = "magpie",
+            // //    IconSymbol = Icon.FullScreenMaximize20,
+            // //    ViewModelType = typeof(Views.Pages.DataPage)
             // //},
-            // new NavigationViewItemBase()
-            // {
-            //     Content = "Info",
-            //     Tag = "info",
-            //     Icon = SymbolRegular.Info20,
-            //     PageType = typeof(Views.Pages.SystemInfoPage)
-            // }
+            new NavigationViewModel()
+            {
+                Title = "Info",
+                // Tag = "info",
+                IconSymbol = Icon.Info,
+                ViewModelType = typeof(SystemInfoViewModel)
+            }
+        };
+
+        SettingsItem = new NavigationViewModel()
+        {
+            Title = "Info",
+            // Tag = "info",
+            IconSymbol = Icon.Settings,
+            ViewModelType = typeof(SettingsViewModel)
         };
 
         // NavigationFooter = new ObservableCollection<INavigationControl>
         // {
-        //     new NavigationViewItemBase()
+        //     new NavigationViewModel()
         //     {
-        //         Content = "Settings",
-        //         Tag = "settings",
-        //         Icon = SymbolRegular.Settings20,
-        //         PageType = typeof(Views.Pages.SettingsPage)
+        //         Title = "Settings",
+        //         // Tag = "settings",
+        //         IconSymbol = Icon.Settings20,
+        //         ViewModelType = typeof(Views.Pages.SettingsPage)
         //     }
         // };
         //
@@ -347,7 +362,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
         //     new MenuItem
         //     {
         //         Header = "Home",
-        //         Tag = "tray_home"
+        //         // Tag = "tray_home"
         //     }
         // };
     }
@@ -392,10 +407,7 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
 
     private async Task ProcessGamePerformanceData(GameLauncherItem game)
     {
-        var appEntries = RTSSSharedMemoryNET.OSD.GetAppEntries()
-            .Where(app => (app.Flags & AppFlags.MASK) != AppFlags.None).ToArray();
-
-        foreach (var app in appEntries)
+        foreach (var app in _rtssService.GetApplicationRenderInfo())
         {
             if (!IsGameMatched(game, app.Name)) continue;
 
@@ -415,26 +427,10 @@ public class MainWindowViewModel : NotifyPropertyChangedBase
                appName.Contains(game.Executable, StringComparison.OrdinalIgnoreCase);
     }
 
-    private void UpdateGamePerformanceData(AppEntry app, GameData gameData)
+    private void UpdateGamePerformanceData(ApplicationRenderInfo app, GameData gameData)
     {
-        var fpsArray = ParseAndUpdateData(app.InstantaneousFrames, gameData.FpsAverageData, out var averageFps);
-        var timeSpans = ParseAndUpdateData(app.InstantaneousFrameTime, gameData.MsAverageData, out var averageTimeSpan);
-
-        gameData.FpsData = averageFps.ToString();
-        gameData.FpsAverageData = fpsArray;
-        gameData.MsData = averageTimeSpan.TotalMilliseconds.ToString("0.##");
-        gameData.MsAverageData = timeSpans;
-    }
-
-    private string ParseAndUpdateData<T>(T newData, string existingData, out T average)
-    {
-        var dataList = existingData.Split(',').Select(s => (T)Convert.ChangeType(s, typeof(T))).ToList();
-        dataList.Add(newData);
-
-        if (dataList.Count > 100) dataList.RemoveAt(0);
-
-        average = (T)Convert.ChangeType(dataList.Average(x => Convert.ToDouble(x)), typeof(T));
-        return string.Join(",", dataList);
+        gameData.FpsData.Add(app.InstantaneousFrames);
+        gameData.MsData.Add(app.InstantaneousFrameTime.TotalMilliseconds);
     }
 
     private async Task AutoReapplySettings(object sender, EventArgs e)

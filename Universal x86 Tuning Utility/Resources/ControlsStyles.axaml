@@ -1,0 +1,204 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
+        xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent"
+        xmlns:primitives="clr-namespace:FluentAvalonia.UI.Controls.Primitives;assembly=FluentAvalonia"
+        xmlns:controls1="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia">
+    
+    <Design.PreviewWith>
+        <Border Margin="100">
+            
+        </Border>
+    </Design.PreviewWith>
+    
+    <Style Selector="ComboBox">
+        <Style Selector="^ /template/ ContentPresenter#ContentPresenter">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Style>
+    
+    <Style Selector="ToggleSwitch">
+        <Style Selector="^ /template/ Grid > ContentPresenter#PART_ContentPresenter">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+    </Style>
+    
+    <Style Selector="controls|CardControl">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefault}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimary}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,16,14,16" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="CornerRadius" Value="4,4,4,4" />
+        <Setter Property="Height" Value="70"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:CardControl}">
+                    <Border
+                        x:Name="ContentBorder"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        MinWidth="{TemplateBinding MinWidth}"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        Padding="{TemplateBinding Padding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                        <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                            <ContentPresenter x:Name="ContentPresenter"
+                                              Margin="0,0,14,0"
+                                              VerticalAlignment="Center"
+                                              Content="{TemplateBinding Content}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|IconCardControl">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefault}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimary}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,16,14,16" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="CornerRadius" Value="4,4,4,4" />
+        <Setter Property="Height" Value="70"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:IconCardControl}">
+                    <Border
+                        x:Name="ContentBorder"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        MinWidth="{TemplateBinding MinWidth}"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        Padding="{TemplateBinding Padding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                        <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              ColumnDefinitions="Auto, *, Auto">
+                            <fluent:FluentIcon Grid.Column="0"
+                                               Margin="0,0,14,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="{TemplateBinding IconSize}"
+                                               Icon="{TemplateBinding Icon}"
+                                               IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                            <ContentPresenter Grid.Column="1"
+                                              x:Name="ContentPresenter"
+                                              Margin="0,0,14,0"
+                                              VerticalAlignment="Center"
+                                              Content="{TemplateBinding Content}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                            
+                            <ContentPresenter Grid.Column="2"
+                                              x:Name="RightContentPresenter"
+                                              Margin="0,0,8,0"
+                                              VerticalAlignment="Center"
+                                              Content="{TemplateBinding RightMenuContent}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.Transparent">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    
+    <Style Selector="fluent|FluentIcon">
+        <Setter Property="FontSize" Value="{DynamicResource DefaultIconExpanderSize}"/>
+    </Style>
+    
+    <Style Selector="Border.Card">
+        <Setter Property="Background" Value="#0DFFFFFF"/>
+        <Setter Property="BorderBrush" Value="#19000000" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,16,14,16" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="TextBlock.Foreground" Value="#FFFFFF" />
+        <Setter Property="TextBlock.FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="TextBlock.FontWeight" Value="Normal" />
+        <Setter Property="Border.CornerRadius" Value="4,4,4,4" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
+    </Style>
+    
+    <Style Selector="UserControl.ValueInfoBadgeStyle">
+        <Setter Property="Background" Value="#9d9d9d"/>
+
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid x:Name="InfoBadgeRoot">
+                    <Border
+                        x:Name="ContentBorder"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        MinWidth="16"
+                        MinHeight="16"
+                        Margin="2"
+                        Padding="3,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{TemplateBinding Background}"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Opacity="{TemplateBinding Opacity}">
+                        <TextBlock
+                            x:Name="TextBlock"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Focusable="False"
+                            FontSize="{TemplateBinding FontSize}"
+                            Foreground="#E4000000"
+                            Text="{TemplateBinding Content}"
+                            TextWrapping="Wrap" />
+
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Border.ValueInfoBadgeStyle.Attention">
+        <Setter Property="Background" Value="#4cc2ff"/>
+    </Style>
+    
+    <Style Selector="Border.ValueInfoBadgeStyle.Success">
+        <Setter Property="Background" Value="#6CCB5F"/>
+    </Style>
+    
+    <Style Selector="Border.ValueInfoBadgeStyle.Caution">
+        <Setter Property="Background" Value="#FCE100"/>
+    </Style>
+    
+    <Style Selector="Border.ValueInfoBadgeStyle.Critical">
+        <Setter Property="Background" Value="#FF99A4"/>
+    </Style>
+</Styles>

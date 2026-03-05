@@ -2,19 +2,24 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Media.Animation;
+using FluentAvalonia.UI.Windowing;
 using Universal_x86_Tuning_Utility.Navigation;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.ViewModels;
 
 namespace Universal_x86_Tuning_Utility.Views.Windows;
 
-public partial class MainWindow : Window, IDisposable
+public partial class MainWindow : AppWindow, IDisposable
 {
     public MainWindow()
     {
         InitializeComponent();
+        
+        TitleBar.ExtendsContentIntoTitleBar = true;
+        TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
         
         Closing += UiWindow_Closing;
         Loaded += MainWindowLoaded;
@@ -53,36 +58,37 @@ public partial class MainWindow : Window, IDisposable
         // Change the current selected item back to normal
         // SetNVIIcon(sender as NavigationViewItem, false);
 
+        if (e.IsSettingsInvoked)
+        {
+            NavigationService.Instance?.Navigate(typeof(SettingsViewModel));
+            return;
+        }
+
         if (e.InvokedItemContainer is NavigationViewItem nvi)
         {
-            NavigationService.Instance.NavigateFromContext(nvi.Tag);
+            NavigationService.Instance?.Navigate(nvi.Tag as Type);
         }
     }
 
     private void MainWindowLoaded(object? sender, RoutedEventArgs e)
     {
-        NavigationService.Instance.SetFrame(FrameView);
+        NavigationService.Instance?.SetFrame(FrameView);
+        NavigationService.Instance?.SetNavigationView(NavView);
         if (DataContext is MainWindowViewModel viewModel)
         {
-            FrameView.NavigationPageFactory = viewModel.NavigationPageFactory;
-            NavigationService.Instance.NavigateFromContext(viewModel.NavigationItems[0]);
+            NavigationService.Instance?.Navigate(viewModel.NavigationItems[0].ViewModelType);
             if (Settings.Default.StartMini)
             {
                 WindowState = WindowState.Minimized;
             }
             else
             {
-                var manufacturer = viewModel.ProductManufacturer.ToUpper();
-                if (manufacturer.Contains("AYANEO") ||
-                    manufacturer.Contains("GPD") ||
-                    manufacturer.Contains("ONEXPLAYER"))
+                if (viewModel.IsPortableConsole)
                 {
-                    var topLevel = GetTopLevel(this)!;
-                    var displayCount = topLevel.Screens!.ScreenCount;
-                    if (displayCount == 1)
+                    var topLevel = GetTopLevel(this);
+                    var display = topLevel?.Screens?.ScreenFromWindow(this);
+                    if (display?.IsPrimary == true)
                     {
-                        var maxHeight = topLevel.Screens.Primary!.Bounds.Height;
-                        MaxHeight = maxHeight;
                         WindowState = WindowState.Maximized;
                     }
                 }
@@ -92,6 +98,8 @@ public partial class MainWindow : Window, IDisposable
     
     public void Dispose()
     {
+        Closing -= UiWindow_Closing;
+        Loaded -= MainWindowLoaded;
         PropertyChanged -= OnPropertyChanged;
     }
 }

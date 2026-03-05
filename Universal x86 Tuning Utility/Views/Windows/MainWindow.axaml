@@ -1,55 +1,114 @@
-﻿<Window x:Class="Universal_x86_Tuning_Utility.Views.Windows.MainWindow"
-        xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ui="using:FluentAvalonia.UI.Controls"
-        xmlns:ic="clr-namespace:FluentAvalonia.FluentIcons;assembly=FluentAvalonia.FluentIcons"
-        xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
-        x:DataType="viewModels:MainWindowViewModel"
-        mc:Ignorable="d"
-        Title="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
-        Icon="/Assets/applicationIcon-256.png"
-        Width="1080"
-        MinWidth="980"
-        Height="640"
-        MinHeight="420"
-        WindowStartupLocation="CenterScreen">
-    <!-- <ui:TitleBar.Header> -->
-    <!--     <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal"> -->
-    <!--         <Button Appearance="Transparent" Margin="0,0,9,0" Command="{Binding ViewModel.NavigateCommand}" -->
-    <!--                    CommandParameter="download" Content="{Binding ViewModel.Downloads}" -->
-    <!--                    Visibility="{Binding ViewModel.IsDownloads, Converter={StaticResource BooleanToVisibilityConverter}}"> -->
-    <!--         </Button> -->
-    <!--         <Button Appearance="Transparent" Margin="0,0,9,0" Command="{Binding ViewModel.NavigateCommand}" -->
-    <!--                    CommandParameter="support"> -->
-    <!--             Buy us a beer! &#9829; -->
-    <!--         </Button> -->
-    <!--         <Button Appearance="Transparent" Margin="0,0,9,0" Command="{Binding ViewModel.NavigateCommand}" -->
-    <!--                    CommandParameter="discord"> -->
-    <!--             Join our Discord! -->
-    <!--         </Button> -->
-    <!--     </StackPanel> -->
-    <!-- </ui:TitleBar.Header> -->
-    
-    <Grid x:Name="RootMainGrid"
-          ColumnDefinitions="Auto, *">
+﻿<windowing:AppWindow x:Class="Universal_x86_Tuning_Utility.Views.Windows.MainWindow"
+                     xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:avalonia="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia"
+                     xmlns:common="clr-namespace:FluentIcons.Common;assembly=FluentIcons.Common"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+                     xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:ui="using:FluentAvalonia.UI.Controls"
+                     xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+                     xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+                     mc:Ignorable="d"
+                     x:DataType="viewModels:MainWindowViewModel"
+                     Title="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                     Width="1080" MinWidth="980"
+                     Height="640" MinHeight="420"
+                     Background="#202020"
+                     Icon="/Assets/applicationIcon-256.png"
+                     TransparencyLevelHint="Mica"
+                     WindowStartupLocation="CenterScreen">
 
-        <ui:NavigationView Grid.Column="0"
-                           AlwaysShowHeader="False"
-                           PaneDisplayMode="Left"
-                           Name="NavView"
-                           IsSettingsVisible="False"
-                           IsPaneToggleButtonVisible="False"
-                           IsPaneOpen="False"
-                           IsBackEnabled="False">
-            <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="asdf"/>
-                <ui:NavigationViewItem Content="video"/>
-            </ui:NavigationView.MenuItems>
-        </ui:NavigationView>
-        <!--  We display our pages inside this element.  -->
-        <ui:Frame Grid.Column="1"
-                  Name="FrameView" />
-    </Grid>
-</Window>
+    <dialogHostAvalonia:DialogHost Identifier="Main"
+                                   DialogMargin="0">
+        <Grid x:Name="RootMainGrid"
+              ColumnDefinitions="50, *"
+              RowDefinitions="50, *">
+
+            <Grid Name="TitleBarHost"
+                  Grid.Row="0"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="2"
+                  Background="Transparent"
+                  ColumnDefinitions="Auto,Auto,*,Auto">
+                <Image Name="WindowIcon"
+                       Width="18"
+                       Height="18"
+                       Margin="12,4"
+                       DockPanel.Dock="Left"
+                       IsHitTestVisible="False"
+                       RenderOptions.BitmapInterpolationMode="HighQuality"
+                       Source="{Binding $parent[windowing:AppWindow].Icon}">
+                    <Image.IsVisible>
+                        <OnPlatform Default="False">
+                            <On Content="True" Options="Windows" />
+                        </OnPlatform>
+                    </Image.IsVisible>
+                </Image>
+
+                <TextBlock Grid.Column="1"
+                           VerticalAlignment="Center"
+                           FontSize="13"
+                           IsHitTestVisible="False"
+                           Text="{Binding $parent[windowing:AppWindow].Title}">
+                    <TextBlock.IsVisible>
+                        <OnPlatform Default="False">
+                            <On Content="True" Options="Windows" />
+                        </OnPlatform>
+                    </TextBlock.IsVisible>
+                </TextBlock>
+
+                <StackPanel Grid.Row="0"
+                            Grid.Column="2"
+                            Margin="0,0,148,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="9">
+                    <Button Classes="Transparent"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="support"
+                            Content="Buy us a beer! &#9829;" />
+                    <Button Classes="Transparent"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="discord"
+                            Content="Join our Discord!" />
+                </StackPanel>
+            </Grid>
+
+            <ui:NavigationView Name="NavView"
+                               Grid.Row="1"
+                               Grid.Column="0"
+                               AlwaysShowHeader="False"
+                               FontSize="40"
+                               IsBackButtonVisible="False"
+                               IsBackEnabled="False"
+                               IsPaneToggleButtonVisible="False"
+                               IsSettingsVisible="True"
+                               ItemInvoked="OnNavigationViewItemInvoked"
+                               MenuItemsSource="{Binding NavigationItems, UpdateSourceTrigger=PropertyChanged}"
+                               PaneDisplayMode="LeftCompact"
+                               SelectedItem="{Binding SelectedNavigationItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                               SettingsItem="{Binding SettingsItem, UpdateSourceTrigger=PropertyChanged}">
+                <ui:NavigationView.MenuItemTemplate>
+                    <DataTemplate DataType="viewModels:NavigationViewModel">
+                        <ui:NavigationViewItem Tag="{Binding ViewModelType}"
+                                               ToolTip.Tip="{Binding  Title}">
+                            <ui:NavigationViewItem.IconSource>
+                                <fluent:FluentIconSource Icon="{Binding IconSymbol, FallbackValue={x:Static common:Icon.Home}}"
+                                                         IconSize="Size48"
+                                                         IconVariant="Filled" />
+                            </ui:NavigationViewItem.IconSource>
+                        </ui:NavigationViewItem>
+                    </DataTemplate>
+                </ui:NavigationView.MenuItemTemplate>
+            </ui:NavigationView>
+
+            <ui:Frame Name="FrameView"
+                      Grid.Row="1"
+                      Grid.Column="1"
+                      NavigationPageFactory="{Binding NavigationPageFactory}" />
+        </Grid>
+    </dialogHostAvalonia:DialogHost>
+</windowing:AppWindow>
