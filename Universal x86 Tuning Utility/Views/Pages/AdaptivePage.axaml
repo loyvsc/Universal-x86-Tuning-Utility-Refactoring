@@ -1,804 +1,756 @@
 ﻿<UserControl x:Class="Universal_x86_Tuning_Utility.Views.Pages.AdaptivePage"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia"
+             xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:models="clr-namespace:ApplicationCore.Models;assembly=ApplicationCore"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             xmlns:icons="clr-namespace:FluentAvalonia.FluentIcons;assembly=FluentAvalonia.FluentIcons"
-             xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
+             xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             d:DesignHeight="720"
+             d:DesignWidth="1280"
              x:DataType="viewModels:AdaptiveViewModel"
-             mc:Ignorable="d"
-             d:DesignHeight="1000"
-             d:DesignWidth="800">
+             mc:Ignorable="d">
 
-    <Grid>
-        <DockPanel LastChildFill="True"
-                   Margin="15,0,0,0">
-            <TextBlock FontSize="26"
-                       FontWeight="Medium"
-                       Text="Adaptive Mode"
-                       DockPanel.Dock="Top" 
-                       Margin="3,10,0,0" />
+    <DockPanel Margin="15,0,0,0" LastChildFill="True">
+        <TextBlock Margin="3,10,0,0"
+                   DockPanel.Dock="Top"
+                   FontSize="{StaticResource HeaderFontSize}"
+                   FontWeight="Medium"
+                   Text="Adaptive Mode" />
 
-            <DockPanel DockPanel.Dock="Top" 
-                       Margin="0,9,18,0">
-                <StackPanel Orientation="Horizontal" 
-                            HorizontalAlignment="Left"
-                            DockPanel.Dock="Left" >
-                    <TextBlock FontSize="17" 
-                               FontWeight="Medium" 
-                               Margin="0,0,12,0"
-                               VerticalAlignment="Center"
-                               Text="Games/Apps:"/>
-                    <ComboBox Width="225"
-                              ItemsSource="{Binding AvailablePresets, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValue="{Binding CurrentPreset, UpdateSourceTrigger=PropertyChanged}"
-                              Height="37">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}"
-                                           FontFamily="{Binding}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                    <Button HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Height="37"
-                            Width="50" 
-                            DockPanel.Dock="Bottom" 
-                            ToolTip.Tip="Updates dropdown list with games/apps" 
-                            Command="{Binding ReloadGamesListCommand}"
-                            Margin="9,0,0,0">
-                        <ui:SymbolIcon Symbol="{icons:FluentIcon ArrowSync20Regular}"
-                                       FontSize="24" />
-                    </Button>
-                </StackPanel>
-            </DockPanel>
-
-            <TextBlock DockPanel.Dock="Top"
-                       Margin="0,8,0,0"
-                       Foreground="LightGray"
-                       Text="Notes: Wait for profiles to load before starting mode!"/>
-
-            <StackPanel Orientation="Horizontal" 
-                        HorizontalAlignment="Right" 
-                        DockPanel.Dock="Bottom" 
-                        Margin="0,9,9,6">
-                <TextBlock FontSize="14" 
-                           VerticalAlignment="Center" 
-                           Margin="0,0,9,9"
-                           Text="Polling Rate"/>
-                <ui:NumberBox Margin="0,0,9,9" 
-                              Minimum="1"
-                              Maximum="8"
-                              Value="{Binding Polling, UpdateSourceTrigger=PropertyChanged}" 
-                              SmallChange="0.05"/>
-                <CheckBox Content="Auto switch app profile" 
-                          Margin="0,0,9,9"
-                          VerticalAlignment="Center"
-                          IsChecked="{Binding IsAutoSwitchEnabled, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button HorizontalAlignment="Right" 
-                        VerticalAlignment="Center" 
-                        Margin="0,0,9,9" 
-                        Width="50" 
-                        Height="40"
+        <DockPanel Margin="0,9,0,0" DockPanel.Dock="Top">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="0,0,12,0"
+                           VerticalAlignment="Center"
+                           FontSize="17"
+                           FontWeight="Medium"
+                           Text="Games/Apps:" />
+                <ComboBox Width="225"
+                          Height="37"
+                          DisplayMemberBinding="{Binding Name}"
+                          ItemsSource="{Binding AvailablePresets, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedValue="{Binding CurrentPreset, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Width="50"
+                        Height="37"
+                        Margin="9,0,0,0"
+                        Command="{Binding ReloadGamesListCommand}"
                         DockPanel.Dock="Bottom"
-                        ToolTip.Tip="Save current settings"
-                        Command="{Binding SavePresetCommand}">
-                    <ui:SymbolIcon Symbol="{icons:FluentIcon Save20Regular}" 
-                                   FontSize="24" />
-                </Button>
-                <Button HorizontalAlignment="Right" 
-                        VerticalAlignment="Center" 
-                        Margin="0,0,9,9"
-                        Height="40"
-                        Width="185"
-                        DockPanel.Dock="Bottom"
-                        Command="{Binding ToggleAdaptiveModeCommand}">
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Symbol="{icons:FluentIcon Play20Regular}"
-                                       Classes.IsStarted="{Binding IsStart, UpdateSourceTrigger=PropertyChanged}"
-                                       Classes.NotStarted="{Binding !IsStart, UpdateSourceTrigger=PropertyChanged}"
-                                       FontSize="24">
-                            <ui:SymbolIcon.Styles>
-                                <Style Selector="ui|SymbolIcon.IsStarted">
-                                    <Setter Property="Symbol" Value="{icons:FluentIcon Stop20Regular}"/>
-                                </Style>
-                                <Style Selector="ui|SymbolIcon.NotStarted">
-                                    <Setter Property="Symbol" Value="{icons:FluentIcon Play20Regular}"/>
-                                </Style>
-                            </ui:SymbolIcon.Styles>
-                        </ui:SymbolIcon>
-                        <TextBlock VerticalAlignment="Center"
-                                   Margin="9,0,0,0"
-                                   Text="Start Adaptive Mode"/>
-                    </StackPanel>
+                        ToolTip.Tip="Updates dropdown list with games/apps">
+                    <avalonia:FluentIcon FontSize="20" Icon="ArrowSync" />
                 </Button>
             </StackPanel>
-
-            <ScrollViewer Margin="0,9,0,0" 
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto" 
-                          IsDeferredScrollingEnabled="False"
-                          DockPanel.Dock="Top">
-                <StackPanel>
-                    <controls:CardControl VerticalAlignment="Top"
-                                          Margin="0,0,15,0">
-                        <Grid ColumnDefinitions="*, Auto">
-                            <StackPanel Grid.Column="0" 
-                                        VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{icons:FluentIcon PresenceAvailable10Regular}"/>
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="Auto Switch" />
-                                <TextBlock FontSize="12"
-                                           Text="Enable this preset for automatic switching. Can be used to exclude games/apps from auto switch." />
-                            </StackPanel>
-                            <StackPanel Grid.Column="1"
-                                        Orientation="Horizontal" >
-                                <ToggleSwitch Margin="0,0,9,0"
-                                              IsChecked="{Binding CurrentPreset.IsAutoSwitch, UpdateSourceTrigger=PropertyChanged}"/>
-                            </StackPanel>
-                        </Grid>
-                    </controls:CardControl>
-                    
-                    <Expander VerticalAlignment="Top" 
-                              Margin="0,8,15,0">
-                        <Expander.Header>
-                            <Grid ColumnDefinitions="*, Auto">
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Book20Regular}"/>
-                                    <TextBlock FontSize="14"
-                                               FontWeight="Medium"
-                                               Text="Basic Adaptive Mode Settings" />
-                                    <TextBlock FontSize="12"
-                                               Text="Provides the ability to toggle/set adaptive mode targets." />
-                                </StackPanel>
-                            </Grid>
-                        </Expander.Header>
-                        <!--  CardExpander content  -->
-                        <StackPanel>
-                            <StackPanel Margin="0,-8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" FontSize="13"
-                                               Text="Max Temperature Limit (°C)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the max temperature limit adaptive mode is allowed to set"
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="0,150,*"
-                                      Margin="0,8,0,0">
-                                    <!--<CheckBox Name="cbTemp"/>-->
-                                    <ui:NumberBox Grid.Column="1"
-                                                  Value="{Binding CurrentPreset.Temp, UpdateSourceTrigger=PropertyChanged}" 
-                                                  Maximum="105"
-                                                  Minimum="10" 
-                                                  SmallChange="1" />
-                                    <Slider Grid.Column="2"
-                                            Value="{Binding CurrentPreset.Temp, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="105" 
-                                            Minimum="10" 
-                                            Margin="12,0,0,0"
-                                            TickFrequency="1" 
-                                            VerticalAlignment="Center"
-                                            IsSnapToTickEnabled="True" />
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" 
-                                               FontSize="13"
-                                               Text="Max Power Limit (W)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the max power limit adpative mode is allowed to set"
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-                                <Grid ColumnDefinitions="0,150,*"
-                                      Margin="0,8,0,0">
-                                    <ui:NumberBox Grid.Column="1"
-                                                  Value="{Binding CurrentPreset.Power, UpdateSourceTrigger=PropertyChanged}"
-                                                  Maximum="300"
-                                                  Minimum="8" 
-                                                  SmallChange="1" />
-                                    <Slider Grid.Column="2" 
-                                            Value="{Binding CurrentPreset.Power, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="300" 
-                                            Minimum="8" 
-                                            Margin="12,0,0,0"
-                                            TickFrequency="1" 
-                                            VerticalAlignment="Center"
-                                            IsSnapToTickEnabled="True"/>
-                                </Grid>
-                            </StackPanel>
-                            
-                            
-                            <StackPanel Margin="0,8,0,0" 
-                                        IsVisible="{Binding IsCurveOptimizerOptionsAvailable, UpdateSourceTrigger=PropertyChanged}">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" 
-                                               FontSize="13"
-                                               Text="Max Curve Optimiser Limit (-)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the max negative curve optimiser limit adpative mode is allowed to set"
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-                                <Grid ColumnDefinitions="33,150,*"
-                                      Margin="0,8,0,0">
-                                    <CheckBox Grid.Column="0"
-                                              IsChecked="{Binding CurrentPreset.IsCo, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <ui:NumberBox Grid.Column="1"
-                                                  Value="{Binding CurrentPreset.Co, UpdateSourceTrigger=PropertyChanged}" 
-                                                  Maximum="50"
-                                                  Minimum="0"
-                                                  SmallChange="1" />
-                                    <Slider Grid.Column="2"
-                                            Margin="12,0,0,0"
-                                            Value="{Binding CurrentPreset.Co, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="50"
-                                            Minimum="0" 
-                                            TickFrequency="1" 
-                                            VerticalAlignment="Center"
-                                            IsSnapToTickEnabled="True"/>
-                                </Grid>
-                            </StackPanel>
-                        </StackPanel>
-                    </Expander>
-
-                    <!-- AMD APU Turbo Boost Overdrive iGPU settings !-->
-                    <Expander VerticalAlignment="Top" 
-                              Margin="0,8,15,0"
-                              IsVisible="{Binding IsAmdApuTurboBoostOverdriveSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
-                        <Expander.Header>
-                            <Grid ColumnDefinitions="*, Auto">
-                                <StackPanel Grid.Column="0"
-                                            VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Pulse20Regular}"/>
-                                    <TextBlock FontSize="14"
-                                               FontWeight="Medium"
-                                               Text="Turbo Boost Overdrive iGPU Settings" />
-                                    <TextBlock FontSize="12"
-                                               Text="Provides the ability to toggle/set Turbo Boost Overdrive iGPU targets." />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1"
-                                            Orientation="Horizontal">
-                                    <ToggleSwitch Margin="0,0,9,0" 
-                                                  IsChecked="{Binding CurrentPreset.IsGfx, UpdateSourceTrigger=PropertyChanged}"/>
-                                </StackPanel>
-                            </Grid>
-                        </Expander.Header>
-                        <!--  CardExpander content  -->
-                        <StackPanel>
-                            <StackPanel Margin="0,-8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold"
-                                               FontSize="13"
-                                               Text="Maximum iGPU Clock Limit (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the maximum iGPU clock speed adaptive mode is allowed to set"
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid Margin="0,8,0,0" ColumnDefinitions="0,150,*">
-                                    <!--<CheckBox Name="cbMaxGfxClk"/>-->
-                                    <ui:NumberBox Grid.Column="1"
-                                                  Value="{Binding CurrentPreset.MaxGfx, UpdateSourceTrigger=PropertyChanged}"
-                                                  Maximum="3300"
-                                                  Minimum="200" 
-                                                  SmallChange="25" />
-                                    <Slider Grid.Column="2" 
-                                            Margin="12,0,0,0"
-                                            VerticalAlignment="Center"
-                                            Value="{Binding CurrentPreset.MaxGfx, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="3400" 
-                                            Minimum="200" 
-                                            TickFrequency="25" 
-                                            IsSnapToTickEnabled="True" />
-                                </Grid>
-                            </StackPanel>
-
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" 
-                                               FontSize="13"
-                                               Text="Minimum iGPU Clock Limit (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the minimum iGPU clock speed adaptive mode is allowed to set"
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="0,150,*"
-                                      Margin="0,8,0,0">
-                                    <ui:NumberBox Grid.Column="1"
-                                                  Value="{Binding CurrentPreset.MinGgx, UpdateSourceTrigger=PropertyChanged}"
-                                                  Maximum="3300"
-                                                  Minimum="200" 
-                                                  SmallChange="25" />
-                                    <Slider Grid.Column="2" 
-                                            Margin="12,0,0,0"
-                                            VerticalAlignment="Center"
-                                            Value="{Binding CurrentPreset.MinGgx, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="3400" 
-                                            Minimum="200" 
-                                            TickFrequency="25" 
-                                            IsSnapToTickEnabled="True"/>
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold"
-                                               FontSize="13"
-                                               Text="Minimum CPU Clock Limit (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the minimum CPU clock speed at which adaptive mode will start throttling iGPU clocks"
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="0,150,*"
-                                      Margin="0,8,0,0">
-                                    <ui:NumberBox Grid.Column="1" 
-                                                  Value="{Binding CurrentPreset.MinCpuClock, UpdateSourceTrigger=PropertyChanged}"
-                                                  Maximum="4000"
-                                                  Minimum="1000" 
-                                                  SmallChange="25" />
-                                    <Slider Grid.Column="2"
-                                            Margin="12,0,0,0"
-                                            VerticalAlignment="Center" 
-                                            Value="{Binding CurrentPreset.MinCpuClock, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="4000" 
-                                            Minimum="1000" 
-                                            TickFrequency="25" 
-                                            IsSnapToTickEnabled="True" />
-                                </Grid>
-                            </StackPanel>
-                            <TextBlock Margin="0,8,0,0" 
-                                       Foreground="LightGray"
-                                       Text="Notes: Ensure you balance CPU and iGPU clocks out for the best performance!"/>
-                        </StackPanel>
-                    </Expander>
-                    <Expander Margin="0,8,15,0">
-                        <Expander.Header>
-                            <Grid ColumnDefinitions="*,Auto">
-                                <StackPanel Grid.Column="0" 
-                                            VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Image24Regular}"/>
-                                    <TextBlock FontSize="14"
-                                               FontWeight="Medium"
-                                               Text="UXTU Super Resolution" />
-                                    <TextBlock FontSize="12"
-                                               Text="Powered by a customised version of Magpie. Use Alt+F to toggle." />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1"
-                                            Orientation="Horizontal">
-                                    <ToggleSwitch Margin="0,0,9,0" 
-                                                  IsChecked="{Binding CurrentPreset.IsMag, UpdateSourceTrigger=PropertyChanged}"/>
-                                </StackPanel>
-                            </Grid>
-                        </Expander.Header>
-                        <!--  CardExpander content  -->
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding CurrentPreset.IsVsync, UpdateSourceTrigger=PropertyChanged}"
-                                          FontSize="13"
-                                          FontWeight="DemiBold"
-                                          Content="Enable VSync"/>
-                                <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
-                                               Margin="6,0,0,-4"
-                                               ToolTip.Tip="Synchronises capture frame rate to display refresh rate."
-                                               VerticalAlignment="Center" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox Width="130"
-                                          IsChecked="{Binding CurrentPreset.IsRecap, UpdateSourceTrigger=PropertyChanged}"
-                                          FontSize="13"
-                                          FontWeight="DemiBold"
-                                          Content="Auto Recapture"/>
-                                <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
-                                               Margin="6,0,0,-4"
-                                               ToolTip.Tip="Auto recaptures the previous capture window after focus was lost and restored."
-                                               VerticalAlignment="Center" />
-                            </StackPanel>
-
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold"
-                                               FontSize="13"
-                                               Text="Capture Sharpness (%)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls UXTU Super Resolution capture image sharpness."
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="150, *"
-                                      Margin="0,8,0,0">
-                                    <ui:NumberBox Grid.Column="0"
-                                                  Value="{Binding CurrentPreset.Sharpness, UpdateSourceTrigger=PropertyChanged}" 
-                                                  Maximum="100"
-                                                  Minimum="5" 
-                                                  SmallChange="1" />
-                                    <Slider Grid.Column="1" 
-                                            Margin="12,0,0,0"
-                                            VerticalAlignment="Center" 
-                                            Value="{Binding CurrentPreset.Sharpness, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="100" 
-                                            Minimum="5" 
-                                            TickFrequency="1" 
-                                            IsSnapToTickEnabled="True"/>
-                                </Grid>
-                            </StackPanel>
-
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" 
-                                               FontSize="13"
-                                               Text="Resolution Scale"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the resolution of the window being captured. Use application controlled if you do not want UXTU to override the window resolution. Not all applications will be compatible with this mode!"
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <ComboBox Margin="0,8,0,0"
-                                          VerticalAlignment="Center" 
-                                          ItemsSource="{Binding UXTUSuperResolutionScales}"
-                                          SelectedValue="{Binding CurrentPreset.SuperResolutionScale, UpdateSourceTrigger=PropertyChanged}" 
-                                          Width="208" 
-                                          Height="37">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate DataType="models:UXTUSuperResolutionScale">
-                                            <TextBlock Text="{Binding Name}"
-                                                       FontFamily="{Binding}"/>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                            </StackPanel>
-                        </StackPanel>
-                    </Expander>
-                    
-                    <!-- Radeon™ Graphics Options -->
-                    <Expander Margin="0,8,15,0">
-                        <Expander.Header>
-                            <Grid ColumnDefinitions="*,Auto">
-                                <StackPanel Grid.Column="0" 
-                                            VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Image24Regular}"/>
-                                    <TextBlock FontSize="14"
-                                               FontWeight="Medium"
-                                               Text="Radeon™ Graphics Options" />
-                                    <TextBlock FontSize="12"
-                                               Text="Provides the ability to customise driver graphics options" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1"
-                                            Orientation="Horizontal">
-                                    <ToggleSwitch Margin="0,0,9,0" 
-                                                  IsChecked="{Binding CurrentPreset.IsRadeonGraphics, UpdateSourceTrigger=PropertyChanged}"/>
-                                </StackPanel>
-                            </Grid>
-                        </Expander.Header>
-                        <!--  CardExpander content  -->
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox FontSize="13"
-                                          FontWeight="DemiBold"
-                                          IsChecked="{Binding CurrentPreset.IsAntiLag, UpdateSourceTrigger=PropertyChanged}"
-                                          Content="Radeon™ Anti-Lag"/>
-                                <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
-                                               Margin="6,0,0,-4"
-                                               ToolTip.Tip="Enables AMD Radeon™ Anti-Lag within drivers on supported hardware."
-                                               VerticalAlignment="Center" />
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" 
-                                               FontSize="13"
-                                               Text="Radeon™ Super Resolution (%)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Enables AMD Radeon™ Super Resolution within drivers on supported hardware. Also allows you to set a custom sharpness effect."
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="33,150,*"
-                                      Margin="0,8,0,0">
-                                    <CheckBox Grid.Column="0"
-                                              IsChecked="{Binding CurrentPreset.IsRsr, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <ui:NumberBox Grid.Column="1"
-                                                  Value="{Binding CurrentPreset.Rsr, UpdateSourceTrigger=PropertyChanged}" 
-                                                  Minimum="100"
-                                                  Maximum="5"  
-                                                  SmallChange="1" />
-                                    <Slider Grid.Column="2"
-                                            Margin="12,0,0,0"
-                                            VerticalAlignment="Center"
-                                            Value="{Binding CurrentPreset.Rsr, UpdateSourceTrigger=PropertyChanged}" 
-                                            Maximum="100"
-                                            Minimum="5"  
-                                            TickFrequency="1"
-                                            IsSnapToTickEnabled="True" />
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold"
-                                               FontSize="13"
-                                               Text="Radeon™ Boost (%)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Enables AMD Radeon™ Boost within drivers on supported hardware. Also allows you to set a minimum resolution in %."
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="33,150,*"
-                                      Margin="0,8,0,0">
-                                    <CheckBox Grid.Column="0"
-                                              IsChecked="{Binding CurrentPreset.IsBoost, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <ui:NumberBox Grid.Column="1"
-                                                  Value="{Binding CurrentPreset.Boost, UpdateSourceTrigger=PropertyChanged}"
-                                                  Maximum="83"
-                                                  Minimum="50" 
-                                                  SmallChange="1" />
-                                    <Slider Grid.Column="2"
-                                            Margin="12,0,0,0"
-                                            VerticalAlignment="Center" 
-                                            Value="{Binding CurrentPreset.Boost, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="83" 
-                                            Minimum="50" 
-                                            TickFrequency="1" 
-                                            IsSnapToTickEnabled="True"/>
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold"
-                                               FontSize="13"
-                                               Text="Radeon™ Image Sharpening (%)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Enables AMD Radeon™ Image Sharpening within drivers on supported hardware. Allows you to set a custom sharpness effect."
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="33,150,*"
-                                      Margin="0,8,0,0">
-                                    <CheckBox Grid.Column="0"
-                                              IsChecked="{Binding CurrentPreset.IsImageSharp, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <ui:NumberBox Grid.Column="1"
-                                                  Value="{Binding CurrentPreset.ImageSharp, UpdateSourceTrigger=PropertyChanged}" 
-                                                  Maximum="100"
-                                                  Minimum="10" 
-                                                  SmallChange="5" />
-                                    <Slider Grid.Column="2"
-                                            Margin="12,0,0,0"
-                                            VerticalAlignment="Center" 
-                                            Value="{Binding CurrentPreset.ImageSharp, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="100" 
-                                            Minimum="10" 
-                                            TickFrequency="5" 
-                                            IsSnapToTickEnabled="True"/>
-                                </Grid>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox FontSize="13"
-                                          FontWeight="DemiBold" 
-                                          IsChecked="{Binding CurrentPreset.IsSync, UpdateSourceTrigger=PropertyChanged}"
-                                          Content="Enhanced Sync"/>
-                                <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}"
-                                               Margin="6,0,0,-4"
-                                               ToolTip.Tip="Enables AMD Enhanced Sync within drivers on supported hardware."
-                                               VerticalAlignment="Center" />
-                            </StackPanel>
-                        </StackPanel>
-                    </Expander>
-                    <Expander Margin="0,8,15,0"
-                              IsVisible="{Binding IsNvidiaGraphicsOptionsAvailable, UpdateSourceTrigger=PropertyChanged}">
-                        <Expander.Header>
-                            <Grid ColumnDefinitions="*,Auto">
-                                <StackPanel Grid.Column="0" 
-                                            VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Pulse20Regular}"/>
-                                    <TextBlock FontSize="14"
-                                               FontWeight="Medium"
-                                               Text="NVIDIA GPU Tuning" />
-                                    <TextBlock FontSize="12"
-                                               Text="Provides the ability to set tune your NVIDIA GPU." />
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="1"
-                                            Orientation="Horizontal" >
-                                    <ToggleSwitch Margin="0,0,9,0" 
-                                                  IsChecked="{Binding CurrentPreset.IsNvidia, UpdateSourceTrigger=PropertyChanged}"/>
-                                </StackPanel>
-                            </Grid>
-                        </Expander.Header>
-                        <!--  CardExpander content  -->
-                        <StackPanel>
-                            <StackPanel Margin="0,-8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" 
-                                               FontSize="13"
-                                               Text="Frequency-Adjusted Voltage Limit (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows."
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="150, *"
-                                      Margin="0,8,0,0">
-                                    <ui:NumberBox Grid.Column="0"
-                                                  Value="{Binding CurrentPreset.NvMaxCoreClock, UpdateSourceTrigger=PropertyChanged}" 
-                                                  Maximum="4000"
-                                                  Minimum="400" 
-                                                  SmallChange="5" />
-                                    <Slider Grid.Column="1"
-                                            Margin="12,0,0,0"
-                                            VerticalAlignment="Center"
-                                            Value="{Binding CurrentPreset.NvMaxCoreClock, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="4000" 
-                                            Minimum="400" 
-                                            TickFrequency="5"
-                                            IsSnapToTickEnabled="True" />
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" 
-                                               FontSize="13"
-                                               Text="GPU Core Clock Offset (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock"
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="150, *"
-                                      Margin="0,8,0,0">
-                                    <ui:NumberBox Grid.Column="0"
-                                                  Value="{Binding CurrentPreset.NvCoreClock, UpdateSourceTrigger=PropertyChanged}"
-                                                  Maximum="2000"
-                                                  Minimum="-500" 
-                                                  SmallChange="5" />
-                                    <Slider Grid.Column="1"
-                                            Margin="12,0,0,0"
-                                            VerticalAlignment="Center" 
-                                            Value="{Binding CurrentPreset.NvCoreClock, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="2000"
-                                            Minimum="-500" 
-                                            TickFrequency="5" 
-                                            IsSnapToTickEnabled="True" />
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Margin="0,8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" 
-                                               FontSize="13"
-                                               Text="GPU Memory Clock (MHz)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's VRAM clock"
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="150, *"
-                                      Margin="0,8,0,0">
-                                    <ui:NumberBox Grid.Column="0"
-                                                  Value="{Binding CurrentPreset.NvMemClock, UpdateSourceTrigger=PropertyChanged}"
-                                                  Maximum="2000"
-                                                  Minimum="-500"
-                                                  SmallChange="25" />
-                                    <Slider Grid.Column="1" 
-                                            Margin="12,0,0,0"
-                                            Value="{Binding CurrentPreset.NvMemClock, UpdateSourceTrigger=PropertyChanged}"
-                                            Maximum="2000"
-                                            Minimum="-500" 
-                                            TickFrequency="25" 
-                                            VerticalAlignment="Center" 
-                                            IsSnapToTickEnabled="True" />
-                                </Grid>
-                            </StackPanel>
-
-                            <TextBlock FontSize="12"
-                                       Text="Warning: We are not liable for any damages to hardware or resulting instabilities caused by adjustment of frequencies and voltages."
-                                       TextWrapping="WrapWithOverflow"
-                                       Margin="0,8,0,0" />
-                        </StackPanel>
-                    </Expander>
-                    
-                    <!-- ASUS Power profile settings !-->
-                    <controls:CardControl Margin="0,8,15,0">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <StackPanel Grid.Column="0" 
-                                        VerticalAlignment="Center">
-                                <ui:SymbolIcon Symbol="{icons:FluentIcon Power20Regular}"/>
-                                <TextBlock FontSize="14"
-                                           FontWeight="Medium"
-                                           Text="ASUS Power Profile" />
-                                <TextBlock FontSize="12"
-                                           Text="Provides the ability to set an ASUS power profile. This will override Armoury Crate!" />
-                            </StackPanel>
-                            <ComboBox Grid.Column="1"
-                                      VerticalAlignment="Center"
-                                      SelectedIndex="{Binding CurrentPreset.AsusPowerProfile, UpdateSourceTrigger=PropertyChanged}"
-                                      MinWidth="164"
-                                      Height="37">
-                                <ComboBoxItem>AC Controlled</ComboBoxItem>
-                                <ComboBoxItem>Silent</ComboBoxItem>
-                                <ComboBoxItem>Performance</ComboBoxItem>
-                                <ComboBoxItem>Turbo</ComboBoxItem>
-                            </ComboBox>
-
-                        </Grid>
-                    </controls:CardControl>
-
-                    <Expander IsVisible="False"
-                              Margin="0,8,15,0">
-                        <Expander.Header>
-                            <Grid ColumnDefinitions="*,Auto">
-                                <StackPanel Grid.Column="0"
-                                            VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Pulse20Regular}"/>
-                                    <TextBlock FontSize="14"
-                                               FontWeight="Medium"
-                                               Text="Static RTSS Frame Rate" />
-                                    <TextBlock FontSize="12"
-                                               Text="Provides the ability to set a custom RTSS frame limit." />
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="1"
-                                            Orientation="Horizontal">
-                                    <ToggleSwitch Name="tsRTSS"
-                                                  Margin="0,0,9,0"/>
-                                </StackPanel>
-                            </Grid>
-                        </Expander.Header>
-                        <!--  CardExpander content  -->
-                        <StackPanel>
-                            <StackPanel Margin="0,-8,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="DemiBold" 
-                                               FontSize="13"
-                                               Text="RTSS Frame Limit (FPS)"/>
-                                    <ui:SymbolIcon Symbol="{icons:FluentIcon Info20Regular}" 
-                                                   Margin="6,0,0,-2"
-                                                   ToolTip.Tip="Controls the set FPS limit in RTSS"
-                                                   VerticalAlignment="Bottom" />
-                                </StackPanel>
-
-                                <Grid ColumnDefinitions="150, *"
-                                      Margin="0,8,0,0">
-                                    <ui:NumberBox Name="nudRTSS" 
-                                                  Grid.Column="0"
-                                                  Text="{Binding ElementName=sdRTSSLim, Path=Value}"
-                                                  Value="{Binding ElementName=sdRTSSLim, Path=Value}" 
-                                                  Maximum="999"
-                                                  Minimum="0" 
-                                                  SmallChange="2" />
-                                    <Slider Name="sdRTSSLim" 
-                                            Grid.Column="1" 
-                                            Margin="12,0,0,0"
-                                            VerticalAlignment="Center" 
-                                            Value="{Binding ElementName=nudRTSS, Path=Value}"
-                                            Maximum="999"
-                                            Minimum="0" 
-                                            TickFrequency="2" 
-                                            IsSnapToTickEnabled="True" />
-                                </Grid>
-                            </StackPanel>
-
-                        </StackPanel>
-                    </Expander>
-                </StackPanel>
-            </ScrollViewer>
         </DockPanel>
-    </Grid>
+
+        <TextBlock Margin="0,8,0,0"
+                   DockPanel.Dock="Top"
+                   Foreground="LightGray"
+                   Text="Notes: Wait for profiles to load before starting mode!" />
+
+        <StackPanel Margin="0,9,9,6"
+                    HorizontalAlignment="Right"
+                    DockPanel.Dock="Bottom"
+                    Orientation="Horizontal"
+                    Spacing="9">
+            <TextBlock VerticalAlignment="Center"
+                       FontSize="14"
+                       Text="Polling Rate" />
+            <ui:NumberBox VerticalAlignment="Center"
+                          Maximum="8"
+                          Minimum="1"
+                          SmallChange="0.05"
+                          Value="{Binding Polling, UpdateSourceTrigger=PropertyChanged}" />
+            <CheckBox Content="Auto switch app profile" IsChecked="{Binding IsAutoSwitchEnabled, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Width="50"
+                    Height="40"
+                    HorizontalAlignment="Right"
+                    Command="{Binding SavePresetCommand}"
+                    DockPanel.Dock="Bottom"
+                    ToolTip.Tip="Save current settings">
+                <avalonia:FluentIcon FontSize="20" Icon="Save" />
+            </Button>
+            <Button Width="185"
+                    Height="40"
+                    Command="{Binding ToggleAdaptiveModeCommand}"
+                    DockPanel.Dock="Bottom">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                    <avalonia:FluentIcon Classes.IsStarted="{Binding IsStart, UpdateSourceTrigger=PropertyChanged}"
+                                         Classes.NotStarted="{Binding !IsStart, UpdateSourceTrigger=PropertyChanged}"
+                                         FontSize="24"
+                                         Icon="Play">
+                        <avalonia:FluentIcon.Styles>
+                            <Style Selector="avalonia|FluentIcon.IsStarted">
+                                <Setter Property="Icon" Value="Stop" />
+                            </Style>
+                            <Style Selector="avalonia|FluentIcon.NotStarted">
+                                <Setter Property="Icon" Value="Play" />
+                            </Style>
+                        </avalonia:FluentIcon.Styles>
+                    </avalonia:FluentIcon>
+                    <TextBlock VerticalAlignment="Center" Text="Start Adaptive Mode" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <ScrollViewer Margin="0,9,0,0"
+                      DockPanel.Dock="Top"
+                      HorizontalScrollBarVisibility="Auto"
+                      IsDeferredScrollingEnabled="False"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical" 
+                        Spacing="8"
+                        Margin="0,0,15,0">
+                <!-- Auto Switch -->
+                <controls:IconCardControl Icon="PresenceAvailable">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock FontSize="14"
+                                   FontWeight="Medium"
+                                   Text="Auto Switch" />
+                        <TextBlock FontSize="12" Text="Enable this preset for automatic switching. Can be used to exclude games/apps from auto switch." />
+                    </StackPanel>
+                    <controls:IconCardControl.RightMenuContent>
+                        <ToggleSwitch IsChecked="{Binding CurrentPreset.IsAutoSwitch, UpdateSourceTrigger=PropertyChanged}"
+                                      VerticalAlignment="Center"/>
+                    </controls:IconCardControl.RightMenuContent>
+                </controls:IconCardControl>
+
+                <!-- Basic Adaptive Mode Settings -->
+                <controls:IconExpander Icon="Book">
+                    <controls:IconExpander.Header>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock FontSize="14"
+                                       FontWeight="Medium"
+                                       Text="Basic Adaptive Mode Settings" />
+                            <TextBlock FontSize="12" Text="Provides the ability to toggle/set adaptive mode targets." />
+                        </StackPanel>
+                    </controls:IconExpander.Header>
+
+                    <StackPanel>
+                        <StackPanel Margin="0,-8,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Max Temperature Limit (°C)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls the max temperature limit adaptive mode is allowed to set" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="150, *">
+                                <ui:NumberBox Grid.Column="0"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"
+                                              Maximum="105"
+                                              Minimum="10"
+                                              SmallChange="1"
+                                              SpinButtonPlacementMode="Compact"
+                                              Value="{Binding CurrentPreset.Temp, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Top"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="105"
+                                        Minimum="10"
+                                        TickFrequency="1"
+                                        Value="{Binding CurrentPreset.Temp, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel Margin="0,8,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Max Power Limit (W)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls the max power limit adpative mode is allowed to set" />
+                            </StackPanel>
+                            <Grid ColumnDefinitions="150,*">
+                                <ui:NumberBox Grid.Column="0"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"
+                                              Maximum="300"
+                                              Minimum="8"
+                                              SmallChange="1"
+                                              Value="{Binding CurrentPreset.Power, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="300"
+                                        Minimum="8"
+                                        TickFrequency="1"
+                                        Value="{Binding CurrentPreset.Power, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,8,0,0"
+                                    IsVisible="{Binding IsCurveOptimizerOptionsAvailable, UpdateSourceTrigger=PropertyChanged}"
+                                    Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Max Curve Optimiser Limit (-)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls the max negative curve optimiser limit adpative mode is allowed to set" />
+                            </StackPanel>
+                            <Grid ColumnDefinitions="33,150,*">
+                                <CheckBox Grid.Column="0"
+                                          VerticalAlignment="Center"
+                                          IsChecked="{Binding CurrentPreset.IsCo, UpdateSourceTrigger=PropertyChanged}" />
+                                <ui:NumberBox Grid.Column="1"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"
+                                              IsEnabled="{Binding CurrentPreset.IsCo, UpdateSourceTrigger=PropertyChanged}"
+                                              Maximum="50"
+                                              Minimum="0"
+                                              SmallChange="1"
+                                              Value="{Binding CurrentPreset.Co, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="2"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsEnabled="{Binding CurrentPreset.IsCo, UpdateSourceTrigger=PropertyChanged}"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="50"
+                                        Minimum="0"
+                                        TickFrequency="1"
+                                        Value="{Binding CurrentPreset.Co, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </controls:IconExpander>
+
+                <!--  AMD APU Turbo Boost Overdrive iGPU settings !  -->
+                <controls:IconExpander Icon="Pulse"
+                                       IsVisible="{Binding IsAmdApuTurboBoostOverdriveSettingsAvailable, UpdateSourceTrigger=PropertyChanged, FallbackValue={x:True}}">
+                    <controls:IconExpander.Header>
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock FontSize="14"
+                                           FontWeight="Medium"
+                                           Text="Turbo Boost Overdrive iGPU Settings" />
+                                <TextBlock FontSize="12" Text="Provides the ability to toggle/set Turbo Boost Overdrive iGPU targets." />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding CurrentPreset.IsGfx, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                    </controls:IconExpander.Header>
+                    <!--  CardExpander content  -->
+                    <StackPanel>
+                        <StackPanel Margin="0,-8,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Maximum iGPU Clock Limit (MHz)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls the maximum iGPU clock speed adaptive mode is allowed to set" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="150,*">
+                                <ui:NumberBox Grid.Column="0"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"
+                                              Maximum="3300"
+                                              Minimum="200"
+                                              SmallChange="25"
+                                              Value="{Binding CurrentPreset.MaxGfx, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="3400"
+                                        Minimum="200"
+                                        TickFrequency="25"
+                                        Value="{Binding CurrentPreset.MaxGfx, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,8,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Minimum iGPU Clock Limit (MHz)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls the minimum iGPU clock speed adaptive mode is allowed to set" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="150,*">
+                                <ui:NumberBox Grid.Column="0"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"
+                                              Maximum="3300"
+                                              Minimum="200"
+                                              SmallChange="25"
+                                              Value="{Binding CurrentPreset.MinGgx, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="3400"
+                                        Minimum="200"
+                                        TickFrequency="25"
+                                        Value="{Binding CurrentPreset.MinGgx, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel Margin="0,8,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Minimum CPU Clock Limit (MHz)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls the minimum CPU clock speed at which adaptive mode will start throttling iGPU clocks" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="150,*">
+                                <ui:NumberBox Grid.Column="0"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"
+                                              Maximum="4000"
+                                              Minimum="1000"
+                                              SmallChange="25"
+                                              Value="{Binding CurrentPreset.MinCpuClock, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="4000"
+                                        Minimum="1000"
+                                        TickFrequency="25"
+                                        Value="{Binding CurrentPreset.MinCpuClock, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+                        <TextBlock Margin="0,8,0,0"
+                                   Foreground="LightGray"
+                                   Text="Notes: Ensure you balance CPU and iGPU clocks out for the best performance!" />
+                    </StackPanel>
+                </controls:IconExpander>
+
+                <!-- UXTU Super Resolution -->
+                <controls:IconExpander Icon="Image">
+                    <controls:IconExpander.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock FontSize="14"
+                                           FontWeight="Medium"
+                                           Text="UXTU Super Resolution" />
+                                <TextBlock FontSize="12" Text="Powered by a customised version of Magpie. Use Alt+F to toggle." />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding CurrentPreset.IsMag, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                    </controls:IconExpander.Header>
+                    <!--  CardExpander content  -->
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="Enable VSync"
+                                      FontSize="13"
+                                      FontWeight="DemiBold"
+                                      IsChecked="{Binding CurrentPreset.IsVsync, UpdateSourceTrigger=PropertyChanged}" />
+                            <avalonia:FluentIcon VerticalAlignment="Center"
+                                                 FontSize="24"
+                                                 Icon="Info"
+                                                 ToolTip.Tip="Synchronises capture frame rate to display refresh rate." />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="Auto Recapture"
+                                      FontSize="13"
+                                      FontWeight="DemiBold"
+                                      IsChecked="{Binding CurrentPreset.IsRecap, UpdateSourceTrigger=PropertyChanged}" />
+                            <avalonia:FluentIcon VerticalAlignment="Center"
+                                                 FontSize="24"
+                                                 Icon="Info"
+                                                 ToolTip.Tip="Auto recaptures the previous capture window after focus was lost and restored." />
+                        </StackPanel>
+
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Capture Sharpness (%)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls UXTU Super Resolution capture image sharpness." />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="150, *">
+                                <ui:NumberBox Grid.Column="0"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"
+                                              Maximum="100"
+                                              Minimum="5"
+                                              SmallChange="1"
+                                              Value="{Binding CurrentPreset.Sharpness, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="100"
+                                        Minimum="5"
+                                        TickFrequency="1"
+                                        Value="{Binding CurrentPreset.Sharpness, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Resolution Scale" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls the resolution of the window being captured. Use application controlled if you do not want UXTU to override the window resolution. Not all applications will be compatible with this mode!" />
+                            </StackPanel>
+
+                            <ComboBox Width="208"
+                                      Height="37"
+                                      VerticalAlignment="Center"
+                                      DisplayMemberBinding="{Binding Name}"
+                                      ItemsSource="{Binding UXTUSuperResolutionScales}"
+                                      SelectedValue="{Binding CurrentPreset.SuperResolutionScale, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </StackPanel>
+                </controls:IconExpander>
+
+                <!--  Radeon™ Graphics Options  -->
+                <controls:IconExpander Icon="Image"
+                                       IsVisible="{Binding IsRadeonGraphicsOptionsAvailable, UpdateSourceTrigger=PropertyChanged}">
+                    <controls:IconExpander.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock FontSize="14"
+                                           FontWeight="Medium"
+                                           Text="Radeon™ Graphics Options" />
+                                <TextBlock FontSize="12" Text="Provides the ability to customise driver graphics options" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding CurrentPreset.IsRadeonGraphics, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                    </controls:IconExpander.Header>
+                    <!--  CardExpander content  -->
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <CheckBox Content="Radeon™ Anti-Lag"
+                                      FontSize="13"
+                                      FontWeight="DemiBold"
+                                      IsChecked="{Binding CurrentPreset.IsAntiLag, UpdateSourceTrigger=PropertyChanged}" />
+                            <avalonia:FluentIcon VerticalAlignment="Center"
+                                                 FontSize="24"
+                                                 Icon="Info"
+                                                 ToolTip.Tip="Enables AMD Radeon™ Anti-Lag within drivers on supported hardware." />
+                        </StackPanel>
+                        <StackPanel Margin="0,8,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Radeon™ Super Resolution (%)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Enables AMD Radeon™ Super Resolution within drivers on supported hardware. Also allows you to set a custom sharpness effect." />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="33,150,*">
+                                <CheckBox Grid.Column="0" 
+                                          IsChecked="{Binding CurrentPreset.IsRsr, UpdateSourceTrigger=PropertyChanged}" 
+                                          VerticalAlignment="Center"/>
+                                <ui:NumberBox Grid.Column="1"
+                                              Maximum="5"
+                                              Minimum="100"
+                                              SmallChange="1"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Stretch"
+                                              IsEnabled="{Binding CurrentPreset.IsRsr, UpdateSourceTrigger=PropertyChanged}"
+                                              Value="{Binding CurrentPreset.Rsr, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="2"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="100"
+                                        Minimum="5"
+                                        TickFrequency="1"
+                                        IsEnabled="{Binding CurrentPreset.IsRsr, UpdateSourceTrigger=PropertyChanged}"
+                                        Value="{Binding CurrentPreset.Rsr, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel Margin="0,8,0,0">
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Radeon™ Boost (%)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Enables AMD Radeon™ Boost within drivers on supported hardware. Also allows you to set a minimum resolution in %." />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="33,150,*">
+                                <CheckBox Grid.Column="0" 
+                                          IsChecked="{Binding CurrentPreset.IsBoost, UpdateSourceTrigger=PropertyChanged}"
+                                          VerticalAlignment="Center"/>
+                                <ui:NumberBox Grid.Column="1"
+                                              Maximum="83"
+                                              Minimum="50"
+                                              SmallChange="1"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Stretch"
+                                              IsEnabled="{Binding CurrentPreset.IsBoost, UpdateSourceTrigger=PropertyChanged}"
+                                              Value="{Binding CurrentPreset.Boost, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="2"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="83"
+                                        Minimum="50"
+                                        TickFrequency="1"
+                                        IsEnabled="{Binding CurrentPreset.IsBoost, UpdateSourceTrigger=PropertyChanged}"
+                                        Value="{Binding CurrentPreset.Boost, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel Margin="0,8,0,0">
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Radeon™ Image Sharpening (%)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Enables AMD Radeon™ Image Sharpening within drivers on supported hardware. Allows you to set a custom sharpness effect." />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="33,150,*">
+                                <CheckBox Grid.Column="0" 
+                                          IsChecked="{Binding CurrentPreset.IsImageSharp, UpdateSourceTrigger=PropertyChanged}"
+                                          VerticalAlignment="Center" />
+                                <ui:NumberBox Grid.Column="1"
+                                              Maximum="100"
+                                              Minimum="10"
+                                              SmallChange="5"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Stretch"
+                                              IsEnabled="{Binding CurrentPreset.IsImageSharp, UpdateSourceTrigger=PropertyChanged}"
+                                              Value="{Binding CurrentPreset.ImageSharp, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="2"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="100"
+                                        Minimum="10"
+                                        TickFrequency="5"
+                                        IsEnabled="{Binding CurrentPreset.IsImageSharp, UpdateSourceTrigger=PropertyChanged}"
+                                        Value="{Binding CurrentPreset.ImageSharp, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="Enhanced Sync"
+                                      FontSize="13"
+                                      FontWeight="DemiBold"
+                                      IsChecked="{Binding CurrentPreset.IsSync, UpdateSourceTrigger=PropertyChanged}" />
+                            <avalonia:FluentIcon Margin="0,0,0,2"
+                                                 Icon="Info"
+                                                 FontSize="20"
+                                                 ToolTip.Tip="Enables AMD Enhanced Sync within drivers on supported hardware." />
+                        </StackPanel>
+                    </StackPanel>
+                </controls:IconExpander>
+                
+                <!-- NVIDIA GPU Tuning -->
+                <controls:IconExpander IsVisible="{Binding IsNvidiaGraphicsOptionsAvailable, UpdateSourceTrigger=PropertyChanged}"
+                                       Icon="Pulse">
+                    <controls:IconExpander.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock FontSize="14"
+                                           FontWeight="Medium"
+                                           Text="NVIDIA GPU Tuning" />
+                                <TextBlock FontSize="12" Text="Provides the ability to set tune your NVIDIA GPU." />
+                            </StackPanel>
+
+                            <ToggleSwitch Grid.Column="1"
+                                          IsChecked="{Binding CurrentPreset.IsNvidia, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                    </controls:IconExpander.Header>
+                    <!--  CardExpander content  -->
+                    <StackPanel Spacing="8">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="Frequency-Adjusted Voltage Limit (MHz)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="150, *">
+                                <ui:NumberBox Grid.Column="0"
+                                              Maximum="4000"
+                                              Minimum="400"
+                                              SmallChange="5"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"
+                                              Value="{Binding CurrentPreset.NvMaxCoreClock, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="4000"
+                                        Minimum="400"
+                                        TickFrequency="5"
+                                        Value="{Binding CurrentPreset.NvMaxCoreClock, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="GPU Core Clock Offset (MHz)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="150, *">
+                                <ui:NumberBox Grid.Column="0"
+                                              Maximum="2000"
+                                              Minimum="-500"
+                                              SmallChange="5"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Stretch"
+                                              Value="{Binding CurrentPreset.NvCoreClock, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="2000"
+                                        Minimum="-500"
+                                        TickFrequency="5"
+                                        Value="{Binding CurrentPreset.NvCoreClock, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                <TextBlock FontSize="13"
+                                           FontWeight="DemiBold"
+                                           Text="GPU Memory Clock (MHz)" />
+                                <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                     FontSize="20"
+                                                     Icon="Info"
+                                                     ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's VRAM clock" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="150, *">
+                                <ui:NumberBox Grid.Column="0"
+                                              Maximum="2000"
+                                              Minimum="-500"
+                                              SmallChange="25"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Stretch"
+                                              Value="{Binding CurrentPreset.NvMemClock, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        Maximum="2000"
+                                        Minimum="-500"
+                                        TickFrequency="25"
+                                        Value="{Binding CurrentPreset.NvMemClock, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <TextBlock FontSize="12"
+                                   Text="Warning: We are not liable for any damages to hardware or resulting instabilities caused by adjustment of frequencies and voltages."
+                                   TextWrapping="WrapWithOverflow" />
+                    </StackPanel>
+                </controls:IconExpander>
+
+                <!--  ASUS Power profile settings !  -->
+                <controls:IconCardControl Icon="Power">
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock FontSize="14"
+                                   FontWeight="Medium"
+                                   Text="ASUS Power Profile" />
+                        <TextBlock FontSize="12" Text="Provides the ability to set an ASUS power profile. This will override Armoury Crate!" />
+                    </StackPanel>
+                    <controls:IconCardControl.RightMenuContent>
+                        <ComboBox Grid.Column="2"
+                                  Height="37"
+                                  MinWidth="164"
+                                  VerticalAlignment="Center"
+                                  SelectedIndex="{Binding CurrentPreset.AsusPowerProfile, UpdateSourceTrigger=PropertyChanged}">
+                            <ComboBoxItem>AC Controlled</ComboBoxItem>
+                            <ComboBoxItem>Silent</ComboBoxItem>
+                            <ComboBoxItem>Performance</ComboBoxItem>
+                            <ComboBoxItem>Turbo</ComboBoxItem>
+                        </ComboBox>
+                    </controls:IconCardControl.RightMenuContent>
+                </controls:IconCardControl>
+
+                <!-- Static RTSS Frame Rate -->
+                <controls:IconExpander IsVisible="False"
+                                       Icon="Pulse">
+                    <controls:IconExpander.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock FontSize="14"
+                                           FontWeight="Medium"
+                                           Text="Static RTSS Frame Rate" />
+                                <TextBlock FontSize="12" Text="Provides the ability to set a custom RTSS frame limit." />
+                            </StackPanel>
+
+                            <!-- IsChecked="{Binding CurrentPreset.IsStaticFpsLimit}" -->
+                            <ToggleSwitch Grid.Column="1" />
+                        </Grid>
+                    </controls:IconExpander.Header>
+                    <!--  CardExpander content  -->
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="6">
+                            <TextBlock FontSize="13"
+                                       FontWeight="DemiBold"
+                                       Text="RTSS Frame Limit (FPS)" />
+                            <avalonia:FluentIcon VerticalAlignment="Bottom"
+                                                 FontSize="20"
+                                                 Icon="Info"
+                                                 ToolTip.Tip="Controls the set FPS limit in RTSS" />
+                        </StackPanel>
+
+                        <Grid ColumnDefinitions="150, *">
+                            <!-- Value="{Binding CurrentPreset.StaticFpsLimit, UpdateSourceTrigger=PropertyChanged}" -->
+                            <ui:NumberBox Grid.Column="0"
+                                          Maximum="999"
+                                          Minimum="0"
+                                          SmallChange="2"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Stretch" />
+                            <!-- Value="{Binding CurrentPreset.StaticFpsLimit, UpdateSourceTrigger=PropertyChanged}" -->
+                            <Slider Grid.Column="1"
+                                    Margin="12,0,0,0"
+                                    VerticalAlignment="Center"
+                                    IsSnapToTickEnabled="True"
+                                    Maximum="999"
+                                    Minimum="0"
+                                    TickFrequency="2" />
+                        </Grid>
+                    </StackPanel>
+                </controls:IconExpander>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
 </UserControl>

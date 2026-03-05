@@ -2,6 +2,7 @@ namespace ApplicationCore.Interfaces;
 
 public interface IUpdateService
 {
-    public Task<bool> IsUpdatesAvailable(string currentVersion);
-    public Task DownloadNewestPackage(string downloadPath);
+    public bool IsUpdateAvailable { get; }
+    public Task<bool> CheckIsUpdatesAvailableAsync(string currentVersion);
+    public Task DownloadNewestPackageAsync(string downloadPath);
 }

@@ -1,15 +1,28 @@
 ﻿<Application x:Class="Universal_x86_Tuning_Utility.App"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:styling="using:FluentAvalonia.Styling">
+             xmlns:styling="using:FluentAvalonia.Styling"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             RequestedThemeVariant="Dark">
     
     <Application.Styles>
-        <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
+        <StyleInclude Source="Resources/ControlsStyles.axaml"/>
+        <styling:FluentAvaloniaTheme PreferSystemTheme="False" PreferUserAccentColor="True" />
+        <dialogHostAvalonia:DialogHostStyles />
     </Application.Styles>
+    
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="/Resources/DefaultValues.axaml"/>
+                <MergeResourceInclude Source="/Resources/ControlThemes.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
     
     <TrayIcon.Icons>
         <TrayIcons>
-            <TrayIcon Icon="/Assets/applicationIcon-256.png" 
+            <TrayIcon Icon="/Assets/applicationIcon-1024.png" 
                       ToolTipText="Universal x86 Tuning Utility"
                       Clicked="OnTrayIconClicked">
                 <TrayIcon.Menu>

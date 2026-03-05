@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
 using System.Windows.Input;
 using ApplicationCore.Interfaces;
-using ApplicationCore.Utilities;
 using DesktopNotifications;
-using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Helpers;
@@ -15,7 +11,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class SettingsViewModel : NotifyPropertyChangedBase
+public class SettingsViewModel : ReactiveObject
 {
     public ICommand CheckUpdateCommand { get; }
     public ICommand DownloadUpdateCommand { get; }
@@ -25,76 +21,100 @@ public class SettingsViewModel : NotifyPropertyChangedBase
     public int ReapplySecond
     {
         get => _reapplySecond;
-        set => SetValue(ref _reapplySecond, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _reapplySecond, value, () =>
+        {
+            Settings.Default.AutoReapplyTime = value;
+        });
     }
     
     public string ApplicationVersion
     {
         get => _appVersion;
-        set => SetValue(ref _appVersion, value);
+        set => this.RaiseAndSetIfChanged(ref _appVersion, value);
     }
 
     public bool IsAutoStartEnabled
     {
         get => _isAutoStartEnabled;
-        set => SetValue(ref _isAutoStartEnabled, value);
+        set => this.RaiseAndSetIfChanged(ref _isAutoStartEnabled, value);
     }
 
     public bool IsStartMinimizedEnabled
     {
         get => _isStartMinimizedEnabled;
-        set => SetValue(ref _isStartMinimizedEnabled, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isStartMinimizedEnabled, value, () =>
+        {
+            Settings.Default.StartMini = value;
+        });
     }
 
     public bool IsMinimizeOnClose
     {
         get => _isMinimizeOnClose;
-        set => SetValue(ref _isMinimizeOnClose, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isMinimizeOnClose, value, () =>
+        {
+            Settings.Default.MinimizeClose = value;
+        });
     }
 
     public bool IsReapplyOnStart
     {
         get => _isReapplyOnStart;
-        set => SetValue(ref _isReapplyOnStart, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isReapplyOnStart, value, () =>
+        {
+            Settings.Default.ApplyOnStart = value;
+        });
     }
 
     public bool IsAutoReapply
     {
         get => _isIsAutoReapply;
-        set => SetValue(ref _isIsAutoReapply, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isIsAutoReapply, value, () =>
+        {
+            Settings.Default.AutoReapply = value;
+        });
     }
 
     public bool IsAutoCheckUpdates
     {
         get => _isAutoCheckUpdates;
-        set => SetValue(ref _isAutoCheckUpdates, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isAutoCheckUpdates, value, () =>
+        {
+            Settings.Default.UpdateCheck = value;
+        });
     }
 
     public bool IsAutoStartAdaptiveMode
     {
         get => _isAutoStartAdaptiveMode;
-        set => SetValue(ref _isAutoStartAdaptiveMode, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isAutoStartAdaptiveMode, value, () =>
+        {
+            Settings.Default.isStartAdpative = value;
+        });
     }
 
     public bool IsAutoTrackGames
     {
         get => _isAutoTrackGames;
-        set => SetValue(ref _isAutoTrackGames, value);
+        set => this.RaiseAndSetIfChangedWithAfterSetAction(ref _isAutoTrackGames, value, () =>
+        {
+            Settings.Default.isTrack = value;
+        });
     }
 
     public bool IsUpdateAvailable
     {
         get => _isUpdateAvailable;
-        set => SetValue(ref _isUpdateAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isUpdateAvailable, value);
     }
 
     public string UpdatesMessage
     {
         get => _updatesMessage;
-        set => SetValue(ref _updatesMessage, value);
+        set => this.RaiseAndSetIfChanged(ref _updatesMessage, value);
     }
     
-    private readonly ILogger<SettingsViewModel> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly IUpdateService _updateService;
     private readonly IUpdateInstallerService _updateInstallerService;
     private readonly INotificationManager _toastNotificationsManager;
@@ -102,7 +122,7 @@ public class SettingsViewModel : NotifyPropertyChangedBase
     private readonly IPlatformServiceAccessor _platformServiceAccessor;
     private readonly IStressTestService _stressTestService;
     private string _appVersion = string.Empty;
-    private string _updatesMessage;
+    private string _updatesMessage = string.Empty;
     private int _reapplySecond;
     private bool _isUpdateAvailable;
     private bool _isReapplyOnStart;
@@ -114,7 +134,7 @@ public class SettingsViewModel : NotifyPropertyChangedBase
     private bool _isMinimizeOnClose;
     private bool _isAutoCheckUpdates;
 
-    public SettingsViewModel(ILogger<SettingsViewModel> logger,
+    public SettingsViewModel(Serilog.ILogger logger,
                              IUpdateService updateService,
                              IUpdateInstallerService updateInstallerService,
                              INotificationManager toastNotificationsManager,
@@ -146,6 +166,12 @@ public class SettingsViewModel : NotifyPropertyChangedBase
         IsAutoTrackGames = Settings.Default.isTrack;
 
         ApplicationVersion = _platformServiceAccessor.ProductVersion;
+
+        if (_updateService.IsUpdateAvailable)
+        {
+            UpdatesMessage = "An update for Universal x86 Tuning Utility has been found!";
+            IsUpdateAvailable = true;
+        }
     }
 
     private async Task StartOnSystemBoot()
@@ -178,7 +204,7 @@ public class SettingsViewModel : NotifyPropertyChangedBase
         catch (Exception ex)
         {
             // log error or display error message to user
-            _logger.LogError(ex, "Error occurred at downloading or installing update");
+            _logger.Error(ex, "Error occurred at downloading or installing update");
             await _toastNotificationsManager.ShowTextNotification(title: "Error",
                 text: "Error occurred at downloading or installing update",
                 notificationType: NotificationManagerExtensions.NotificationType.Error);
@@ -189,7 +215,7 @@ public class SettingsViewModel : NotifyPropertyChangedBase
     {
         if (UpdateHelper.IsInternetAvailable())
         {
-            var isUpdateAvailable = await _updateService.IsUpdatesAvailable(ApplicationVersion);
+            var isUpdateAvailable = await _updateService.CheckIsUpdatesAvailableAsync(ApplicationVersion);
 
             if (isUpdateAvailable)
             {

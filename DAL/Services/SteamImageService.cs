@@ -1,23 +1,32 @@
 ﻿using System.Text.RegularExpressions;
 using Accord.Math.Distances;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Utilities;
 using craftersmine.SteamGridDBNet;
 
 namespace DAL.Services;
 
 public class ImageService : IImageService
 {
+    private const string SteamApiKey = "33006ae9737e547251b1cff96e9e6ec9";
+    private const string GameImagesDirectory = @"Assets\GameImages";
+    
     public async Task<string> GetIconImageUrl(string gameName)
     {
-        string filePath = $@"\Assets\GameImages\{CleanFileName(gameName)}.jpeg";
+        string filePath = $@"Assets\GameImages\{CleanFileName(gameName)}.jpeg";
         try
         {
-            var client = new SteamGridDb("33006ae9737e547251b1cff96e9e6ec9");
+            if (File.Exists(filePath))
+            {
+                return filePath;
+            }
+            
+            using var client = new SteamGridDb(SteamApiKey);
             SteamGridDbGame[]? games = await client.SearchForGamesAsync(gameName);
 
             // Instantiate the string distance algorithm
             var levenshtein = new Levenshtein();
-            var iconSizeThresholds = new[] { 256, 192, 128, 512, 1024, 96 };
+            var iconSizeThresholds = new[] { 256, 192, 128, 512, 96 };
 
             foreach (var result in games)
             {
@@ -66,8 +75,22 @@ public class ImageService : IImageService
     
     public string CleanFileName(string fileName)
     {
-        string illegalChars = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
-        string pattern = "[" + Regex.Escape(illegalChars) + "]";
+        var sb = StringBuilderPool.Rent();
+        
+        sb.Append(Path.GetInvalidFileNameChars());
+        sb.Append(Path.GetInvalidPathChars());
+
+        var escape = Regex.Escape(sb.ToString());
+
+        sb.Clear();
+
+        sb.Append('[');
+        sb.Append(escape);
+        sb.Append(']');
+
+        string pattern = sb.ToString();
+        
+        StringBuilderPool.Return(sb);
         return Regex.Replace(fileName, pattern, "_");
     }
 
@@ -75,7 +98,7 @@ public class ImageService : IImageService
     {
         try
         {
-            var client = new SteamGridDb("33006ae9737e547251b1cff96e9e6ec9");
+            using var client = new SteamGridDb(SteamApiKey);
             SteamGridDbGame[]? games = await client.SearchForGamesAsync(gameName);
 
             // Instantiate the string distance algorithm
@@ -135,7 +158,11 @@ public class ImageService : IImageService
             response.EnsureSuccessStatusCode();
             await using (var stream = await response.Content.ReadAsStreamAsync())
             {
-                await using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                if (!Directory.Exists(GameImagesDirectory))
+                {
+                    Directory.CreateDirectory(GameImagesDirectory);
+                }
+                await using (var fileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write))
                 {
                     await stream.CopyToAsync(fileStream);
                 }

@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Media;
-using ApplicationCore.Utilities;
+using Avalonia.Media;
+using ReactiveUI;
 using Universal_x86_Tuning_Utility.Models;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public partial class DataViewModel : NotifyPropertyChangedBase
+public partial class DataViewModel : ReactiveObject
 {
     private List<DataColor> _colors;
 
     public List<DataColor> Colors
     {
         get => _colors;
-        set => SetValue(ref _colors, value);
+        set => this.RaiseAndSetIfChanged(ref _colors, value);
     }
     
     public DataViewModel()
@@ -26,7 +26,7 @@ public partial class DataViewModel : NotifyPropertyChangedBase
         {
             colorsArray[i] = new DataColor
             {
-                Color = new SolidColorBrush(Color.FromArgb(
+                Color = new SolidColorBrush(new Color(
                     a: 200,
                     r: (byte)random.Next(0, 250),
                     g: (byte)random.Next(0, 250),

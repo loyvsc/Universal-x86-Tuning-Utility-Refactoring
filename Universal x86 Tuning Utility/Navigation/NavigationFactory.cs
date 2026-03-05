@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using FluentAvalonia.UI.Controls;
+using Splat;
 using Universal_x86_Tuning_Utility.ViewModels;
 using Universal_x86_Tuning_Utility.Views.Pages;
 
@@ -10,13 +11,6 @@ namespace Universal_x86_Tuning_Utility.Navigation;
 
 public class NavigationFactory : INavigationPageFactory
 {
-    public NavigationFactory(MainWindowViewModel owner)
-    {
-        Owner = owner;
-    }
-
-    public MainWindowViewModel Owner { get; }
-
     public Control GetPage(Type srcType)
     {
         return null;
@@ -33,6 +27,7 @@ public class NavigationFactory : INavigationPageFactory
             GamesViewModel => new GamesPage() { DataContext = target },
             AutomationsViewModel => new AutomationsPage() { DataContext = target },
             SystemInfoViewModel => new SystemInfoPage() { DataContext = target },
+            SettingsViewModel => new SettingsPage() { DataContext = target },
             _ => new UserControl()
             {
                 Background = Brushes.White, 

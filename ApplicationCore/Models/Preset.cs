@@ -53,24 +53,6 @@ public class Preset : NotifyPropertyChangedBase
     private int _boost;
     private int _imageSharp;
 
-    private int _ccd1Core1;
-    private int _ccd1Core2;
-    private int _ccd1Core3;
-    private int _ccd1Core4;
-    private int _ccd1Core5;
-    private int _ccd1Core6;
-    private int _ccd1Core7;
-    private int _ccd1Core8;
-
-    private int _ccd2Core1;
-    private int _ccd2Core2;
-    private int _ccd2Core3;
-    private int _ccd2Core4;
-    private int _ccd2Core5;
-    private int _ccd2Core6;
-    private int _ccd2Core7;
-    private int _ccd2Core8;
-
     private int _nvMaxCoreClk = 4000;
     private int _nvCoreClk;
     private int _nvMemClk;
@@ -125,23 +107,6 @@ public class Preset : NotifyPropertyChangedBase
     private bool _isImageSharp;
     private bool _isSync;
     private bool _isNvidia;
-    private bool _isCcd1Core1;
-    private bool _isCcd1Core2;
-    private bool _isCcd1Core3;
-    private bool _isCcd1Core4;
-    private bool _isCcd1Core5;
-    private bool _isCcd1Core6;
-    private bool _isCcd1Core7;
-    private bool _isCcd1Core8;
-
-    private bool _isCcd2Core1;
-    private bool _isCcd2Core2;
-    private bool _isCcd2Core3;
-    private bool _isCcd2Core4;
-    private bool _isCcd2Core5;
-    private bool _isCcd2Core6;
-    private bool _isCcd2Core7;
-    private bool _isCcd2Core8;
 
     private bool _isAmdOc;
 

@@ -1,5 +1,4 @@
-﻿using ApplicationCore.Enums;
-using ApplicationCore.Enums.Laptop;
+﻿using ApplicationCore.Enums.Laptop;
 
 namespace ApplicationCore.Models.LaptopInfo;
 

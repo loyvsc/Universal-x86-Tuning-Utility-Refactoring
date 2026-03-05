@@ -1,3 +1,5 @@
+using ApplicationCore.Models;
+
 namespace ApplicationCore.Interfaces;
 
 public interface IRtssService
@@ -10,4 +12,6 @@ public interface IRtssService
     public void Start();
     public void Stop();
     public bool IsRTSSRunning();
+    
+    public IEnumerable<ApplicationRenderInfo> GetApplicationRenderInfo();
 }

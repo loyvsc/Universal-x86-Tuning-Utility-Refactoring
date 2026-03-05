@@ -2,7 +2,7 @@ namespace ApplicationCore.Enums;
 
 public enum Manufacturer
 {
-    Unknown = -1,
+    Unknown,
     Intel,
     AMD
 }

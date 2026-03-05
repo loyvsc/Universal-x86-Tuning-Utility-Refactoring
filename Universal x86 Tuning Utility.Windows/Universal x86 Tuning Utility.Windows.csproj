@@ -1,0 +1,115 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ApplicationIcon>..\Universal x86 Tuning Utility\favicon.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.7" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.7" />
+        <PackageReference Include="DesktopNotificationsFixed.Avalonia" Version="1.0.1" />
+        <PackageReference Include="DesktopNotificationsFixed.Windows" Version="1.0.0" />
+        <PackageReference Include="WindowsDisplayAPI" Version="1.3.0.13" />
+        <PackageReference Include="hidlibrary" Version="3.3.40" />
+        <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
+        <PackageReference Include="NvAPIWrapper.Net" Version="0.8.1.101" />
+        <PackageReference Include="GameLib.NET" Version="1.4.1" />
+        <PackageReference Include="TaskScheduler" Version="2.12.2" />
+        <PackageReference Include="MouseKeyHook" Version="5.7.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Universal x86 Tuning Utility\Universal x86 Tuning Utility.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="ADLX_3DSettings.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="ADLX_AutoTuning.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="ADLX_DisplaySettings.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="ADLX_PerformanceMetrics.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="inpoutx64.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="kernel32.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="MagpieRT.exp">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="MagpieRT.lib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="MagpieRT.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="Magpie.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="RTSSSharedMemoryNET.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="ucrtbased.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="vcruntime140d.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="WinRing0x64.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="WinRing0x64_Mem.sys">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="WinRing0x64_Mem.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="WinRing0x64_Fan.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <None Remove="WinRing0x64_Fan.sys" />
+      <AdditionalFiles Include="WinRing0x64_Fan.sys">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="WinRing0x64.sys">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="WinRing0_Mem.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="WinRing0_Mem.sys">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="vcruntime140_1d.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <None Include="..\Universal x86 Tuning Utility\favicon.ico">
+        <Link>favicon.ico</Link>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Assets\**">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Folder>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="RTSSSharedMemoryNET">
+        <HintPath>RTSSSharedMemoryNET.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+</Project>

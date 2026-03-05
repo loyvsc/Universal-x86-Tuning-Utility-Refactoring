@@ -1,22 +1,24 @@
 ﻿using ApplicationCore.Interfaces;
-using Microsoft.Extensions.Logging;
 using Octokit;
+using Serilog;
 using FileMode = System.IO.FileMode;
 
 namespace DAL.Services;
 
 public class UpdateService : IUpdateService
 {
-    private readonly ILogger<UpdateService> _logger;
+    private readonly ILogger _logger;
     private const string Owner = "JamesCJ60";
     private const string RepositoryName = "Universal-x86-Tuning-Utility";
+    
+    public bool IsUpdateAvailable { get; private set; }
 
-    public UpdateService(ILogger<UpdateService> logger)
+    public UpdateService(ILogger logger)
     {
         _logger = logger;
     }
 
-    public async Task<bool> IsUpdatesAvailable(string currentVersion)
+    public async Task<bool> CheckIsUpdatesAvailableAsync(string currentVersion)
     {
         try
         {
@@ -26,17 +28,19 @@ public class UpdateService : IUpdateService
             var latestRelease = releases[0];
             var latestVersion = new Version(latestRelease.TagName);
             
-            return latestVersion.CompareTo(Version.Parse(currentVersion)) > 0;
+            IsUpdateAvailable = latestVersion.CompareTo(Version.Parse(currentVersion)) > 0;
+
+            return IsUpdateAvailable;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred when checking for updates");
+            _logger.Error(ex, "Exception occurred when checking for updates");
         }
 
         return false;
     }
     
-    public async Task DownloadNewestPackage(string downloadPath)
+    public async Task DownloadNewestPackageAsync(string downloadPath)
     {
         try
         {
@@ -65,7 +69,7 @@ public class UpdateService : IUpdateService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred when download last update");
+            _logger.Error(ex, "Exception occurred when download last update");
             throw;
         }
     }

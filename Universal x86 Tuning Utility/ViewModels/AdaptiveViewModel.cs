@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ApplicationCore.Enums;
@@ -13,11 +14,12 @@ using Avalonia.Threading;
 using DesktopNotifications;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
+using Universal_x86_Tuning_Utility.Helpers;
 using Universal_x86_Tuning_Utility.Properties;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class AdaptiveViewModel : NotifyPropertyChangedBase
+public class AdaptiveViewModel : ReactiveObject
 {
     public ICommand ToggleAdaptiveModeCommand { get; }
     public ICommand SavePresetCommand { get; }
@@ -26,76 +28,78 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
     public bool IsAutoSwitchEnabled
     {
         get => _isAutoSwitchEnabled;
-        set => SetValue(ref _isAutoSwitchEnabled, value, () =>
+        set
         {
+            this.RaiseAndSetIfChanged(ref _isAutoSwitchEnabled, value);
             Settings.Default.autoSwitch = value;
-        });
+        }
     }
 
     public bool IsStart
     {
         get => _isStart;
-        set => SetValue(ref _isStart, value);
+        set => this.RaiseAndSetIfChanged(ref _isStart, value);
     }
 
     public AdaptivePreset CurrentPreset
     {
         get => _currentPreset;
-        set => SetValue(ref _currentPreset, value);
+        set => this.RaiseAndSetIfChanged(ref _currentPreset, value);
     }
 
     public EnhancedObservableCollection<AdaptivePreset> AvailablePresets
     {
         get => _availablePresets;
-        set => SetValue(ref _availablePresets, value);
+        set => this.RaiseAndSetIfChanged(ref _availablePresets, value);
     }
 
     public bool IsAsusPowerSettingsAvailable
     {
         get => _isAsusPowerSettingsAvailable;
-        set => SetValue(ref _isAsusPowerSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAsusPowerSettingsAvailable, value);
     }
 
     public bool IsAmdApuTurboBoostOverdriveSettingsAvailable
     {
         get => _isAmdApuTurboBoostOverdriveSettingsAvailable;
-        set => SetValue(ref _isAmdApuTurboBoostOverdriveSettingsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isAmdApuTurboBoostOverdriveSettingsAvailable, value);
     }
 
     public bool IsRadeonGraphicsOptionsAvailable
     {
         get => _isRadeonGraphicsOptionsAvailable;
-        set => SetValue(ref _isRadeonGraphicsOptionsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isRadeonGraphicsOptionsAvailable, value);
     }
 
     public bool IsNvidiaGraphicsOptionsAvailable
     {
         get => _isNvidiaGraphicsOptionsAvailable;
-        set => SetValue(ref _isNvidiaGraphicsOptionsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isNvidiaGraphicsOptionsAvailable, value);
     }
 
     public bool IsCurveOptimizerOptionsAvailable
     {
         get => _isCurveOptimizerOptionsAvailable;
-        set => SetValue(ref _isCurveOptimizerOptionsAvailable, value);
+        set => this.RaiseAndSetIfChanged(ref _isCurveOptimizerOptionsAvailable, value);
     }
 
     public double Polling
     {
         get => _polling;
-        set => SetValue(ref _polling, value, () =>
+        set
         {
+            this.RaiseAndSetIfChanged(ref _polling, value);
             Settings.Default.polling = value;
             var newInterval = TimeSpan.FromSeconds(value);
             _sensorsTimer.Interval = newInterval;
             _adaptiveModeTimer.Interval = newInterval;
-        });
+        }
     }
 
     public List<UXTUSuperResolutionScale> UXTUSuperResolutionScales
     {
         get => _UXTUSuperResolutionScales;
-        set => SetValue(ref _UXTUSuperResolutionScales, value);
+        set => this.RaiseAndSetIfChanged(ref _UXTUSuperResolutionScales, value);
     }
 
     private List<UXTUSuperResolutionScale> _UXTUSuperResolutionScales;
@@ -106,7 +110,9 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
     private bool _isNvidiaGraphicsOptionsAvailable;
     private bool _isCurveOptimizerOptionsAvailable;
     private AdaptivePreset _currentPreset;
-    private EnhancedObservableCollection<AdaptivePreset> _availablePresets;
+
+    private EnhancedObservableCollection<AdaptivePreset> _availablePresets =
+        new EnhancedObservableCollection<AdaptivePreset>();
     
     private readonly ISystemInfoService _systemInfoService;
     private readonly IGameLauncherService _gameLauncherService;
@@ -116,6 +122,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
     private readonly ICpuControlService _cpuControlService;
     private readonly IRtssService _rtssService;
     private readonly IAmdGpuService _amdGpuService;
+    private readonly INvidiaGpuService _nvidiaGpuService;
     private readonly IAmdApuControlService _amdApuControlService;
     private readonly IRyzenAdjService _ryzenAdjService;
     private readonly DispatcherTimer _adaptiveModeTimer;
@@ -129,6 +136,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
                              ICpuControlService cpuControlService,
                              IRtssService rtssService,
                              IAmdGpuService amdGpuService,
+                             INvidiaGpuService nvidiaGpuService,
                              IAmdApuControlService amdApuControlService,
                              IRyzenAdjService ryzenAdjService)
     {
@@ -140,8 +148,39 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         _cpuControlService = cpuControlService;
         _rtssService = rtssService;
         _amdGpuService = amdGpuService;
+        _nvidiaGpuService = nvidiaGpuService;
         _amdApuControlService = amdApuControlService;
         _ryzenAdjService = ryzenAdjService;
+        
+        ToggleAdaptiveModeCommand = ReactiveCommand.Create(ToggleAdaptiveMode);
+        SavePresetCommand = ReactiveCommand.CreateFromTask(SavePreset);
+        ReloadGamesListCommand = ReactiveCommand.Create(ReloadGamesList);
+
+        UXTUSuperResolutionScales = new List<UXTUSuperResolutionScale>()
+        {
+            new UXTUSuperResolutionScale(ResolutionScale.ApplicationControlled, "Application Controlled"),
+            new UXTUSuperResolutionScale(ResolutionScale.UltraQuality, "Ultra Quality (77%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.Quality, "Quality (67%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.Balanced, "Balanced (59%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.Performance, "Performance (50%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.UltraPerformance, "Ultra Performance (33%)"),
+        };
+
+        IsAsusPowerSettingsAvailable = _systemInfoService.LaptopInfo?.Brand == LaptopBrand.ASUS;
+        
+        if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) == 0)
+        {
+            IsAmdApuTurboBoostOverdriveSettingsAvailable = false;
+            IsRadeonGraphicsOptionsAvailable = false;
+        }
+        
+        IsNvidiaGraphicsOptionsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.Nvidia) != 0;
+        
+        if (_systemInfoService.Cpu.Manufacturer == Manufacturer.Intel)
+        {
+            IsCurveOptimizerOptionsAvailable = false;
+            IsAmdApuTurboBoostOverdriveSettingsAvailable = false;
+        }
 
         _adaptiveModeTimer = new DispatcherTimer
         {
@@ -155,31 +194,24 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         };
         _sensorsTimer.Tick += SensorsTimerTick;
         
-        ToggleAdaptiveModeCommand = ReactiveCommand.CreateFromTask(ToggleAdaptiveMode);
-        SavePresetCommand = ReactiveCommand.CreateFromTask(SavePreset);
-        ReloadGamesListCommand = ReactiveCommand.Create(ReloadGamesList);
-        
         Polling = Settings.Default.polling;
-
-        UXTUSuperResolutionScales = new List<UXTUSuperResolutionScale>()
+        
+        ThreadPool.QueueUserWorkItem(_ =>
         {
-            new UXTUSuperResolutionScale(ResolutionScale.ApplicationControlled, "Application Controlled"),
-            new UXTUSuperResolutionScale(ResolutionScale.UltraQuality, "Ultra Quality (77%)"),
-            new UXTUSuperResolutionScale(ResolutionScale.Quality, "Quality (67%)"),
-            new UXTUSuperResolutionScale(ResolutionScale.Balanced, "Balanced (59%)"),
-            new UXTUSuperResolutionScale(ResolutionScale.Performance, "Performance (50%)"),
-            new UXTUSuperResolutionScale(ResolutionScale.UltraPerformance, "Ultra Performance (33%)"),
-        };
+            ReloadGamesList();
 
-        Initialize();
+            if (Settings.Default.isStartAdpative)
+            {
+                ToggleAdaptiveMode();
+            }
+        }, null);
     }
 
     private int CPUTemp, CPULoad, CPUClock, GPULoad, GPUClock, GPUMemClock, CPUPower;
     private bool _isAutoSwitchEnabled;
     private double _polling;
 
-    private static int newMinCPUClock = 1440;
-    private static int minCPUClock = 1440;
+    private int minCPUClock = 1440;
     
     private void ReloadGamesList()
     {
@@ -187,10 +219,13 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         var defaultPreset = _adaptivePresetService.GetPreset("Default");
         if (defaultPreset == null)
         {
-            defaultPreset = new AdaptivePreset();
+            defaultPreset = new AdaptivePreset()
+            {
+                Name = "Default"
+            };
         
             if (_systemInfoService.Cpu.ProcessorType == ProcessorType.Desktop ||
-                _systemInfoService.Cpu.RyzenFamily == RyzenFamily.DragonRange)
+                _systemInfoService.Cpu is RyzenCpuInfo { RyzenFamily: RyzenFamily.DragonRange })
             {
                 defaultPreset.Power = 86;
             }
@@ -204,13 +239,13 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
             defaultPreset.Temp = 95;
             defaultPreset.MinCpuClock = 1500;
             defaultPreset.NvMaxCoreClock = 4000;
-            _adaptivePresetService.SavePreset("Default", defaultPreset);
-        }
+            _adaptivePresetService.SavePreset(defaultPreset.Name, defaultPreset);
+        } 
         AvailablePresets.Add(defaultPreset);
         
-        _gameLauncherService.ReSearchGames(true);
+        _gameLauncherService.ReSearchGames();
         
-        var installedGames = _gameLauncherService.InstalledGames.Value;
+        var installedGames = _gameLauncherService.ReSearchGames();
         foreach (var game in installedGames)
         {
             var adaptivePreset = _adaptivePresetService.GetPreset(game.GameName);
@@ -228,14 +263,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
 
     private void SensorsTimerTick(object? sender, EventArgs e)
     {
-        if (_systemInfoService.Cpu.Manufacturer == Manufacturer.Intel)
-        {
-            CPUTemp = (int)_sensorsService.GetCPUInfo(SensorType.Temperature, "Package");
-        }
-        else
-        {
-            CPUTemp = (int)_sensorsService.GetCPUInfo(SensorType.Temperature, "Core");
-        }
+        CPUTemp = (int)_sensorsService.GetCPUInfo(SensorType.Temperature, _systemInfoService.Cpu.Manufacturer == Manufacturer.Intel ? "Package" : "Core");
         CPULoad = (int)_sensorsService.GetCPUInfo(SensorType.Load, "Total");
 
         for (int i = 0; i < _systemInfoService.Cpu.CoresCount; i++)
@@ -245,22 +273,19 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         
         CPUClock /= _systemInfoService.Cpu.CoresCount;
 
-        //CPUPower = (int)GetSensor.getCPUInfo(SensorType.Power, "Package");
+        CPUPower = (int)_sensorsService.GetCPUInfo(SensorType.Power, "Package");
 
-        if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) == 0)
+        if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.Nvidia) == 0)
         {
             GPULoad = _amdGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuLoad);
             GPUClock = _amdGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuClock);
             GPUMemClock = _amdGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuMemClock);
         }
-        
-        if (CPULoad < 100 / _systemInfoService.Cpu.CoresCount + 5)
+        else if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) == 0)
         {
-            newMinCPUClock = minCPUClock + 500;
-        }
-        else
-        {
-            newMinCPUClock = minCPUClock;
+            // GPULoad = _nvidiaGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuLoad);
+            // GPUClock = _nvidiaGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuClock);
+            // GPUMemClock = _nvidiaGpuService.GetGpuMetrics(0, AmdGpuSensor.GpuMemClock);
         }
 
         if (AvailablePresets.Count > 0 && IsAutoSwitchEnabled)
@@ -268,24 +293,15 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
             var runningGameName = GetRunningGame() ?? "Default";
             if (CurrentPreset.Name != runningGameName)
             {
-                int selectedIndex = 0; // index to select if the search fails
-
-                for (var i = 0; i < _availablePresets.Count; i++)
-                {
-                    var item = _availablePresets[i];
-                    if (item.Name == runningGameName)
-                    {
-                        CurrentPreset = item;
-                        return;
-                    }
-                }
+                CurrentPreset = _availablePresets.FirstOrDefault(item => item.Name == runningGameName) ?? 
+                                _availablePresets[0]; // if the search fails
             }
         }
     }
     
     private string? GetRunningGame()
     {
-        var installedGames = _gameLauncherService.InstalledGames.Value;
+        var installedGames = _gameLauncherService.ReSearchGames();
         foreach (GameLauncherItem item in installedGames)
         {
             int i = 0;
@@ -350,10 +366,6 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         {
             _cpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, CurrentPreset.Power,
                 CurrentPreset.Power - 5, CurrentPreset.Temp);
-            _cpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, CurrentPreset.Power,
-                CurrentPreset.Power - 5, CurrentPreset.Temp);
-            _cpuControlService.UpdatePowerLimit(CPUTemp, CPULoad, CurrentPreset.Power,
-                CurrentPreset.Power - 5, CurrentPreset.Temp);
             _adaptiveModeTickCount++;
         }
         else
@@ -369,125 +381,85 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
             if (CurrentPreset.IsGfx)
             {
                 _amdApuControlService.UpdateiGPUClock(CurrentPreset.MaxGfx, CurrentPreset.MinGgx,
-                    CurrentPreset.Temp, CPUPower, CPUTemp, GPUClock, GPULoad, GPUMemClock, CPUClock,
+                    CurrentPreset.Temp, CPUTemp, GPUClock, GPULoad, GPUMemClock, CPUClock,
                     minCPUClock);
             }
 
-            var commandString = $"--UXTUSR={CurrentPreset.IsMag}-{CurrentPreset.IsVsync}-{CurrentPreset.Sharpness / 100}-{CurrentPreset.SuperResolutionScale.ResolutionScale}-{CurrentPreset.IsRecap} ";
+            using var adjCommandBuilder = new RyzenAdjCommandBuilder();
+            
+            adjCommandBuilder.AddSuperResolution(CurrentPreset.IsMag, CurrentPreset.IsVsync,
+                CurrentPreset.Sharpness / 100, CurrentPreset.SuperResolutionScale.ResolutionScale,
+                CurrentPreset.IsRecap);
 
             if (Settings.Default.isASUS)
             {
                 if (CurrentPreset.AsusPowerProfile > 0)
-                    commandString = commandString + $"--ASUS-Power={CurrentPreset.AsusPowerProfile} ";
+                {
+                    adjCommandBuilder.AddAsusPowerProfile(CurrentPreset.AsusPowerProfile);
+                }
             }
 
             if (_cpuControlService.CpuCommand != _lastCpu)
             {
-                commandString += _cpuControlService.CpuCommand;
+                adjCommandBuilder.AddCustomCommand(_cpuControlService.CpuCommand);
                 _lastCpu = _cpuControlService.CpuCommand;
             }
 
             if (_cpuControlService.CoCommand != null && _cpuControlService.CoCommand != "" &&
                 CurrentPreset.IsCo && _cpuControlService.CoCommand != _lastCo)
             {
-                commandString += _cpuControlService.CoCommand;
+                adjCommandBuilder.AddCustomCommand(_cpuControlService.CoCommand);
                 _lastCo = _cpuControlService.CoCommand;
             }
 
             if (_amdApuControlService.IsAvailable &&
                 CurrentPreset.IsGfx && _amdApuControlService.Clock != _lastiGPUClock)
             {
-                commandString += $"--gfx-clk={_amdApuControlService.Clock} ";
+                adjCommandBuilder.AddGfxClock(_amdApuControlService.Clock);
                 _lastiGPUClock = _amdApuControlService.Clock;
             }
 
             if (CurrentPreset.IsRadeonGraphics)
             {
-                if (CurrentPreset.IsAntiLag)
-                    commandString = commandString + $"--ADLX-Lag=0-true --ADLX-Lag=1-true ";
-                else commandString = commandString + $"--ADLX-Lag=0-false --ADLX-Lag=1-false ";
-
-                if (CurrentPreset.IsRsr)
-                    commandString = commandString + $"--ADLX-RSR=true-{CurrentPreset.Rsr} ";
-                else commandString = commandString + $"--ADLX-RSR=false-{CurrentPreset.Rsr} ";
-
-                if (CurrentPreset.IsBoost)
-                    commandString = commandString +
-                                    $"--ADLX-Boost=0-true-{CurrentPreset.Boost} --ADLX-Boost=1-true-{CurrentPreset.Boost} ";
-                else
-                    commandString = commandString +
-                                    $"--ADLX-Boost=0-false-{CurrentPreset.Boost} --ADLX-Boost=1-false-{CurrentPreset.Boost} ";
-
-                if (CurrentPreset.IsImageSharp)
-                    commandString = commandString +
-                                    $"--ADLX-ImageSharp=0-true-{CurrentPreset.ImageSharp} --ADLX-ImageSharp=1-true-{CurrentPreset.ImageSharp} ";
-                else
-                    commandString = commandString +
-                                    $"--ADLX-ImageSharp=0-false-{CurrentPreset.ImageSharp} --ADLX-ImageSharp=1-false-{CurrentPreset.ImageSharp} ";
-
-                if (CurrentPreset.IsSync)
-                    commandString = commandString + $"--ADLX-Sync=0-true --ADLX-Sync=1-true ";
-                else commandString = commandString + $"--ADLX-Sync=0-false --ADLX-Sync=1-false ";
+                adjCommandBuilder.AddADLXLag(CurrentPreset.IsAntiLag);
+                adjCommandBuilder.AddALDXRsr(CurrentPreset.IsRsr);
+                adjCommandBuilder.AddADLXBoost(CurrentPreset.IsBoost, CurrentPreset.Boost);
+                adjCommandBuilder.AddImageSharp(CurrentPreset.IsImageSharp, CurrentPreset.ImageSharp);
+                adjCommandBuilder.AddADLXSync(CurrentPreset.IsSync);
             }
 
             if (CurrentPreset.IsNvidia)
             {
-                commandString = commandString +
-                                $"--NVIDIA-Clocks={CurrentPreset.NvMaxCoreClock}-{CurrentPreset.NvCoreClock}-{CurrentPreset.NvMemClock} ";
+                adjCommandBuilder.AddNvidiaClocks(0, CurrentPreset.NvMaxCoreClock, CurrentPreset.NvCoreClock, CurrentPreset.NvMemClock);
             }
 
-            await _ryzenAdjService.Translate(commandString);
+            await _ryzenAdjService.Translate(adjCommandBuilder.Build());
+        }
+        // && CurrentPreset.IsStaticFpsLimit
+        if (_rtssService.IsRTSSRunning())
+        {
+            // _rtssService.FpsLimit = CurrentPreset.StaticFpsLimit;
         }
 
-        // if (_rtssService.IsRTSSRunning() && tsRTSS.IsChecked == true)
-        //     _rtssService.FpsLimit = nudRTSS.Value;
-
-        //if (RTSS.RTSSRunning())
-        //{
-        //    int i = 0;
-        //    bool found = false;
-        //    do
-        //    {
-        //        AppFlags appFlag = RunningGames.appFlags[i];
-        //        var appEntries = OSD.GetAppEntries(appFlag);
-        //        foreach (var app in appEntries)
-        //        {
-        //            found = true;
-        //            osd.Update($"{RunningGames.appFlags[i]} {app.InstantaneousFrames}FPS {app.InstantaneousFrameTime.Milliseconds}ms");
-        //        }
-        //        i++;
-        //    } while (i < RunningGames.appFlags.Count && found == false);
-        //}
-    }
-
-    private void Initialize()
-    {
-        IsAsusPowerSettingsAvailable = _systemInfoService.LaptopInfo?.Brand == LaptopBrand.ASUS;
-        
-        if (_systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.AMD) == 0)
+        if (_rtssService.IsRTSSRunning())
         {
-            IsAmdApuTurboBoostOverdriveSettingsAvailable = false;
-            IsRadeonGraphicsOptionsAvailable = false;
-        }
-
-        IsNvidiaGraphicsOptionsAvailable = _systemInfoService.Gpus.Count(x => x.Manufacturer == GpuManufacturer.Nvidia) != 0;
-        
-        _gameLauncherService.ReSearchGames(true);
-        ReloadGamesList();
-        
-        if (_systemInfoService.Cpu.Manufacturer == Manufacturer.Intel)
-        {
-            IsCurveOptimizerOptionsAvailable = false;
-            IsAmdApuTurboBoostOverdriveSettingsAvailable = false;
-        }
-
-        if (Settings.Default.isStartAdpative)
-        {
-            ToggleAdaptiveMode().GetAwaiter().GetResult();
+            // int i = 0;
+            // bool found = false;
+            // do
+            // {
+            //     AppFlags appFlag = RunningGames.appFlags[i];
+            //     var appEntries = OSD.GetAppEntries(appFlag);
+            //     foreach (var app in appEntries)
+            //     {
+            //         found = true;
+            //         osd.Update($"{RunningGames.appFlags[i]} {app.InstantaneousFrames}FPS {app.InstantaneousFrameTime.Milliseconds}ms");
+            //     }
+            //     i++;
+            // } while (i < RunningGames.appFlags.Count && found == false);
         }
     }
 
-    private async Task ToggleAdaptiveMode()
+    private void ToggleAdaptiveMode()
     {
         try
         {
@@ -510,7 +482,7 @@ public class AdaptiveViewModel : NotifyPropertyChangedBase
         }
         catch (Exception ex)
         {
-            await _notificationManager.ShowTextNotification("Error occurred", ex.Message,
+            _notificationManager.ShowTextNotification("Error occurred", ex.Message,
                 NotificationManagerExtensions.NotificationType.Error);
         }
     }
