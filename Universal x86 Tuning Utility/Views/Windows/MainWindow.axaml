@@ -93,7 +93,8 @@
                                SettingsItem="{Binding SettingsItem, UpdateSourceTrigger=PropertyChanged}">
                 <ui:NavigationView.MenuItemTemplate>
                     <DataTemplate DataType="viewModels:NavigationViewModel">
-                        <ui:NavigationViewItem Tag="{Binding ViewModelType}">
+                        <ui:NavigationViewItem Tag="{Binding ViewModelType}"
+                                               ToolTip.Tip="{Binding  Title}">
                             <ui:NavigationViewItem.IconSource>
                                 <fluent:FluentIconSource Icon="{Binding IconSymbol, FallbackValue={x:Static common:Icon.Home}}"
                                                          IconSize="Size48"
