@@ -30,4 +30,6 @@ public enum RyzenFamily
     StrixHalo,
     StrixPoint,
     StrixPoint2,
+    KrackanPoint,
+    KrackanPoint2
 }

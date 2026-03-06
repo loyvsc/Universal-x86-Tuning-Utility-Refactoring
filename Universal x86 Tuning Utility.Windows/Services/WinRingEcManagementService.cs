@@ -232,10 +232,10 @@ public class WinRingEcManagementService : IWinRingEcManagementService, IDisposab
         }
         
         var dllStatus = _ols!.GetDllStatus();
-        if (dllStatus != (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_NO_ERROR)
+        if (dllStatus != (uint)Ols.OlsDllStatus.OLS_DLL_NO_ERROR)
         {
             _ols = null;
-            _logger.Error("WinRing0 DllStatus Error: {dllStatus}", (OpenLibSys_Mem.Ols.OlsDllStatus)dllStatus);
+            _logger.Error("WinRing0 DllStatus Error: {dllStatus}", (Ols.OlsDllStatus)dllStatus);
         }
         else
         {

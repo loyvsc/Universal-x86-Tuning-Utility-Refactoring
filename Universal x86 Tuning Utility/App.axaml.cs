@@ -150,8 +150,11 @@ public class App : Application
 
     private async void HandeUnhandledException(Exception ex)
     {
-        await MessageBoxManager.GetMessageBoxStandard("Error", ex.ToString())
-            .ShowDialogAsync();
+        _ = Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            await MessageBoxManager.GetMessageBoxStandard("Error", ex.ToString())
+                .ShowDialogAsync();
+        });
     }
 
     /// <summary>

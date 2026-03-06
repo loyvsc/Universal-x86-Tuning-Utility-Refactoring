@@ -13,7 +13,6 @@ using Splat;
 using Universal_x86_Tuning_Utility.Windows.Extensions;
 using Universal_x86_Tuning_Utility.Windows.Interfaces;
 using Universal_x86_Tuning_Utility.Windows.Services.Amd.Windows;
-using Ols = OpenLibSys_Mem.Ols;
 
 namespace Universal_x86_Tuning_Utility.Windows.Services.SystemInfoServices;
 
@@ -357,9 +356,11 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         int smuDelay = 10;
 
         var ols = new Ols();
-        if (ols.Status != Ols.OlsStatus.NO_ERROR || ols.DllStatus != Ols.OlsDllStatus.OLS_DLL_NO_ERROR)
+        var status = ols.GetStatus();
+        var dllStatus = Ols.OlsDllStatus.OLS_DLL_NO_ERROR;
+        if (status != Ols.Status.NO_ERROR || ols.GetDllStatus() != (uint) dllStatus)
             throw new ApplicationException(
-                $"Ols initialization error. OlsStatus={ols.Status.ToString()}; DllStatus={ols.DllStatus.ToString()}");
+                $"Ols initialization error. OlsStatus={status.ToString()}; DllStatus={dllStatus.ToString()}");
 
         uint someOffset = ReadDword(0x50200, ols, smuDelay) == 0x300 ? 0x100000u : 0u;
 
@@ -447,9 +448,11 @@ public class WindowsSystemInfoService : ISystemInfoService, IDisposable
         int smuDelay = smuSlow ? 60 : 10;
 
         Ols ols = new Ols();
-        if (ols.Status != Ols.OlsStatus.NO_ERROR || ols.DllStatus != Ols.OlsDllStatus.OLS_DLL_NO_ERROR)
+        var status = ols.GetStatus();
+        var dllStatus = Ols.OlsDllStatus.OLS_DLL_NO_ERROR;
+        if (status != Ols.Status.NO_ERROR || ols.GetDllStatus() != (uint) dllStatus)
             throw new ApplicationException(
-                $"Ols initialization error. OlsStatus={ols.Status.ToString()}; DllStatus={ols.DllStatus.ToString()}");
+                $"Ols initialization error. OlsStatus={status.ToString()}; DllStatus={dllStatus.ToString()}");
 
         uint eax = 0, ebx = 0, ecx = 0, edx = 0;
         ols.CpuidPx(0x80000001, ref eax, ref ebx, ref ecx, ref edx, 0x01);
