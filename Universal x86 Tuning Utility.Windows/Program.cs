@@ -41,6 +41,7 @@ class Program
             .AfterPlatformServicesSetup(_ =>
             {
                 SplatRegistrations.RegisterConstant(notificationManager!);
+                SplatRegistrations.RegisterLazySingleton<ICpuAffinityService, WindowsCpuAffinityService>(); 
                 SplatRegistrations.RegisterLazySingleton<IASUSWmiService, WindowsAsusWmiService>(); 
                 SplatRegistrations.RegisterLazySingleton<ICliService, WindowsCliService>();
                 SplatRegistrations.RegisterLazySingleton<IDisplayInfoService, WindowsDisplayInfoService>();
