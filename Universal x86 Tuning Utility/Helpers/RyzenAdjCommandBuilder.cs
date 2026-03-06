@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using ApplicationCore.Enums;
+using ApplicationCore.Models;
 using ApplicationCore.Utilities;
 
 namespace Universal_x86_Tuning_Utility.Helpers;
@@ -492,6 +493,13 @@ public class RyzenAdjCommandBuilder : IDisposable
         _sb.Append(name);
         _sb.Append('=');
         _sb.Append(value * 1000);
+        _sb.Append(CommandSeparator);
+    }
+
+    public void AddCcdAffinity(CcdAffinityMode value)
+    {
+        _sb.Append("--CCD-Affinity=");
+        _sb.Append(value.Value);
         _sb.Append(CommandSeparator);
     }
 

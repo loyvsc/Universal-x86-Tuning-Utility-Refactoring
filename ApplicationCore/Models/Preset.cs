@@ -58,6 +58,7 @@ public class Preset : NotifyPropertyChangedBase
     private int _nvMemClk;
 
     private int _amdClock;
+    private CcdAffinityMode _ccdAffinity;
     private int _amdVid;
 
     private int _softMiniGpuClk;
@@ -838,5 +839,11 @@ public class Preset : NotifyPropertyChangedBase
     {
         get => _resolutionScale;
         set => SetValue(ref _resolutionScale, value);
+    }
+
+    public CcdAffinityMode CcdAffinity
+    {
+        get => _ccdAffinity;
+        set => SetValue(ref _ccdAffinity, value);
     }
 }

@@ -210,6 +210,12 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _isAsusGpuEcoModeSettingsAvailable, value);
     }
 
+    public bool IsCcdAffinityAvailable
+    {
+        get => _isCcdAfinityAvailable;
+        set => this.RaiseAndSetIfChanged(ref _isCcdAfinityAvailable, value);
+    }
+
     public List<AsusPowerProfile> AsusPowerProfiles
     {
         get => _asusPowerProfiles;
@@ -252,17 +258,25 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _uxtuSuperResolutionScales, value);
     }
 
+    public List<CcdAffinityMode> CcdAffinityModes
+    {
+        get => _ccdAffinityModes;
+        set => this.RaiseAndSetIfChanged(ref _ccdAffinityModes, value);
+    }
+
     #endregion
 
     #region Backing fields
 
     private List<UXTUSuperResolutionScale> _uxtuSuperResolutionScales;
+    private List<CcdAffinityMode> _ccdAffinityModes;
     private Preset? _selectedPreset;
     private bool _isAsusEcoMode;
     private bool _isAsusEcoModeAvailable;
     private bool _isAsusPowerSettingsAvailable;
     private bool _isAsusGpuUltimateSettingsAvailable;
     private bool _isAsusGpuEcoModeSettingsAvailable;
+    private bool _isCcdAfinityAvailable;
     private List<AsusPowerProfile> _asusPowerProfiles;
     private AsusPowerProfile _selectedAsusPowerProfile;
     private List<Preset> _availablePresets;
@@ -302,6 +316,7 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
     private readonly IDisplayInfoService _displayInfoService;
     private readonly IIntelManagementService _intelManagementService;
     private readonly IASUSWmiService _asusWmiService;
+    private readonly ICpuAffinityService _cpuAffinityService;
     private EnhancedObservableCollection<DisplayModel> _availableDisplays;
     private DisplayModel _selectedDisplay;
 
@@ -315,7 +330,8 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         IDisplayInfoService displayInfoService,
         IIntelManagementService intelManagementService,
         IASUSWmiService asusWmiService,
-        IPresetServiceFactory presetServiceFactory)
+        IPresetServiceFactory presetServiceFactory,
+        ICpuAffinityService cpuAffinityService)
     {
         _logger = logger;
         _systemInfoService = systemInfoService;
@@ -325,6 +341,7 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
         _displayInfoService = displayInfoService;
         _intelManagementService = intelManagementService;
         _asusWmiService = asusWmiService;
+        _cpuAffinityService = cpuAffinityService;
 
         _apuPresetService = presetServiceFactory.GetPresetService(Settings.Default.Path + "apuPresets.json");
         _amdDesktopPresetService = presetServiceFactory.GetPresetService(Settings.Default.Path + "amdDtCpuPresets.json");
@@ -360,6 +377,13 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
             new UXTUSuperResolutionScale(ResolutionScale.Balanced, "Balanced (59%)"),
             new UXTUSuperResolutionScale(ResolutionScale.Performance, "Performance (50%)"),
             new UXTUSuperResolutionScale(ResolutionScale.UltraPerformance, "Ultra Performance (33%)"),
+        };
+
+        CcdAffinityModes = new List<CcdAffinityMode>()
+        {
+            new CcdAffinityMode(0, "All CCDs"),
+            new CcdAffinityMode(1, "CCD 0"),
+            new CcdAffinityMode(2, "CCD 1"),
         };
 
         Initialize();
@@ -497,6 +521,10 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
                 IsAmdCCD2COSettingAvailable = ryzenCpuInfo.RyzenFamily == RyzenFamily.DragonRange &&
                                               ryzenCpuInfo.RyzenSeries == RyzenSeries.Ryzen9;
 
+                IsCcdAffinityAvailable = ryzenCpuInfo.RyzenFamily is RyzenFamily.DragonRange or
+                                             RyzenFamily.FireRange or RyzenFamily.StrixHalo &&
+                                         _cpuAffinityService.GetAllGroupsActiveProcessorsCount() > 16;
+
                 var apuPresets = _apuPresetService.GetPresets();
                 AvailablePresets = apuPresets.ToList();
             }
@@ -506,6 +534,7 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
                 IsAmdCOSettingAvailable = ryzenCpuInfo.RyzenFamily >= RyzenFamily.Vermeer;
                 IsAmdCCD1COSettingAvailable = IsAmdCOSettingAvailable;
                 IsAmdCCD2COSettingAvailable = ryzenCpuInfo.RyzenSeries == RyzenSeries.Ryzen9;
+                IsCcdAffinityAvailable = Environment.ProcessorCount > 16;
 
                 var desktopPresets = _amdDesktopPresetService.GetPresets();
                 AvailablePresets = desktopPresets.ToList();
@@ -905,6 +934,11 @@ public class CustomPresetsViewModel : ReactiveObject, IDisposable
                     "edc-limit",
                     SelectedPreset.DtCpuEdc);
             }
+        }
+
+        if (IsCcdAffinityAvailable)
+        {
+            commandBuilder.AddCcdAffinity(SelectedPreset.CcdAffinity);
         }
 
         return commandBuilder.Build().TrimEnd();

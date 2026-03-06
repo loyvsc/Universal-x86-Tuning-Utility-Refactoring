@@ -24,6 +24,7 @@ public class WindowsRyzenAdjService : IRyzenAdjService
     private readonly ISystemInfoService _systemInfoService;
     private readonly IASUSWmiService _asusWmiService;
     private readonly IPowerPlanService _powerPlanService;
+    private readonly ICpuAffinityService _cpuAffinityService;
 
     public WindowsRyzenAdjService(Serilog.ILogger logger,
                                   IDisplayInfoService displayInfoService,
@@ -32,7 +33,8 @@ public class WindowsRyzenAdjService : IRyzenAdjService
                                   INvidiaGpuService nvidiaGpuService,
                                   ISystemInfoService systemInfoService,
                                   IASUSWmiService asusWmiService,
-                                  IPowerPlanService powerPlanService)
+                                  IPowerPlanService powerPlanService,
+                                  ICpuAffinityService cpuAffinityService)
     {
         _logger = logger;
         _displayInfoService = displayInfoService;
@@ -42,6 +44,7 @@ public class WindowsRyzenAdjService : IRyzenAdjService
         _systemInfoService = systemInfoService;
         _asusWmiService = asusWmiService;
         _powerPlanService = powerPlanService;
+        _cpuAffinityService = cpuAffinityService;
     }
 
     //Translate RyzenAdj like cli arguments to UXTU
@@ -75,6 +78,10 @@ public class WindowsRyzenAdjService : IRyzenAdjService
                         {
                             UXTUSR(ryzenAdjCommandString, ryzenAdjCommandValueString);
                             Task.Delay(50);
+                        }
+                        else if (ryzenAdjCommandString.Contains("CCD-Affinity"))
+                        {
+                            _cpuAffinityService.SetGlobalAffinity(Convert.ToInt32(ryzenAdjCommandValueString));
                         }
                         else if (ryzenAdjCommandString.Contains("Power-Plan"))
                         {

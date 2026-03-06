@@ -2193,6 +2193,29 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </controls:IconExpander>
+                
+                <!-- Amd CCD Affinity Mode settings !-->
+                <controls:IconCardControl Icon="Grid"
+                                          IconSize="20"
+                                          IsVisible="{Binding IsCcdAffinityAvailable, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="14"
+                            FontWeight="Medium"
+                            Text="CCD Affinity Mode" />
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="Directs threads to selected CCDs, trimming cross-die traffic and fine-tuning performance."/>
+                    </StackPanel>
+                    <controls:IconCardControl.RightMenuContent>
+                        <ComboBox VerticalAlignment="Center"
+                                  ItemsSource="{Binding CcdAffinityModes, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValue="{Binding SelectedPreset.CcdAffinity, UpdateSourceTrigger=PropertyChanged}" 
+                                  MinWidth="164" 
+                                  Height="37"/>
+                    </controls:IconCardControl.RightMenuContent>
+                </controls:IconCardControl>
 
                 <!-- Amd power (boost) profile settings !-->
                 <controls:IconCardControl
