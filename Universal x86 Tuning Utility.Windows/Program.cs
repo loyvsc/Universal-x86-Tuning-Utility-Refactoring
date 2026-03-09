@@ -2,9 +2,10 @@
 using System;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Utilities;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using DesktopNotifications.Avalonia;
 using Splat;
+using Universal_x86_Tuning_Utility.Helpers;
 using Universal_x86_Tuning_Utility.Interfaces;
 using Universal_x86_Tuning_Utility.Windows.Interfaces;
 using Universal_x86_Tuning_Utility.Windows.Services;
@@ -68,5 +69,8 @@ class Program
                 SplatRegistrations.SetupIOC();
             })
             .LogToTrace()
-            .UseReactiveUI();
+            .UseReactiveUI(builder =>
+            {
+                builder.WithExceptionHandler(new RxAppObservableExceptionHandler());
+            });
 }
