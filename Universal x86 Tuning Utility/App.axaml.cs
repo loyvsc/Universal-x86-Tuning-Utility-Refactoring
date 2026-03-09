@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Reactive;
 using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Utilities;
@@ -11,6 +13,7 @@ using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using MsBox.Avalonia;
 using ReactiveUI;
+using ReactiveUI.Builder;
 using Serilog;
 using Serilog.Events;
 using Splat;
@@ -119,8 +122,6 @@ public class App : Application
             _desktopApplicationLifetime.Exit += OnExit;
             
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
-
-            RxApp.DefaultExceptionHandler = new RxAppObservableExceptionHandler();
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
         }
