@@ -75,6 +75,7 @@
         </AvaloniaResource>
         <None Remove="Assets\edit.png" />
         <AvaloniaResource Include="Assets\edit.png" />
+        <AvaloniaResource Include="Resources\Localizations\en-EN.json" />
     </ItemGroup>
     
     <ItemGroup>

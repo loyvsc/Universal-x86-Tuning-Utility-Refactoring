@@ -69,5 +69,14 @@
   "Quality": "Quality (67%)",
   "Balanced": "Balanced (59%)",
   "Performance": "Performance (50%)",
-  "UltraPerformance": "Ultra Performance (33%)"
+  "UltraPerformance": "Ultra Performance (33%)",
+  
+  "Automations": "Automations",
+  "BatteryChargePreset": "Preset on Battery Charge",
+  "BatteryChargePresetDescription": "Provides the ability to set a preset to apply when the battery is charging.",
+  "ReloadPresetsTooltip": "Updates dropdown list with current presets",
+  "BatteryDischargePreset": "Preset on Battery Discharge",
+  "BatteryDischargePresetDescription": "Provides the ability to set a preset to apply when the battery is discharging.",
+  "SystemResumePreset": "Preset on System Resume",
+  "SystemResumePresetDescription": "Provides the ability to set a preset to apply on system resume from sleep/hibernation."
 }
