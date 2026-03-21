@@ -78,5 +78,15 @@
   "BatteryDischargePreset": "Preset on Battery Discharge",
   "BatteryDischargePresetDescription": "Provides the ability to set a preset to apply when the battery is discharging.",
   "SystemResumePreset": "Preset on System Resume",
-  "SystemResumePresetDescription": "Provides the ability to set a preset to apply on system resume from sleep/hibernation."
+  "SystemResumePresetDescription": "Provides the ability to set a preset to apply on system resume from sleep/hibernation.",
+  
+  "WelcomeTo": "Welcome To",
+  "TryOutPremadePresets": "Try Out The Premade Presets",
+  "CreatedBy": "Created by JamesCJ, sbski and ProjectSBC",
+  "PremadePresets": "Premade Presets",
+  "CustomPresets": "Custom Presets",
+  "GameLibrary": "Game Library",
+  "SystemInfo": "System Info",
+  "NeedHelp": "Need Help?",
+  "SupportUs": "Support Us"
 }
