@@ -235,4 +235,16 @@ public class AdaptivePreset : NotifyPropertyChangedBase
         get => _isAutoSwitch;
         set => SetValue(ref _isAutoSwitch, value);
     }
+
+    public bool IsStaticFpsLimit
+    {
+        get;
+        set => SetValue(ref field, value);
+    }
+
+    public int StaticFpsLimit
+    {
+        get;
+        set => SetValue(ref field, value);
+    }
 }

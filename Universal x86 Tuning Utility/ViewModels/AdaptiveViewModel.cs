@@ -435,10 +435,10 @@ public class AdaptiveViewModel : ReactiveObject
 
             await _ryzenAdjService.Translate(adjCommandBuilder.Build());
         }
-        // && CurrentPreset.IsStaticFpsLimit
-        if (_rtssService.IsRTSSRunning())
+        
+        if (_rtssService.IsRTSSRunning() && CurrentPreset.IsStaticFpsLimit)
         {
-            // _rtssService.FpsLimit = CurrentPreset.StaticFpsLimit;
+            _rtssService.FpsLimit = CurrentPreset.StaticFpsLimit;
         }
 
         if (_rtssService.IsRTSSRunning())
