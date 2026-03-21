@@ -88,5 +88,16 @@
   "GameLibrary": "Game Library",
   "SystemInfo": "System Info",
   "NeedHelp": "Need Help?",
-  "SupportUs": "Support Us"
+  "SupportUs": "Support Us",
+  
+  "FanControlTest": "Fan Control Test",
+  "ReloadConfig": "Reload Config",
+  "TestFanCurve": "Test Fan Curve",
+  "UpdateFanSpeed": "Update Fan Speed",
+  "EnableFanControl": "Enable Fan Control",
+  "DisableFanControl": "Disable Fan Control",
+  "FanConfigName": "Fan Config Name:",
+  "Copy": "Copy",
+  "FanCurveTest": "Fan Curve Test:",
+  "FanSpeed": "Fan Speed (%)"
 }
