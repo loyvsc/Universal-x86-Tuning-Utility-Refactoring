@@ -99,5 +99,10 @@
   "FanConfigName": "Fan Config Name:",
   "Copy": "Copy",
   "FanCurveTest": "Fan Curve Test:",
-  "FanSpeed": "Fan Speed (%)"
+  "FanSpeed": "Fan Speed (%)",
+  
+  "AverageFrametime": "Average Frametime",
+  "AverageFPS": "Average FPS",
+  "ReloadGamesListTooltip": "Reload list of games",
+  "AddGameManuallyTooltip": "Add a game manually"
 }
