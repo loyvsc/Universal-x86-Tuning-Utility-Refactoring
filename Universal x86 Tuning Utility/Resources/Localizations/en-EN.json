@@ -108,5 +108,20 @@
   
   "DeviceCertifiedPreset": "Device Certified Preset",
   "UxtuCommandOutput": "UXTU Command Output:",
-  "UxtuCommandOutputDescription": "Note: Some output commands may not be compatible with RyzenAdj"
+  "UxtuCommandOutputDescription": "Note: Some output commands may not be compatible with RyzenAdj",
+  
+  "Settings": "Settings",
+  "StartOnSystemBoot": "Start on System Boot",
+  "StartMinimized": "Start Minimized",
+  "MinimizeOnClose": "Minimize on close",
+  "ReapplyOnStart": "Reapply On Start",
+  "AutoReapply": "Auto Reapply (s)",
+  "AutoUpdateCheck": "Auto Update Check",
+  "AutoStartAdaptiveMode": "Auto Start Adaptive Mode",
+  "TrackGames": "Track Games",
+  "StartStressTest": "Start Stress Test",
+  "StressTestWarning": "WARNING: This will put extreme stress on your CPU. Use at your own risk!",
+  "AboutUXTU": "About Universal x86 Tuning Utility",
+  "CheckForUpdates": "Check for Updates",
+  "DownloadUpdate": "Download Update"
 }

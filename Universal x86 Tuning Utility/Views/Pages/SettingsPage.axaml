@@ -6,6 +6,7 @@
              xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             xmlns:localization="clr-namespace:Universal_x86_Tuning_Utility.Localization"
              d:DesignHeight="720"
              d:DesignWidth="1280"
              x:DataType="viewModels:SettingsViewModel"
@@ -14,41 +15,49 @@
     <StackPanel Margin="18,10,18,0">
         <TextBlock FontSize="{StaticResource HeaderFontSize}"
                    FontWeight="Medium"
-                   Text="Settings"
+                   Text="{localization:Localize Settings}"
                    Margin="0,0,0,9"/>
 
         <CheckBox Command="{Binding StartOnSystemBootCommand}"
-                  Content="Start on System Boot"
+                  Content="{localization:Localize StartOnSystemBoot}"
                   IsChecked="{Binding IsAutoStartEnabled, UpdateSourceTrigger=PropertyChanged}" />
-        <CheckBox Content="Start Minimized" IsChecked="{Binding IsStartMinimizedEnabled, UpdateSourceTrigger=PropertyChanged}" />
-        <CheckBox Content="Minimize on close" IsChecked="{Binding IsMinimizeOnClose, UpdateSourceTrigger=PropertyChanged}" />
-        <CheckBox Content="Reapply On Start" IsChecked="{Binding IsReapplyOnStart, UpdateSourceTrigger=PropertyChanged}" />
+        <CheckBox Content="{localization:Localize StartMinimized}"
+                  IsChecked="{Binding IsStartMinimizedEnabled, UpdateSourceTrigger=PropertyChanged}" />
+        <CheckBox Content="{localization:Localize MinimizeOnClose}"
+                  IsChecked="{Binding IsMinimizeOnClose, UpdateSourceTrigger=PropertyChanged}" />
+        <CheckBox Content="{localization:Localize ReapplyOnStart}" 
+                  IsChecked="{Binding IsReapplyOnStart, UpdateSourceTrigger=PropertyChanged}" />
         <StackPanel Orientation="Horizontal" Spacing="9">
-            <CheckBox Content="Auto Reapply (s)" IsChecked="{Binding IsAutoReapply, UpdateSourceTrigger=PropertyChanged}" />
+            <CheckBox Content="{localization:Localize AutoReapply}"
+                      IsChecked="{Binding IsAutoReapply, UpdateSourceTrigger=PropertyChanged}" />
             <controls:NumberBox Maximum="90"
                                 Minimum="1"
                                 Value="{Binding ReapplySecond, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
-        <CheckBox Content="Auto Update Check" IsChecked="{Binding IsAutoCheckUpdates, UpdateSourceTrigger=PropertyChanged}" />
-        <CheckBox Content="Auto Start Adaptive Mode" IsChecked="{Binding IsAutoStartAdaptiveMode, UpdateSourceTrigger=PropertyChanged}" />
-        <CheckBox Content="Track Games" IsChecked="{Binding IsAutoTrackGames, UpdateSourceTrigger=PropertyChanged}" />
+        <CheckBox Content="{localization:Localize AutoUpdateCheck}"
+                  IsChecked="{Binding IsAutoCheckUpdates, UpdateSourceTrigger=PropertyChanged}" />
+        <CheckBox Content="{localization:Localize AutoStartAdaptiveMode}"
+                  IsChecked="{Binding IsAutoStartAdaptiveMode, UpdateSourceTrigger=PropertyChanged}" />
+        <CheckBox Content="{localization:Localize TrackGames}"
+                  IsChecked="{Binding IsAutoTrackGames, UpdateSourceTrigger=PropertyChanged}" />
         <Button Width="178"
                 Margin="0,9,0,0"
                 Command="{Binding StartStressTestCommand}">
             <StackPanel Orientation="Horizontal" Spacing="9">
                 <fluent:FluentIcon FontSize="24" Icon="Fire" />
-                <TextBlock VerticalAlignment="Center" Text="Start Stress Test" />
+                <TextBlock VerticalAlignment="Center" 
+                           Text="{localization:Localize StartStressTest}" />
             </StackPanel>
         </Button>
 
         <TextBlock Margin="0,4.5,0,0"
                    Foreground="DarkRed"
-                   Text="WARNING: This will put extreme stress on your CPU. Use at your own risk!" />
+                   Text="{localization:Localize StressTestWarning}" />
 
         <TextBlock Margin="0,24,0,0"
                    FontSize="20"
                    FontWeight="Medium"
-                   Text="About Universal x86 Tuning Utility" />
+                   Text="{localization:Localize AboutUXTU}" />
         <TextBlock Margin="0,12,0,9" Text="{Binding ApplicationVersion, FallbackValue=No internet connection!}" />
 
         <StackPanel Orientation="Horizontal" Spacing="9">
@@ -57,7 +66,8 @@
                     <controls:SymbolIcon Margin="0,0,9,0"
                                          FontSize="24"
                                          Symbol="Sync" />
-                    <TextBlock VerticalAlignment="Center" Text="Check for Updates" />
+                    <TextBlock VerticalAlignment="Center" 
+                               Text="{localization:Localize CheckForUpdates}" />
                 </StackPanel>
             </Button>
 
@@ -69,7 +79,7 @@
                                          FontSize="24"
                                          Symbol="Download" />
                     <TextBlock VerticalAlignment="Center" 
-                               Text="Download Update" />
+                               Text="{localization:Localize DownloadUpdate}" />
                 </StackPanel>
             </Button>
         </StackPanel>
