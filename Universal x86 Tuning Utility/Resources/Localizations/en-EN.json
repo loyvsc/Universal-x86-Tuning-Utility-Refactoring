@@ -123,5 +123,8 @@
   "StressTestWarning": "WARNING: This will put extreme stress on your CPU. Use at your own risk!",
   "AboutUXTU": "About Universal x86 Tuning Utility",
   "CheckForUpdates": "Check for Updates",
-  "DownloadUpdate": "Download Update"
+  "DownloadUpdate": "Download Update",
+  
+  "BusUsABeer": "Buy us a beer! &#9829;",
+  "JoinOurDiscord": "Join our Discord!"
 }
