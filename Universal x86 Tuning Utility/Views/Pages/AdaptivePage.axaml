@@ -8,6 +8,7 @@
              xmlns:models="clr-namespace:ApplicationCore.Models;assembly=ApplicationCore"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             xmlns:localization="clr-namespace:Universal_x86_Tuning_Utility.Localization"
              d:DesignHeight="720"
              d:DesignWidth="1280"
              x:DataType="viewModels:AdaptiveViewModel"
@@ -18,7 +19,7 @@
                    DockPanel.Dock="Top"
                    FontSize="{StaticResource HeaderFontSize}"
                    FontWeight="Medium"
-                   Text="Adaptive Mode" />
+                   Text="{localization:Localize AdaptiveMode}" />
 
         <DockPanel Margin="0,9,0,0" DockPanel.Dock="Top">
             <StackPanel Orientation="Horizontal">
@@ -26,7 +27,7 @@
                            VerticalAlignment="Center"
                            FontSize="17"
                            FontWeight="Medium"
-                           Text="Games/Apps:" />
+                           Text="{localization:Localize AdaptivePageHeader}" />
                 <ComboBox Width="225"
                           Height="37"
                           DisplayMemberBinding="{Binding Name}"
@@ -37,7 +38,7 @@
                         Margin="9,0,0,0"
                         Command="{Binding ReloadGamesListCommand}"
                         DockPanel.Dock="Bottom"
-                        ToolTip.Tip="Updates dropdown list with games/apps">
+                        ToolTip.Tip="{localization:Localize ReloadAppsTooltip}">
                     <avalonia:FluentIcon FontSize="20" Icon="ArrowSync" />
                 </Button>
             </StackPanel>
@@ -46,7 +47,7 @@
         <TextBlock Margin="0,8,0,0"
                    DockPanel.Dock="Top"
                    Foreground="LightGray"
-                   Text="Notes: Wait for profiles to load before starting mode!" />
+                   Text="{localization:Localize AdaptivePageDescription}" />
 
         <StackPanel Margin="0,9,9,6"
                     HorizontalAlignment="Right"
@@ -55,19 +56,19 @@
                     Spacing="9">
             <TextBlock VerticalAlignment="Center"
                        FontSize="14"
-                       Text="Polling Rate" />
+                       Text="{localization:Localize PollingRate}" />
             <ui:NumberBox VerticalAlignment="Center"
                           Maximum="8"
                           Minimum="1"
                           SmallChange="0.05"
                           Value="{Binding Polling, UpdateSourceTrigger=PropertyChanged}" />
-            <CheckBox Content="Auto switch app profile" IsChecked="{Binding IsAutoSwitchEnabled, UpdateSourceTrigger=PropertyChanged}" />
+            <CheckBox Content="{localization:Localize AutoSwitchAppProfile}" IsChecked="{Binding IsAutoSwitchEnabled, UpdateSourceTrigger=PropertyChanged}" />
             <Button Width="50"
                     Height="40"
                     HorizontalAlignment="Right"
                     Command="{Binding SavePresetCommand}"
                     DockPanel.Dock="Bottom"
-                    ToolTip.Tip="Save current settings">
+                    ToolTip.Tip="{localization:Localize SaveCurrentSettings}">
                 <avalonia:FluentIcon FontSize="20" Icon="Save" />
             </Button>
             <Button Width="185"
@@ -88,7 +89,8 @@
                             </Style>
                         </avalonia:FluentIcon.Styles>
                     </avalonia:FluentIcon>
-                    <TextBlock VerticalAlignment="Center" Text="Start Adaptive Mode" />
+                    <TextBlock VerticalAlignment="Center" 
+                               Text="{localization:Localize StartAdaptiveMode}" />
                 </StackPanel>
             </Button>
         </StackPanel>
@@ -106,8 +108,9 @@
                     <StackPanel Orientation="Vertical">
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
-                                   Text="Auto Switch" />
-                        <TextBlock FontSize="12" Text="Enable this preset for automatic switching. Can be used to exclude games/apps from auto switch." />
+                                   Text="{localization:Localize AutoSwitch}" />
+                        <TextBlock FontSize="12" 
+                                   Text="{localization:Localize EnablePresetForAutomaticSwitching}" />
                     </StackPanel>
                     <controls:IconCardControl.RightMenuContent>
                         <ToggleSwitch IsChecked="{Binding CurrentPreset.IsAutoSwitch, UpdateSourceTrigger=PropertyChanged}"
@@ -121,8 +124,9 @@
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                             <TextBlock FontSize="14"
                                        FontWeight="Medium"
-                                       Text="Basic Adaptive Mode Settings" />
-                            <TextBlock FontSize="12" Text="Provides the ability to toggle/set adaptive mode targets." />
+                                       Text="{localization:Localize BasicAdaptiveModeSettings}" />
+                            <TextBlock FontSize="12" 
+                                       Text="{localization:Localize BasicAdaptiveModeSettingsDescription}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
 
@@ -131,11 +135,11 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Max Temperature Limit (°C)" />
+                                           Text="{localization:Localize MaxTemperatureLimit}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls the max temperature limit adaptive mode is allowed to set" />
+                                                     ToolTip.Tip="{localization:Localize MaxTemperatureLimitToolTip}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="150, *">
@@ -161,11 +165,11 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Max Power Limit (W)" />
+                                           Text="{localization:Localize MaxPowerLimit}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls the max power limit adpative mode is allowed to set" />
+                                                     ToolTip.Tip="{localization:Localize MaxPowerLimitToolTip}" />
                             </StackPanel>
                             <Grid ColumnDefinitions="150,*">
                                 <ui:NumberBox Grid.Column="0"
@@ -192,11 +196,11 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Max Curve Optimiser Limit (-)" />
+                                           Text="{localization:Localize MaxCurveOptimiserLimit}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls the max negative curve optimiser limit adpative mode is allowed to set" />
+                                                     ToolTip.Tip="{localization:Localize MaxCurveOptimiserLimitToolTip}" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33,150,*">
                                 <CheckBox Grid.Column="0"
@@ -232,8 +236,9 @@
                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="Turbo Boost Overdrive iGPU Settings" />
-                                <TextBlock FontSize="12" Text="Provides the ability to toggle/set Turbo Boost Overdrive iGPU targets." />
+                                           Text="{localization:Localize AmdApuIGpuTbo}" />
+                                <TextBlock FontSize="12" 
+                                           Text="{localization:Localize AmdApuIGpuTboDescription}" />
                             </StackPanel>
                             <ToggleSwitch Grid.Column="1" IsChecked="{Binding CurrentPreset.IsGfx, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
@@ -244,11 +249,11 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Maximum iGPU Clock Limit (MHz)" />
+                                           Text="{localization:Localize AmdApuMaxIGpuClockLimit}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls the maximum iGPU clock speed adaptive mode is allowed to set" />
+                                                     ToolTip.Tip="{localization:Localize AmdApuMaxIGpuClockLimitDescription}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="150,*">
@@ -274,11 +279,11 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Minimum iGPU Clock Limit (MHz)" />
+                                           Text="{localization:Localize AmdApuMinIGpuClockLimit}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls the minimum iGPU clock speed adaptive mode is allowed to set" />
+                                                     ToolTip.Tip="{localization:Localize AmdApuMinIGpuClockLimitDescription}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="150,*">
@@ -303,11 +308,11 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Minimum CPU Clock Limit (MHz)" />
+                                           Text="{localization:Localize AmdApuMinCpuClockLimit}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls the minimum CPU clock speed at which adaptive mode will start throttling iGPU clocks" />
+                                                     ToolTip.Tip="{localization:Localize AmdApuMinCpuClockLimitDescription}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="150,*">
@@ -330,7 +335,7 @@
                         </StackPanel>
                         <TextBlock Margin="0,8,0,0"
                                    Foreground="LightGray"
-                                   Text="Notes: Ensure you balance CPU and iGPU clocks out for the best performance!" />
+                                   Text="{localization:Localize AmdApuIGpuTboNote}" />
                     </StackPanel>
                 </controls:IconExpander>
 
@@ -341,44 +346,46 @@
                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="UXTU Super Resolution" />
-                                <TextBlock FontSize="12" Text="Powered by a customised version of Magpie. Use Alt+F to toggle." />
+                                           Text="{localization:Localize SuperResolutionHeader}" />
+                                <TextBlock FontSize="12" 
+                                           Text="{localization:Localize SuperResolutionDescription}" />
                             </StackPanel>
-                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding CurrentPreset.IsMag, UpdateSourceTrigger=PropertyChanged}" />
+                            <ToggleSwitch Grid.Column="1" 
+                                          IsChecked="{Binding CurrentPreset.IsMag, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
                     </controls:IconExpander.Header>
                     <!--  CardExpander content  -->
                     <StackPanel Spacing="8">
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Content="Enable VSync"
+                            <CheckBox Content="{localization:Localize EnableVSync}"
                                       FontSize="13"
                                       FontWeight="DemiBold"
                                       IsChecked="{Binding CurrentPreset.IsVsync, UpdateSourceTrigger=PropertyChanged}" />
                             <avalonia:FluentIcon VerticalAlignment="Center"
                                                  FontSize="24"
                                                  Icon="Info"
-                                                 ToolTip.Tip="Synchronises capture frame rate to display refresh rate." />
+                                                 ToolTip.Tip="{localization:Localize EnableVSyncTooltip}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Content="Auto Recapture"
+                            <CheckBox Content="{localization:Localize AutoRecapture}"
                                       FontSize="13"
                                       FontWeight="DemiBold"
                                       IsChecked="{Binding CurrentPreset.IsRecap, UpdateSourceTrigger=PropertyChanged}" />
                             <avalonia:FluentIcon VerticalAlignment="Center"
                                                  FontSize="24"
                                                  Icon="Info"
-                                                 ToolTip.Tip="Auto recaptures the previous capture window after focus was lost and restored." />
+                                                 ToolTip.Tip="{localization:Localize AutoRecaptureTooltip}" />
                         </StackPanel>
 
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Capture Sharpness (%)" />
+                                           Text="{localization:Localize CaptureSharpness}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls UXTU Super Resolution capture image sharpness." />
+                                                     ToolTip.Tip="{localization:Localize CaptureSharpnessTooltip}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="150, *">
@@ -404,17 +411,17 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Resolution Scale" />
+                                           Text="{localization:Localize ResolutionScale}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls the resolution of the window being captured. Use application controlled if you do not want UXTU to override the window resolution. Not all applications will be compatible with this mode!" />
+                                                     ToolTip.Tip="{localization:Localize ResolutionScaleTooltip}" />
                             </StackPanel>
 
                             <ComboBox Width="208"
                                       Height="37"
                                       VerticalAlignment="Center"
-                                      DisplayMemberBinding="{Binding Name}"
+                                      DisplayMemberBinding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                                       ItemsSource="{Binding UXTUSuperResolutionScales}"
                                       SelectedValue="{Binding CurrentPreset.SuperResolutionScale, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
@@ -429,33 +436,35 @@
                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="Radeon™ Graphics Options" />
-                                <TextBlock FontSize="12" Text="Provides the ability to customise driver graphics options" />
+                                           Text="{localization:Localize RadeonGraphicsOptions}" />
+                                <TextBlock FontSize="12"
+                                           Text="{localization:Localize RadeonGraphicsOptionsDescrption}" />
                             </StackPanel>
-                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding CurrentPreset.IsRadeonGraphics, UpdateSourceTrigger=PropertyChanged}" />
+                            <ToggleSwitch Grid.Column="1" 
+                                          IsChecked="{Binding CurrentPreset.IsRadeonGraphics, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
                     </controls:IconExpander.Header>
                     <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <CheckBox Content="Radeon™ Anti-Lag"
+                            <CheckBox Content="{localization:Localize RadeonAntiLag}"
                                       FontSize="13"
                                       FontWeight="DemiBold"
                                       IsChecked="{Binding CurrentPreset.IsAntiLag, UpdateSourceTrigger=PropertyChanged}" />
                             <avalonia:FluentIcon VerticalAlignment="Center"
                                                  FontSize="24"
                                                  Icon="Info"
-                                                 ToolTip.Tip="Enables AMD Radeon™ Anti-Lag within drivers on supported hardware." />
+                                                 ToolTip.Tip="{localization:Localize RadeonAntiLagTooltip}" />
                         </StackPanel>
                         <StackPanel Margin="0,8,0,0">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Radeon™ Super Resolution (%)" />
+                                           Text="{localization:Localize RadeonSuperResolution}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Enables AMD Radeon™ Super Resolution within drivers on supported hardware. Also allows you to set a custom sharpness effect." />
+                                                     ToolTip.Tip="{localization:Localize RadeonSuperResolutionTooltip}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="33,150,*">
@@ -486,11 +495,11 @@
                                         Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Radeon™ Boost (%)" />
+                                           Text="{localization:Localize RadeonBoost}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Enables AMD Radeon™ Boost within drivers on supported hardware. Also allows you to set a minimum resolution in %." />
+                                                     ToolTip.Tip="{localization:Localize RadeonBoostTooltip}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="33,150,*">
@@ -521,11 +530,11 @@
                                         Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Radeon™ Image Sharpening (%)" />
+                                           Text="{localization:Localize RadeonImageSharpening}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Enables AMD Radeon™ Image Sharpening within drivers on supported hardware. Allows you to set a custom sharpness effect." />
+                                                     ToolTip.Tip="{localization:Localize RadeonImageSharpeningTooltip}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="33,150,*">
@@ -553,14 +562,14 @@
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Content="Enhanced Sync"
+                            <CheckBox Content="{localization:Localize EnhancedSync}"
                                       FontSize="13"
                                       FontWeight="DemiBold"
                                       IsChecked="{Binding CurrentPreset.IsSync, UpdateSourceTrigger=PropertyChanged}" />
                             <avalonia:FluentIcon Margin="0,0,0,2"
                                                  Icon="Info"
                                                  FontSize="20"
-                                                 ToolTip.Tip="Enables AMD Enhanced Sync within drivers on supported hardware." />
+                                                 ToolTip.Tip="{localization:Localize EnhancedSyncTooltip}" />
                         </StackPanel>
                     </StackPanel>
                 </controls:IconExpander>
@@ -573,8 +582,9 @@
                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="NVIDIA GPU Tuning" />
-                                <TextBlock FontSize="12" Text="Provides the ability to set tune your NVIDIA GPU." />
+                                           Text="{localization:Localize NVIDIAGPUTuning}" />
+                                <TextBlock FontSize="12" 
+                                           Text="{localization:Localize NVIDIAGPUTuningTooltip}" />
                             </StackPanel>
 
                             <ToggleSwitch Grid.Column="1"
@@ -588,11 +598,11 @@
                                         Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="Frequency-Adjusted Voltage Limit (MHz)" />
+                                           Text="{localization:Localize FrequencyAdjustedVoltageLimit}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." />
+                                                     ToolTip.Tip="{localization:Localize FrequencyAdjustedVoltageLimitTooltip}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="150, *">
@@ -618,11 +628,11 @@
                                         Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="GPU Core Clock Offset (MHz)" />
+                                           Text="{localization:Localize GPUCoreClockOffset}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" />
+                                                     ToolTip.Tip="{localization:Localize GPUCoreClockOffsetTooltip}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="150, *">
@@ -648,11 +658,11 @@
                                         Spacing="6">
                                 <TextBlock FontSize="13"
                                            FontWeight="DemiBold"
-                                           Text="GPU Memory Clock (MHz)" />
+                                           Text="{localization:Localize GPUMemoryClock}" />
                                 <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                      FontSize="20"
                                                      Icon="Info"
-                                                     ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's VRAM clock" />
+                                                     ToolTip.Tip="{localization:Localize GPUMemoryClockTooltip}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="150, *">
@@ -675,7 +685,7 @@
                         </StackPanel>
 
                         <TextBlock FontSize="12"
-                                   Text="Warning: We are not liable for any damages to hardware or resulting instabilities caused by adjustment of frequencies and voltages."
+                                   Text="{localization:Localize NVIDIAGPUTuningNote}"
                                    TextWrapping="WrapWithOverflow" />
                     </StackPanel>
                 </controls:IconExpander>
@@ -685,8 +695,9 @@
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
-                                   Text="ASUS Power Profile" />
-                        <TextBlock FontSize="12" Text="Provides the ability to set an ASUS power profile. This will override Armoury Crate!" />
+                                   Text="{localization:Localize ASUSPowerProfile}" />
+                        <TextBlock FontSize="12"
+                                   Text="{localization:Localize ASUSPowerProfileDescription}" />
                     </StackPanel>
                     <controls:IconCardControl.RightMenuContent>
                         <ComboBox Grid.Column="2"
@@ -710,8 +721,9 @@
                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="Static RTSS Frame Rate" />
-                                <TextBlock FontSize="12" Text="Provides the ability to set a custom RTSS frame limit." />
+                                           Text="{localization:Localize StaticRTSSFrameRate}" />
+                                <TextBlock FontSize="12" 
+                                           Text="{localization:Localize StaticRTSSFrameRateDescription}" />
                             </StackPanel>
                             
                             <ToggleSwitch Grid.Column="1"
@@ -724,11 +736,11 @@
                                     Spacing="6">
                             <TextBlock FontSize="13"
                                        FontWeight="DemiBold"
-                                       Text="RTSS Frame Limit (FPS)" />
+                                       Text="{localization:Localize RTSSFrameLimit}" />
                             <avalonia:FluentIcon VerticalAlignment="Bottom"
                                                  FontSize="20"
                                                  Icon="Info"
-                                                 ToolTip.Tip="Controls the set FPS limit in RTSS" />
+                                                 ToolTip.Tip="{localization:Localize RTSSFrameLimitTooltip}" />
                         </StackPanel>
 
                         <Grid ColumnDefinitions="150, *">
