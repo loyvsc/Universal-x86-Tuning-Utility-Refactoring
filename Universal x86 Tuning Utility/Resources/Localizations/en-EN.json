@@ -104,5 +104,9 @@
   "AverageFrametime": "Average Frametime",
   "AverageFPS": "Average FPS",
   "ReloadGamesListTooltip": "Reload list of games",
-  "AddGameManuallyTooltip": "Add a game manually"
+  "AddGameManuallyTooltip": "Add a game manually",
+  
+  "DeviceCertifiedPreset": "Device Certified Preset",
+  "UxtuCommandOutput": "UXTU Command Output:",
+  "UxtuCommandOutputDescription": "Note: Some output commands may not be compatible with RyzenAdj"
 }
