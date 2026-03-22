@@ -70,7 +70,7 @@
                     <Button Classes="Transparent"
                             Command="{Binding NavigateCommand}"
                             CommandParameter="support"
-                            Content="{localization:Localize BusUsABeer}" />
+                            Content="{localization:Localize BuyUsABeer}" />
                     <Button Classes="Transparent"
                             Command="{Binding NavigateCommand}"
                             CommandParameter="discord"
