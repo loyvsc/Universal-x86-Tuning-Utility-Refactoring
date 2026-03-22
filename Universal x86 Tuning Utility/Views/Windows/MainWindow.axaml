@@ -67,6 +67,10 @@
                             VerticalAlignment="Center"
                             Orientation="Horizontal"
                             Spacing="9">
+                    <ComboBox PlaceholderText="Language"
+                              ItemsSource="{Binding AvailableLanguages}"
+                              SelectedValue="{Binding CurrentLanguage, UpdateSourceTrigger=PropertyChanged}"
+                              Width="120"/>
                     <Button Classes="Transparent"
                             Command="{Binding NavigateCommand}"
                             CommandParameter="support"
