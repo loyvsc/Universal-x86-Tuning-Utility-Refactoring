@@ -8,6 +8,7 @@
              xmlns:models="clr-namespace:ApplicationCore.Models;assembly=ApplicationCore"
              xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
              xmlns:avalonia="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia"
+             xmlns:localization="clr-namespace:Universal_x86_Tuning_Utility.Localization"
              mc:Ignorable="d"
              d:DesignWidth="1280"
              d:DesignHeight="2500"
@@ -20,7 +21,7 @@
     <DockPanel>
         <TextBlock FontSize="{StaticResource HeaderFontSize}"
                    FontWeight="Medium"
-                   Text="Custom Presets"
+                   Text="{localization:Localize CustomPresets}"
                    DockPanel.Dock="Top"
                    Margin="18,10,0,0" />
 
@@ -33,7 +34,7 @@
                            FontWeight="Medium"
                            Margin="0,0,12,0"
                            VerticalAlignment="Center"
-                           Text="Saved Presets:" />
+                           Text="{localization:Localize SavedPresets}" />
                 <ComboBox Width="225"
                           ItemsSource="{Binding AvailablePresets, UpdateSourceTrigger=PropertyChanged}"
                           SelectedValue="{Binding SelectedPreset, UpdateSourceTrigger=PropertyChanged}"
@@ -46,7 +47,7 @@
                            FontWeight="Medium"
                            Margin="0,0,12,0"
                            VerticalAlignment="Center"
-                           Text="New Preset Name:" />
+                           Text="{localization:Localize NewPresetName}" />
                 <TextBox Margin="0,0,-2,0"
                          Width="225"
                          Height="35"
@@ -65,7 +66,7 @@
                     DockPanel.Dock="Bottom"
                     Width="50"
                     IsVisible="{Binding UndoActionAvailable, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTip.Tip="Undo overclock settings"
+                    ToolTip.Tip="{localization:Localize UndoOverclockSettings}"
                     Command="{Binding UndoCommand}">
                 <ui:SymbolIcon Symbol="Sync" FontSize="24" />
             </Button>
@@ -75,7 +76,7 @@
                     Height="40"
                     DockPanel.Dock="Bottom"
                     Width="50"
-                    ToolTip.Tip="Reload settings of current preset values"
+                    ToolTip.Tip="{localization:Localize ReloadSettingsOfCurrentPresetValues}"
                     Command="{Binding ReloadPresetValuesCommand}">
                 <ui:SymbolIcon Symbol="Sync" FontSize="24" />
             </Button>
@@ -85,7 +86,7 @@
                     Height="40"
                     DockPanel.Dock="Bottom"
                     Width="50"
-                    ToolTip.Tip="Delete current settings preset"
+                    ToolTip.Tip="{localization:Localize DeleteCurrentSettingsPreset}"
                     Command="{Binding DeletePresetCommand}">
                 <ui:SymbolIcon Symbol="Delete" FontSize="24" />
             </Button>
@@ -95,7 +96,7 @@
                     Height="40"
                     DockPanel.Dock="Bottom"
                     Width="50"
-                    ToolTip.Tip="Save current settings as new preset"
+                    ToolTip.Tip="{localization:Localize SaveCurrentSettingsAsNewPreset}"
                     Command="{Binding SavePresetCommand}">
                 <ui:SymbolIcon Symbol="SaveFilled" FontSize="24" />
             </Button>
@@ -105,7 +106,7 @@
                     Height="40"
                     Width="50"
                     DockPanel.Dock="Bottom"
-                    ToolTip.Tip="Apply current settings"
+                    ToolTip.Tip="{localization:Localize ApplyCurrentSettings}"
                     Command="{Binding ApplyPresetCommand}">
                 <ui:SymbolIcon Symbol="Document" FontSize="24" />
             </Button>
@@ -117,7 +118,6 @@
                       IsDeferredScrollingEnabled="False">
             <StackPanel Margin="15,0,15,0"
                         Spacing="8">
-                <!-- Amd Apu Thermal settings !-->
                 <controls:IconExpander
                     IsVisible="{Binding IsAmdApuSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
                     DockPanel.Dock="Top"
@@ -127,9 +127,9 @@
                                     VerticalAlignment="Center">
                             <TextBlock FontSize="14"
                                        FontWeight="Medium"
-                                       Text="APU Temperature Tuning" />
+                                       Text="{localization:Localize APUTemperatureTuning}" />
                             <TextBlock FontSize="12"
-                                       Text="Provides the ability to set APU thermal targets." />
+                                       Text="{localization:Localize APUTemperatureTuningDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
                     <controls:IconExpander.Content>
@@ -138,11 +138,11 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
-                                               Text="Temperature Limit (°C)" />
+                                               Text="{localization:Localize TemperatureLimitC}" />
                                     <avalonia:FluentIcon Icon="Info"
                                                          FontSize="20"
                                                          Margin="6,0,0,-2"
-                                                         ToolTip.Tip="Controls the temperature limit at which the APU starts soft throttling"
+                                                         ToolTip.Tip="{localization:Localize ControlsTempLimitAPUSoftThrottling}"
                                                          VerticalAlignment="Bottom" />
                                 </StackPanel>
 
@@ -168,11 +168,11 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
-                                               Text="Skin Temperature Limit (°C)" />
+                                               Text="{localization:Localize SkinTemperatureLimitC}" />
                                     <avalonia:FluentIcon Icon="Info"
                                                          FontSize="20"
                                                          Margin="6,0,0,-2"
-                                                         ToolTip.Tip="Controls the laptop chassis temperature limit at which the APU starts throttling"
+                                                         ToolTip.Tip="{localization:Localize ControlsChassisTempLimitAPUThrottling}"
                                                          VerticalAlignment="Bottom" />
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33, 150, *"
@@ -198,7 +198,6 @@
                     </controls:IconExpander.Content>
                 </controls:IconExpander>
 
-                <!-- Amd cpu thermal settings !-->
                 <controls:IconExpander Icon="Temperature"
                                        IsVisible="{Binding IsAmdCpuThermalSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
@@ -207,24 +206,23 @@
                             <TextBlock
                                 FontSize="14"
                                 FontWeight="Medium"
-                                Text="CPU Temperature Tuning" />
+                                Text="{localization:Localize CPUTemperatureTuning}" />
                             <TextBlock
                                 FontSize="12"
-                                Text="Provides the ability to set CPU thermal targets." />
+                                Text="{localization:Localize CPUTemperatureTuningDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Temperature Limit (°C)" />
+                                           Text="{localization:Localize TemperatureLimitC}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
                                                      VerticalAlignment="Bottom"
-                                                     ToolTip.Tip="Controls the temperature limit at which the CPU starts hard throttling" />
+                                                     ToolTip.Tip="{localization:Localize ControlsTempLimitCPUHardThrottling}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="33, 150, *" Margin="0,8,0,0">
@@ -248,7 +246,6 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Amd apu cpu settings !-->
                 <controls:IconExpander
                     IsVisible="{Binding IsAmdApuSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
                     Icon="Power">
@@ -257,22 +254,21 @@
                                     VerticalAlignment="Center">
                             <TextBlock FontSize="14"
                                        FontWeight="Medium"
-                                       Text="APU Power Tuning" />
+                                       Text="{localization:Localize APUPowerTuning}" />
                             <TextBlock FontSize="12"
-                                       Text="Provides the ability to set APU power targets." />
+                                       Text="{localization:Localize APUPowerTuningDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="STAPM Power Limit (W)" />
+                                           Text="{localization:Localize STAPMPowerLimitW}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the APU's Skin Temperature Aware Power Management power limit"
+                                                     ToolTip.Tip="{localization:Localize ControlsAPUSTAPMPowerLimit}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *"
@@ -298,11 +294,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Slow Power Limit (W)" />
+                                           Text="{localization:Localize SlowPowerLimitW}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the APU's slow boost duration power limit. Within SmartShift enabled systems, this options controls the total power shared between the AMD CPU and AMD dGPU"
+                                                     ToolTip.Tip="{localization:Localize ControlsAPUSlowBoostDuration}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *" Margin="0,8,0,0">
@@ -327,11 +323,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Slow Boost Duration (s)" />
+                                           Text="{localization:Localize SlowBoostDurationS}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls how long the APU stays within the slow boost power limit"
+                                                     ToolTip.Tip="{localization:Localize ControlsAPUSlowBoostPowerLimit}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *"
@@ -354,11 +350,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Fast Power Limit (W)" />
+                                           Text="{localization:Localize FastPowerLimitW}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the APU's fast boost duration power limit. Within SmartShift enabled systems, this options controls the total power shared between the AMD CPU and AMD dGPU"
+                                                     ToolTip.Tip="{localization:Localize ControlsAPUFastBoostDuration}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *"
@@ -384,11 +380,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Fast Boost Duration (s)" />
+                                           Text="{localization:Localize FastBoostDurationS}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls how long the APU stays within the fast boost power limit"
+                                                     ToolTip.Tip="{localization:Localize ControlsAPUFastBoostPowerLimit}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *"
@@ -413,7 +409,6 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Amd cpu settings !-->
                 <controls:IconExpander
                     IsVisible="{Binding IsAmdCpuSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
                     Icon="Power">
@@ -422,23 +417,22 @@
                             <TextBlock
                                 FontSize="14"
                                 FontWeight="Medium"
-                                Text="CPU Power Tuning" />
+                                Text="{localization:Localize CPUPowerTuning}" />
                             <TextBlock
                                 FontSize="12"
-                                Text="Provides the ability to set CPU power targets." />
+                                Text="{localization:Localize CPUPowerTuningDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="PPT Limit (W)" />
+                                           Text="{localization:Localize PPTLimitW}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the CPU's Package Power Tracking power limit"
+                                                     ToolTip.Tip="{localization:Localize ControlsCPUPPTLimit}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *"
@@ -464,11 +458,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="EDC Limit (A)" />
+                                           Text="{localization:Localize EDCLimitA}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the CPU's Electrical Design Current limit"
+                                                     ToolTip.Tip="{localization:Localize ControlsCPUEDCLimit}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *"
@@ -494,11 +488,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="TDC Limit (A)" />
+                                           Text="{localization:Localize TDCLimitA}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the CPU's Thermal Design Current limit"
+                                                     ToolTip.Tip="{localization:Localize ControlsCPUTDCLimit}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *"
@@ -523,7 +517,6 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Intel cpu settings !-->
                 <controls:IconExpander
                     IsVisible="{Binding IsIntelSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
                     Icon="Power">
@@ -531,22 +524,21 @@
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock FontSize="14"
                                        FontWeight="Medium"
-                                       Text="CPU Power Tuning" />
+                                       Text="{localization:Localize CPUPowerTuning}" />
                             <TextBlock FontSize="12"
-                                       Text="Provides the ability to set CPU power targets." />
+                                       Text="{localization:Localize CPUPowerTuningDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Power Limit (W)" />
+                                           Text="{localization:Localize PowerLimitW}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the CPU's total power limit"
+                                                     ToolTip.Tip="{localization:Localize ControlsCPUTotalPowerLimit}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *"
@@ -573,11 +565,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Power Limit 2 (W)" />
+                                           Text="{localization:Localize PowerLimit2W}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the CPU's short boost power limit"
+                                                     ToolTip.Tip="{localization:Localize ControlsCPUShortBoostPowerLimit}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *" Margin="0,8,0,0">
@@ -601,30 +593,28 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Amd apu vrm settings !-->
                 <controls:IconExpander Icon="Flash"
                                        IsVisible="{Binding IsAmdApuVrmSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock FontSize="14"
                                        FontWeight="Medium"
-                                       Text="APU VRM Tuning" />
+                                       Text="{localization:Localize APUVRMTuning}" />
                             <TextBlock FontSize="12"
-                                       Text="Provides the ability to set APU VRM current targets." />
+                                       Text="{localization:Localize APUVRMTuningDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="CPU TDC Limit (A)" />
+                                           Text="{localization:Localize CPUTDCLimitA}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
                                                      VerticalAlignment="Bottom"
-                                                     ToolTip.Tip="Controls the CPU's Thermal Design Current limit" />
+                                                     ToolTip.Tip="{localization:Localize ControlsCPUTDCLimit}" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33, 150, *"
                                   Margin="0,8,0,0">
@@ -649,12 +639,12 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="CPU EDC Limit (A)" />
+                                           Text="{localization:Localize CPUEDCLimitA}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
                                                      VerticalAlignment="Bottom"
-                                                     ToolTip.Tip="Controls the CPU's Electrical Design Current limit" />
+                                                     ToolTip.Tip="{localization:Localize ControlsCPUEDCLimit}" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33,150,*"
                                   Margin="0,8,0,0">
@@ -679,12 +669,12 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="SoC TDC Limit (A)" />
+                                           Text="{localization:Localize SoCTDCLimitA}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
                                                      VerticalAlignment="Bottom"
-                                                     ToolTip.Tip="Controls the SoC's Thermal Design Current limit" />
+                                                     ToolTip.Tip="{localization:Localize ControlsSoCTDCLimit}" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33,150,*"
                                   Margin="0,8,0,0">
@@ -709,12 +699,12 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="SoC EDC Limit (A)" />
+                                           Text="{localization:Localize SoCEDCLimitA}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
                                                      VerticalAlignment="Bottom"
-                                                     ToolTip.Tip="Controls the SoC's Electrical Design Current limit" />
+                                                     ToolTip.Tip="{localization:Localize ControlsSoCEDCLimit}" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33,150,*"
                                   Margin="0,8,0,0">
@@ -739,12 +729,12 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="GFX TDC Limit (A)" />
+                                           Text="{localization:Localize GFXTDCLimitA}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
                                                      VerticalAlignment="Bottom"
-                                                     ToolTip.Tip="Controls the iGPU's Thermal Design Current limit" />
+                                                     ToolTip.Tip="{localization:Localize ControlsiGPUTDCLimit}" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33,150,*"
                                   Margin="0,8,0,0">
@@ -769,12 +759,12 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="GFX EDC Limit (A)" />
+                                           Text="{localization:Localize GFXEDCLimitA}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
                                                      VerticalAlignment="Bottom"
-                                                     ToolTip.Tip="Controls the iGPU's Electrical Design Current limit" />
+                                                     ToolTip.Tip="{localization:Localize ControlsiGPUEDCLimit}" />
                             </StackPanel>
                             <Grid ColumnDefinitions="33,150,*"
                                   Margin="0,8,0,0">
@@ -798,7 +788,6 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Amd apu igpu settings !-->
                 <controls:IconExpander Icon="Pulse"
                                        IsVisible="{Binding IsAmdApuIGpuClockSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
@@ -806,23 +795,22 @@
                             <TextBlock
                                 FontSize="14"
                                 FontWeight="Medium"
-                                Text="iGPU Tuning" />
+                                Text="{localization:Localize iGPUTuning}" />
                             <TextBlock
                                 FontSize="12"
-                                Text="Provides the ability to set a static iGPU boost clock on select APUs/CPUs." />
+                                Text="{localization:Localize iGPUTuningDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="iGPU Clock (MHz)" />
+                                           Text="{localization:Localize iGPUClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the static boost clock speed of the iGPU, requires either a system reboot or system sleep to revert back to normal."
+                                                     ToolTip.Tip="{localization:Localize ControlsiGPUStaticBoostClock}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -848,7 +836,6 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Amd soft clock settings !-->
                 <controls:IconExpander Icon="Pulse"
                                        IsVisible="{Binding IsAmdSoftClockSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
@@ -856,23 +843,22 @@
                             <TextBlock
                                 FontSize="14"
                                 FontWeight="Medium"
-                                Text="APU Soft Clock Limit Tuning" />
+                                Text="{localization:Localize APUSoftClockLimitTuning}" />
                             <TextBlock
                                 FontSize="12"
-                                Text="Provides the ability to set various soft clock speed targets on select APUs." />
+                                Text="{localization:Localize APUSoftClockLimitTuningDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Minimum iGPU Clock (MHz)" />
+                                           Text="{localization:Localize SoftMinimumiGPUClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the minimum soft clock target of the iGPU. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMinimumSoftClockiGPU}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -899,11 +885,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Maximum iGPU Clock (MHz)" />
+                                           Text="{localization:Localize SoftMaximumiGPUClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the maximum soft clock target of the iGPU. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMaximumSoftClockiGPU}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -930,11 +916,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Minimum CPU Clock (MHz)" />
+                                           Text="{localization:Localize SoftMinimumCPUClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the minimum soft clock target of the CPU. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMinimumSoftClockCPU}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -961,11 +947,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text=" Soft Maximum CPU Clock (MHz)" />
+                                           Text="{localization:Localize SoftMaximumCPUClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the maximum soft clock target of the CPU. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMaximumSoftClockCPU}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -992,11 +978,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Minimum Data Launch Clock (MHz)" />
+                                           Text="{localization:Localize SoftMinimumDataLaunchClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the minimum soft clock target of the Data Launch Clock. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMinimumSoftClockDataLaunch}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1023,11 +1009,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Maximum Data Launch Clock (MHz)" />
+                                           Text="{localization:Localize SoftMaximumDataLaunchClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the maximum soft clock target of the Data Launch Clock. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMaximumSoftClockDataLaunch}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1054,11 +1040,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Minimum Infinity Fabric Clock (MHz)" />
+                                           Text="{localization:Localize SoftMinimumInfinityFabricClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the minimum soft clock target of the Infinity Fabric. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMinimumSoftClockInfinityFabric}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1085,11 +1071,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Maximum Infinity Fabric Clock (MHz)" />
+                                           Text="{localization:Localize SoftMaximumInfinityFabricClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the maximum soft clock target of the Infinity Fabric. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMaximumSoftClockInfinityFabric}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1116,11 +1102,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Minimum SoC Clock (MHz)" />
+                                           Text="{localization:Localize SoftMinimumSoCClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the minimum soft clock target of the SoC. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMinimumSoftClockSoC}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1147,11 +1133,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Maximum SoC Clock (MHz)" />
+                                           Text="{localization:Localize SoftMaximumSoCClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the maximum soft clock target of the SoC. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMaximumSoftClockSoC}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1178,11 +1164,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Minimum VCN Clock (MHz)" />
+                                           Text="{localization:Localize SoftMinimumVCNClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the minimum soft clock target of the Video Core Next. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMinimumSoftClockVCN}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1208,11 +1194,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Soft Maximum VCN Clock (MHz)" />
+                                           Text="{localization:Localize SoftMaximumVCNClockMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the maximum soft clock target of the Video Core Next. This only works when within your APUs specification."
+                                                     ToolTip.Tip="{localization:Localize ControlsMaximumSoftClockVCN}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1238,7 +1224,6 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Uxtu super resolution !-->
                 <controls:IconExpander Icon="Image">
                     <controls:IconExpander.Header>
                         <Grid ColumnDefinitions="*,Auto">
@@ -1246,9 +1231,9 @@
                                         VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="UXTU Super Resolution" />
+                                           Text="{localization:Localize UXTUSuperResolution}" />
                                 <TextBlock FontSize="12"
-                                           Text="Powered by a customised version of Magpie. Use Alt+F to toggle." />
+                                           Text="{localization:Localize UXTUSuperResolutionDesc}" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal"
                                         Grid.Column="1">
@@ -1257,29 +1242,28 @@
                             </StackPanel>
                         </Grid>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <CheckBox FontSize="13"
                                       FontWeight="DemiBold"
-                                      Content="Enable VSync"
+                                      Content="{localization:Localize EnableVSync}"
                                       IsChecked="{Binding SelectedPreset.IsVsync, UpdateSourceTrigger=PropertyChanged}" />
                             <avalonia:FluentIcon Icon="Info"
                                                  FontSize="20"
                                                  Margin="6,0,0,-2"
-                                                 ToolTip.Tip="Synchronises capture frame rate to display refresh rate."
+                                                 ToolTip.Tip="{localization:Localize SynchronisesCaptureFrameRate}"
                                                  VerticalAlignment="Top" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <CheckBox Width="130"
                                       FontSize="13"
                                       FontWeight="DemiBold"
-                                      Content="Auto Recapture"
+                                      Content="{localization:Localize AutoRecapture}"
                                       IsChecked="{Binding SelectedPreset.IsRecap, UpdateSourceTrigger=PropertyChanged}" />
                             <avalonia:FluentIcon Icon="Info"
                                                  FontSize="20"
                                                  Margin="6,0,0,-2"
-                                                 ToolTip.Tip="Auto recaptures the previous capture window after focus was lost and restored."
+                                                 ToolTip.Tip="{localization:Localize AutoRecapturesPreviousCapture}"
                                                  VerticalAlignment="Top" />
                         </StackPanel>
 
@@ -1287,11 +1271,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Capture Sharpness (%)" />
+                                           Text="{localization:Localize CaptureSharpnessPercent}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls UXTU Super Resolution capture image sharpness."
+                                                     ToolTip.Tip="{localization:Localize ControlsUXTUSuperResolutionSharpness}"
                                                      VerticalAlignment="Top" />
                             </StackPanel>
 
@@ -1316,11 +1300,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Resolution Scale" />
+                                           Text="{localization:Localize ResolutionScale}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the resolution of the window being captured. Use application controlled if you do not want UXTU to override the window resolution. Not all applications will be compatible with this mode!"
+                                                     ToolTip.Tip="{localization:Localize ControlsResolutionOfWindow}"
                                                      VerticalAlignment="Top" />
                             </StackPanel>
                             <ComboBox Margin="0,8,0,0"
@@ -1339,7 +1323,6 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Radeon graphics settings !-->
                 <controls:IconExpander Icon="Image"
                                        IsVisible="{Binding IsRadeonGpuSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
@@ -1348,9 +1331,9 @@
                                         VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="Radeon™ Graphics Options" />
+                                           Text="{localization:Localize RadeonGraphicsOptions}" />
                                 <TextBlock FontSize="12"
-                                           Text="Provides the ability to customise driver graphics options" />
+                                           Text="{localization:Localize RadeonGraphicsOptionsDesc}" />
                             </StackPanel>
                             <StackPanel Grid.Column="1"
                                         Orientation="Horizontal">
@@ -1359,28 +1342,27 @@
                             </StackPanel>
                         </Grid>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <CheckBox FontSize="13"
                                       FontWeight="DemiBold"
-                                      Content="Radeon™ Anti-Lag"
+                                      Content="{localization:Localize RadeonAntiLag}"
                                       IsChecked="{Binding SelectedPreset.IsAntiLag, UpdateSourceTrigger=PropertyChanged}" />
                             <avalonia:FluentIcon Icon="Info"
                                                  FontSize="20"
                                                  Margin="6,0,0,-4"
-                                                 ToolTip.Tip="Enables AMD Radeon™ Anti-Lag within drivers on supported hardware."
+                                                 ToolTip.Tip="{localization:Localize EnablesAMDRadeonAntiLag}"
                                                  VerticalAlignment="Center" />
                         </StackPanel>
                         <StackPanel Margin="0,8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Radeon™ Super Resolution (%)" />
+                                           Text="{localization:Localize RadeonSuperResolutionPercent}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Enables AMD Radeon™ Super Resolution within drivers on supported hardware. Also allows you to set a custom sharpness effect."
+                                                     ToolTip.Tip="{localization:Localize EnablesAMDRadeonSuperResolution}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1407,11 +1389,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Radeon™ Boost (%)" />
+                                           Text="{localization:Localize RadeonBoostPercent}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Enables AMD Radeon™ Boost within drivers on supported hardware. Also allows you to set a minimum resolution in %."
+                                                     ToolTip.Tip="{localization:Localize EnablesAMDRadeonBoost}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1438,11 +1420,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Radeon™ Image Sharpening (%)" />
+                                           Text="{localization:Localize RadeonImageSharpeningPercent}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Enables AMD Radeon™ Image Sharpening within drivers on supported hardware. Allows you to set a custom sharpness effect."
+                                                     ToolTip.Tip="{localization:Localize EnablesAMDRadeonImageSharpening}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1469,18 +1451,17 @@
                         <StackPanel Orientation="Horizontal">
                             <CheckBox FontSize="13"
                                       FontWeight="DemiBold"
-                                      Content="Enhanced Sync"
+                                      Content="{localization:Localize EnhancedSync}"
                                       IsChecked="{Binding SelectedPreset.IsSync, UpdateSourceTrigger=PropertyChanged}" />
                             <avalonia:FluentIcon Icon="Info"
                                                  FontSize="24"
                                                  Margin="6,0,0,-4"
-                                                 ToolTip.Tip="Enables AMD Enhanced Sync within drivers on supported hardware."
+                                                 ToolTip.Tip="{localization:Localize EnablesAMDEnhancedSync}"
                                                  VerticalAlignment="Center" />
                         </StackPanel>
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Nvidia graphics settings !-->
                 <controls:IconExpander Icon="Pulse"
                                        IsVisible="{Binding IsNvidiaGpuSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
@@ -1489,9 +1470,9 @@
                                         VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="NVIDIA GPU Tuning" />
+                                           Text="{localization:Localize NVIDIAGPUTuning}" />
                                 <TextBlock FontSize="12"
-                                           Text="Provides the ability to tune your NVIDIA GPU." />
+                                           Text="{localization:Localize NVIDIAGPUTuningDesc}" />
                             </StackPanel>
 
                             <StackPanel Grid.Column="1"
@@ -1501,17 +1482,16 @@
                             </StackPanel>
                         </Grid>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Frequency-Adjusted Voltage Limit (MHz)" />
+                                           Text="{localization:Localize FrequencyAdjustedVoltageLimitMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows."
+                                                     ToolTip.Tip="{localization:Localize ControlsMaximumVoltageGPU}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1536,11 +1516,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="GPU Core Clock Offset (MHz)" />
+                                           Text="{localization:Localize GPUCoreClockOffsetMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock"
+                                                     ToolTip.Tip="{localization:Localize ControlsClockOffsetNVIDIAGPUCore}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1565,11 +1545,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="GPU Memory Clock Offset (MHz)" />
+                                           Text="{localization:Localize GPUMemoryClockOffsetMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's VRAM clock"
+                                                     ToolTip.Tip="{localization:Localize ControlsClockOffsetNVIDIAGPUVRAM}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1592,12 +1572,11 @@
                         </StackPanel>
 
                         <TextBlock FontSize="12"
-                                   Text="Warning: We are not liable for any damages to hardware or resulting instabilities caused by adjustment of frequencies and voltages."
+                                   Text="{localization:Localize WarningHardwareDamages}"
                                    TextWrapping="WrapWithOverflow" Margin="0,8,0,0" />
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Intel power balance settings !-->
                 <controls:IconExpander Icon="Scales"
                                        IsVisible="{Binding IsIntelSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
@@ -1606,9 +1585,9 @@
                                         VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="Intel Power Balance" />
+                                           Text="{localization:Localize IntelPowerBalance}" />
                                 <TextBlock FontSize="12"
-                                           Text="Provides the ability to tune the power balance of your Intel CPU." />
+                                           Text="{localization:Localize IntelPowerBalanceDesc}" />
                             </StackPanel>
 
                             <StackPanel Grid.Column="1"
@@ -1618,17 +1597,16 @@
                             </StackPanel>
                         </Grid>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="CPU Balance" />
+                                           Text="{localization:Localize CPUBalance}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows."
+                                                     ToolTip.Tip="{localization:Localize ControlsMaximumVoltageGPU}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1653,9 +1631,8 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="GPU Balance" />
-                                <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                            </StackPanel>
+                                           Text="{localization:Localize GPUBalance}" />
+                                </StackPanel>
 
                             <Grid ColumnDefinitions="150, *"
                                   Margin="0,8,0,0">
@@ -1677,7 +1654,6 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Intel Clock Ratio Control !-->
                 <controls:IconExpander Icon="Pulse"
                                        IsVisible="{Binding IsIntelSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
@@ -1686,9 +1662,9 @@
                                         VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="Intel Clock Ratio Control" />
+                                           Text="{localization:Localize IntelClockRatioControl}" />
                                 <TextBlock FontSize="12"
-                                           Text="Provides the ability to tune the clock ratios of your Intel CPU based the number of cores actively in use." />
+                                           Text="{localization:Localize IntelClockRatioControlDesc}" />
                             </StackPanel>
 
                             <StackPanel Grid.Column="1"
@@ -1698,7 +1674,6 @@
                             </StackPanel>
                         </Grid>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <ItemsControl
                         ItemsSource="{Binding SelectedPreset.IntelClockRatios, UpdateSourceTrigger=PropertyChanged}">
                         <ItemsControl.ItemTemplate>
@@ -1712,7 +1687,7 @@
                                                              FontSize="20"
                                                              IconVariant="Regular"
                                                              Margin="6,0,0,-2"
-                                                             ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows."
+                                                             ToolTip.Tip="{localization:Localize ControlsMaximumVoltageGPU}"
                                                              VerticalAlignment="Bottom" />
                                     </StackPanel>
 
@@ -1737,7 +1712,6 @@
                     </ItemsControl>
                 </controls:IconExpander>
 
-                <!-- Intel FIVR Tuning !-->
                 <controls:IconExpander Icon="Pulse"
                                        IsVisible="{Binding IsIntelSettingsAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
@@ -1746,9 +1720,9 @@
                                         VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="Intel FIVR Tuning" />
+                                           Text="{localization:Localize IntelFIVRTuning}" />
                                 <TextBlock FontSize="12"
-                                           Text="Provides the ability to tune the voltages of your Intel CPU." />
+                                           Text="{localization:Localize IntelFIVRTuningDesc}" />
                             </StackPanel>
 
                             <StackPanel Grid.Column="1"
@@ -1758,15 +1732,13 @@
                             </StackPanel>
                         </Grid>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Core Offset (mV)" />
-                                <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the maximum voltage your GPU will run within the Frequency/Voltage curve based on clock speed. You can undervolt your NVIDIA GPU by lowering this clock speed below stock and increasing the core clock offset. Start at your GPU's rated boost clock and work down. To reset it, set it to the maximum possible clock the slider allows." VerticalAlignment="Bottom" />-->
-                            </StackPanel>
+                                           Text="{localization:Localize CoreOffsetmV}" />
+                                </StackPanel>
 
                             <Grid ColumnDefinitions="150, *"
                                   Margin="0,8,0,0">
@@ -1789,9 +1761,8 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="iGPU Offset (mV)" />
-                                <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                            </StackPanel>
+                                           Text="{localization:Localize iGPUOffsetmV}" />
+                                </StackPanel>
 
                             <Grid ColumnDefinitions="150, *"
                                   Margin="0,8,0,0">
@@ -1814,9 +1785,8 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="Cache Offset (mV)" />
-                                <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                            </StackPanel>
+                                           Text="{localization:Localize CacheOffsetmV}" />
+                                </StackPanel>
 
                             <Grid ColumnDefinitions="150, *"
                                   Margin="0,8,0,0">
@@ -1839,9 +1809,8 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="System Agent Offset (mV)" />
-                                <!--<ui:SymbolIcon Symbol="{ic:FluentIcon Info20Regular}" Margin="6,0,0,-2"  ToolTip.Tip="Controls the clock offset for your NVIDIA GPU's core clock" VerticalAlignment="Bottom" />-->
-                            </StackPanel>
+                                           Text="{localization:Localize SystemAgentOffsetmV}" />
+                                </StackPanel>
 
                             <Grid ColumnDefinitions="150, *"
                                   Margin="0,8,0,0">
@@ -1862,12 +1831,11 @@
                         </StackPanel>
                         <TextBlock FontSize="12"
                                    Margin="0,8,0,0"
-                                   Text="Warning: We are not liable for any damages to hardware or resulting instabilities caused by adjustment of frequencies and voltages."
+                                   Text="{localization:Localize WarningHardwareDamages}"
                                    TextWrapping="WrapWithOverflow" />
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Ryzen cpu tuning !-->
                 <controls:IconExpander Icon="Pulse"
                                        IsVisible="{Binding IsAmdCpuTuneSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
@@ -1876,9 +1844,9 @@
                                         VerticalAlignment="Center">
                                 <TextBlock FontSize="14"
                                            FontWeight="Medium"
-                                           Text="AMD Ryzen™ CPU Tuning" />
+                                           Text="{localization:Localize AMDRyzenCPUTuning}" />
                                 <TextBlock FontSize="12"
-                                           Text="Provides the ability to set tune your AMD Ryzen™ CPU." />
+                                           Text="{localization:Localize AMDRyzenCPUTuningDesc}" />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal"
@@ -1888,17 +1856,16 @@
                             </StackPanel>
                         </Grid>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="CPU Clocks (MHz)" />
+                                           Text="{localization:Localize CPUClocksMHz}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Provides the ability to set a static CPU clock"
+                                                     ToolTip.Tip="{localization:Localize ProvidesAbilityStaticCPUClock}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1923,11 +1890,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="CPU VID (mV)" />
+                                           Text="{localization:Localize CPUVIDmV}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
-                                                     ToolTip.Tip="Controls the set voltage for the CPU"
+                                                     ToolTip.Tip="{localization:Localize ControlsSetVoltageCPU}"
                                                      VerticalAlignment="Bottom" />
                             </StackPanel>
 
@@ -1950,36 +1917,34 @@
 
                             <TextBlock FontSize="12"
                                        Margin="0,8,0,0"
-                                       Text="Warning: We are not liable for any damages to hardware or resulting instabilities caused by adjustment of frequencies and voltages."
+                                       Text="{localization:Localize WarningHardwareDamages}"
                                        TextWrapping="WrapWithOverflow" />
                         </StackPanel>
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Amd pbo settings !-->
                 <controls:IconExpander Icon="TopSpeed"
                                        IsVisible="{Binding IsAmdPboSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock FontSize="14"
                                        FontWeight="Medium"
-                                       Text="AMD Precision Boost Overdrive" />
+                                       Text="{localization:Localize AMDPrecisionBoostOverdrive}" />
                             <TextBlock FontSize="12"
-                                       Text="Provides the ability to customise PBO options." />
+                                       Text="{localization:Localize AMDPrecisionBoostOverdriveDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="PBO Scalar" />
+                                           Text="{localization:Localize PBOScalar}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
                                                      VerticalAlignment="Bottom"
-                                                     ToolTip.Tip="Allows control to change the PBO Scalar which adjusts the FIT/FITness/FailuresInTime limit by the set amount" />
+                                                     ToolTip.Tip="{localization:Localize AllowsControlPBOScalar}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="33, 150, *"
@@ -2004,30 +1969,28 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Amd Curve optimizer settings !-->
                 <controls:IconExpander Icon="TopSpeed"
                                        IsVisible="{Binding IsAmdCOSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                             <TextBlock FontSize="14"
                                        FontWeight="Medium"
-                                       Text="AMD Curve Optimiser" />
+                                       Text="{localization:Localize AMDCurveOptimiser}" />
                             <TextBlock FontSize="12"
-                                       Text="Provides the ability to customise Curve Optimiser options." />
+                                       Text="{localization:Localize AMDCurveOptimiserDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <StackPanel>
                         <StackPanel Margin="0,-8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontWeight="DemiBold"
                                            FontSize="13"
-                                           Text="All Core Offset" />
+                                           Text="{localization:Localize AllCoreOffset}" />
                                 <avalonia:FluentIcon Icon="Info"
                                                      FontSize="20"
                                                      Margin="6,0,0,-2"
                                                      VerticalAlignment="Bottom"
-                                                     ToolTip.Tip="Allows control to change the all core Curve Optimiser Frequency/Voltage curve offset" />
+                                                     ToolTip.Tip="{localization:Localize AllowsControlAllCoreCurveOptimiser}" />
                             </StackPanel>
 
                             <Grid ColumnDefinitions="33, 150, *"
@@ -2053,13 +2016,13 @@
                                             Margin="0,8,0,0">
                                     <TextBlock FontWeight="DemiBold"
                                                FontSize="13"
-                                               Text="iGPU Offset" />
+                                               Text="{localization:Localize iGPUOffset}" />
                                     <avalonia:FluentIcon Icon="Info"
                                                          FontSize="24"
                                                          IconVariant="Regular"
                                                          Margin="6,0,0,-2"
                                                          VerticalAlignment="Bottom"
-                                                         ToolTip.Tip="Allows control to change the iGPU Curve Optimiser Frequency/Voltage curve offset" />
+                                                         ToolTip.Tip="{localization:Localize AllowsControliGPUCurveOptimiser}" />
                                 </StackPanel>
                                 <Grid ColumnDefinitions="33,150,*"
                                       Margin="0,8,0,0">
@@ -2084,19 +2047,17 @@
                     </StackPanel>
                 </controls:IconExpander>
 
-                <!-- Amd CCD1 settings !-->
                 <controls:IconExpander Icon="TopSpeed"
                                        IsVisible="{Binding IsAmdCCD1COSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock FontSize="14"
                                        FontWeight="Medium"
-                                       Text="AMD Per-Core Curve Optimiser (CCD1)" />
+                                       Text="{localization:Localize AMDPerCoreCurveOptimiserCCD1}" />
                             <TextBlock FontSize="12"
-                                       Text="Provides the ability to customise per-core Curve Optimiser options." />
+                                       Text="{localization:Localize AMDPerCoreCurveOptimiserDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <ItemsControl
                         ItemsSource="{Binding SelectedPreset.Ccd1States, UpdateSourceTrigger=PropertyChanged}">
                         <ItemsControl.ItemTemplate>
@@ -2139,19 +2100,17 @@
                     </ItemsControl>
                 </controls:IconExpander>
 
-                <!-- Amd CCD2 settings !-->
                 <controls:IconExpander Icon="TopSpeed"
                                        IsVisible="{Binding IsAmdCCD2COSettingAvailable, UpdateSourceTrigger=PropertyChanged}">
                     <controls:IconExpander.Header>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock FontSize="14"
                                        FontWeight="Medium"
-                                       Text="AMD Per-Core Curve Optimiser (CCD2)" />
+                                       Text="{localization:Localize AMDPerCoreCurveOptimiserCCD2}" />
                             <TextBlock FontSize="12"
-                                       Text="Provides the ability to customise per-core Curve Optimiser options." />
+                                       Text="{localization:Localize AMDPerCoreCurveOptimiserDesc}" />
                         </StackPanel>
                     </controls:IconExpander.Header>
-                    <!--  CardExpander content  -->
                     <ItemsControl
                         ItemsSource="{Binding SelectedPreset.Ccd2States, UpdateSourceTrigger=PropertyChanged}">
                         <ItemsControl.ItemTemplate>
@@ -2194,7 +2153,6 @@
                     </ItemsControl>
                 </controls:IconExpander>
                 
-                <!-- Amd CCD Affinity Mode settings !-->
                 <controls:IconCardControl Icon="Grid"
                                           IconSize="20"
                                           IsVisible="{Binding IsCcdAffinityAvailable, UpdateSourceTrigger=PropertyChanged}">
@@ -2202,11 +2160,11 @@
                         <TextBlock
                             FontSize="14"
                             FontWeight="Medium"
-                            Text="CCD Affinity Mode" />
+                            Text="{localization:Localize CCDAffinityMode}" />
                         <TextBlock
                             FontSize="12"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                            Text="Directs threads to selected CCDs, trimming cross-die traffic and fine-tuning performance."/>
+                            Text="{localization:Localize CCDAffinityModeDesc}"/>
                     </StackPanel>
                     <controls:IconCardControl.RightMenuContent>
                         <ComboBox VerticalAlignment="Center"
@@ -2217,16 +2175,15 @@
                     </controls:IconCardControl.RightMenuContent>
                 </controls:IconCardControl>
 
-                <!-- Amd power (boost) profile settings !-->
                 <controls:IconCardControl
                     IsVisible="{Binding IsAmdPowerProfileSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
                     Icon="FastAcceleration">
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
-                                   Text="AMD Boost Profile" />
+                                   Text="{localization:Localize AMDBoostProfile}" />
                         <TextBlock FontSize="12"
-                                   Text="Provides the ability to set a manual boost profile which impact on boost delay." />
+                                   Text="{localization:Localize AMDBoostProfileDesc}" />
                     </StackPanel>
                     <controls:IconCardControl.RightMenuContent>
                         <ComboBox Grid.Column="2"
@@ -2238,16 +2195,15 @@
                     </controls:IconCardControl.RightMenuContent>
                 </controls:IconCardControl>
 
-                <!-- Display settings !-->
                 <controls:IconCardControl
                     IsVisible="{Binding IsChangeRefreshRateAvailable, UpdateSourceTrigger=PropertyChanged}"
                     Icon="Desktop">
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
-                                   Text="Display Refresh Rate" />
+                                   Text="{localization:Localize DisplayRefreshRate}" />
                         <TextBlock FontSize="12"
-                                   Text="Provides the ability to set a custom supported display refresh rate. May not work for everyone!" />
+                                   Text="{localization:Localize DisplayRefreshRateDesc}" />
                     </StackPanel>
                     <controls:IconCardControl.RightMenuContent>
                         <StackPanel Orientation="Horizontal"
@@ -2261,7 +2217,7 @@
                                       MinWidth="164"
                                       Height="37" />
                             <Button Command="{Binding IdentificateMonitorsCommand}"
-                                    ToolTip.Tip="Identificate monitors"
+                                    ToolTip.Tip="{localization:Localize IdentificateMonitors}"
                                     Height="37">
                                 <avalonia:FluentIcon Icon="Eye" />
                             </Button>
@@ -2277,14 +2233,13 @@
                     </controls:IconCardControl.RightMenuContent>
                 </controls:IconCardControl>
 
-                <!-- Power mode settings !-->
                 <controls:IconCardControl Icon="Power">
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
-                                   Text="Power Mode" />
+                                   Text="{localization:Localize PowerMode}" />
                         <TextBlock FontSize="12"
-                                   Text="Provides the ability to change the Windows power mode from a preset." />
+                                   Text="{localization:Localize PowerModeDesc}" />
                     </StackPanel>
                     <controls:IconCardControl.RightMenuContent>
                         <ComboBox VerticalAlignment="Center"
@@ -2296,16 +2251,15 @@
                     </controls:IconCardControl.RightMenuContent>
                 </controls:IconCardControl>
 
-                <!-- Asus power settings !-->
                 <controls:IconCardControl
                     IsVisible="{Binding IsAsusPowerSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
                     Icon="Power">
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
-                                   Text="ASUS Power Profile" />
+                                   Text="{localization:Localize ASUSPowerProfile}" />
                         <TextBlock FontSize="12"
-                                   Text="Provides the ability to set an ASUS power profile. This will override Armoury Crate!" />
+                                   Text="{localization:Localize ASUSPowerProfileDesc}" />
                     </StackPanel>
                     <controls:IconCardControl.RightMenuContent>
                         <ComboBox VerticalAlignment="Center"
@@ -2317,16 +2271,15 @@
                     </controls:IconCardControl.RightMenuContent>
                 </controls:IconCardControl>
 
-                <!-- Asus gpu mode !-->
                 <controls:IconCardControl
                     IsVisible="{Binding IsAsusGpuUltimateSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
                     Icon="FastAcceleration">
                     <StackPanel>
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
-                                   Text="ASUS GPU Ultimate Mode" />
+                                   Text="{localization:Localize ASUSGPUUltimateMode}" />
                         <TextBlock FontSize="12"
-                                   Text="Provides the ability to manually toggle MUX switch on/off. This will override Armoury Crate!" />
+                                   Text="{localization:Localize ASUSGPUUltimateModeDesc}" />
                     </StackPanel>
 
                     <controls:IconCardControl.RightMenuContent>
@@ -2336,16 +2289,15 @@
                     </controls:IconCardControl.RightMenuContent>
                 </controls:IconCardControl>
 
-                <!-- Asus eco-mode settings !-->
                 <controls:IconCardControl
                     IsVisible="{Binding IsAsusEcoModeAvailable, UpdateSourceTrigger=PropertyChanged}"
                     Icon="LeafTwo">
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock FontSize="14"
                                    FontWeight="Medium"
-                                   Text="ASUS iGPU Only Mode" />
+                                   Text="{localization:Localize ASUSiGPUOnlyMode}" />
                         <TextBlock FontSize="12"
-                                   Text="Provides the ability to toggle iGPU only mode on/off. This will override Armoury Crate!" />
+                                   Text="{localization:Localize ASUSiGPUOnlyModeDesc}" />
                     </StackPanel>
                     <controls:IconCardControl.RightMenuContent>
                         <ToggleSwitch
