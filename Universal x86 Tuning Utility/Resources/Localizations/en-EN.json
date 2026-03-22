@@ -1,4 +1,6 @@
 ﻿{
+  "LangPackageName": "English",
+  
   "AdaptiveMode": "Adaptive Mode",
   "AdaptivePageHeader": "Games/Apps:",
   "ReloadAppsTooltip": "Updates dropdown list with games/apps",

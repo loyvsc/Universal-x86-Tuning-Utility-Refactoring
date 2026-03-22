@@ -112,6 +112,7 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            ProgramCore.Initialize(uri => AssetLoader.Exists(uri), uri => AssetLoader.GetAssets(uri, null), uri => AssetLoader.Open(uri));
             Settings.Default.Path = AppContext.BaseDirectory;
             _desktopApplicationLifetime = desktop;
             _desktopApplicationLifetime.MainWindow = new MainWindow()
