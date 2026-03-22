@@ -22,7 +22,7 @@ internal sealed class Localizer : ILocalizer
     /// <summary>
     /// Path to localization assets
     /// </summary>
-    private const string LocalizationPath = "avares://BenzMagic/Resources/Localization";
+    private const string LocalizationPath = "avares://Universal x86 Tuning Utility/Resources/Localizations";
 
     /// <summary>
     /// Property name for changing notification
