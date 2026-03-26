@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             xmlns:localization="clr-namespace:Universal_x86_Tuning_Utility.Localization"
              d:DesignHeight="450"
              d:DesignWidth="800"
              x:DataType="viewModels:FanControlViewModel"
@@ -13,7 +14,7 @@
         <TextBlock DockPanel.Dock="Top"
                    FontSize="{StaticResource HeaderFontSize}"
                    FontWeight="Medium"
-                   Text="Fan Control Test" />
+                   Text="{localization:Localize FanControlTest}" />
 
         <StackPanel Margin="0,9,9,9"
                     HorizontalAlignment="Right"
@@ -21,23 +22,23 @@
                     Orientation="Horizontal">
             <Button Width="145"
                     Command="{Binding ReloadCommand}"
-                    Content="Reload Config" />
+                    Content="{localization:Localize ReloadConfig}" />
             <Button Width="145"
                     Margin="9,0,0,0"
                     Command="{Binding TestFanCurveCommand}"
-                    Content="Test Fan Curve" />
+                    Content="{localization:Localize TestFanCurve}" />
             <Button Width="145"
                     Margin="9,0,0,0"
                     Command="{Binding SetFanSpeedCommand}"
-                    Content="Update Fan Speed" />
+                    Content="{localization:Localize UpdateFanSpeed}" />
             <Button Width="145"
                     Margin="9,0,0,0"
                     Command="{Binding EnableFanControlCommand}"
-                    Content="Enable Fan Control" />
+                    Content="{localization:Localize EnableFanControl}" />
             <Button Width="145"
                     Margin="9,0,0,0"
                     Command="{Binding DisableFanControlCommand}"
-                    Content="Disable Fan Control" />
+                    Content="{localization:Localize DisableFanControl}" />
         </StackPanel>
 
         <StackPanel Margin="0,12,18,0"
@@ -46,14 +47,14 @@
             <TextBlock VerticalAlignment="Center"
                        FontSize="16"
                        FontWeight="DemiBold"
-                       Text="Fan Config Name:" />
+                       Text="{localization:Localize FanConfigName}" />
             <TextBlock Margin="9,0,0,0"
                        VerticalAlignment="Center"
                        FontSize="16"
                        Text="{Binding ConfigName, UpdateSourceTrigger=PropertyChanged}" />
             <Button Margin="9,0,0,0"
                     Command="{Binding CopyCommand}"
-                    Content="Copy" />
+                    Content="{localization:Localize Copy}" />
         </StackPanel>
 
         <StackPanel Margin="0,12,18,0"
@@ -61,14 +62,15 @@
                     Orientation="Horizontal">
             <TextBlock FontSize="16"
                        FontWeight="DemiBold"
-                       Text="Fan Curve Test:" />
+                       Text="{localization:Localize FanCurveTest}" />
             <TextBlock Margin="9,0,0,0"
                        FontSize="16"
                        Text="{Binding Status, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
         <StackPanel Margin="0,12,18,0" DockPanel.Dock="Top">
-            <TextBlock FontSize="16" Text="Fan Speed (%)" />
+            <TextBlock FontSize="16" 
+                       Text="{localization:Localize FanSpeed}" />
             <NumericUpDown Margin="0,9,0,0"
                            Maximum="100"
                            Minimum="0"

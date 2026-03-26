@@ -7,6 +7,7 @@
              mc:Ignorable="d"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
              xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
+             xmlns:localization="clr-namespace:Universal_x86_Tuning_Utility.Localization"
              d:DesignWidth="1280"
              d:DesignHeight="720"
              ScrollViewer.IsDeferredScrollingEnabled="False">
@@ -34,7 +35,7 @@
                         <StackPanel Background="Transparent">
                             <TextBlock FontSize="18"
                                        Foreground="#B7FFFFFF"
-                                       Text="Welcome To" />
+                                       Text="{localization:Localize WelcomeTo}" />
                             <TextBlock FontSize="28"
                                        FontWeight="Bold"
                                        Foreground="#FFFFFF"
@@ -50,7 +51,7 @@
                                     Background="Transparent"
                                     Command="{Binding NavigateCommand}"
                                     CommandParameter="premade"
-                                    Content="Try Out The Premade Presets"
+                                    Content="{localization:Localize TryOutPremadePresets}"
                                     IsVisible="{Binding IsAmdSettingsAvailable, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </Border>
@@ -59,7 +60,7 @@
                                VerticalAlignment="Bottom"
                                FontSize="10"
                                Foreground="#57FFFFFF"
-                               Text="Created by JamesCJ, sbski and ProjectSBC" />
+                               Text="{localization:Localize CreatedBy}" />
                 </Grid>
             </Border>
         </Border>
@@ -75,56 +76,56 @@
                                        IsVisible="{Binding IsAmdSettingsAvailable, UpdateSourceTrigger=PropertyChanged}"
                                        Command="{Binding NavigateCommand}"
                                        CommandParameter="premade"
-                                       Content="Premade Presets"
+                                       Content="{localization:Localize PremadePresets}"
                                        Icon="Predictions"/>
 
             <controls:FluentIconButton Grid.Row="0"
                                        Grid.Column="1"
                                        Command="{Binding NavigateCommand}"
                                        CommandParameter="custom"
-                                       Content="Custom Presets"
+                                       Content="{localization:Localize CustomPresets}"
                                        Icon="Book"/>
 
             <controls:FluentIconButton Grid.Row="0"
                                        Grid.Column="2"
                                        Command="{Binding NavigateCommand}"
                                        CommandParameter="adaptive"
-                                       Content="Adaptive Mode"
+                                       Content="{localization:Localize AdaptiveMode}"
                                        Icon="Radar"/>
 
             <controls:FluentIconButton Grid.Row="0"
                                        Grid.Column="3"
                                        Command="{Binding NavigateCommand}"
                                        CommandParameter="auto"
-                                       Content="Automations"
+                                       Content="{localization:Localize Automations}"
                                        Icon="Transmission"/>
 
             <controls:FluentIconButton Grid.Row="1"
                                        Grid.Column="0"
                                        Command="{Binding NavigateCommand}"
                                        CommandParameter="games"
-                                       Content="Game Library"
+                                       Content="{localization:Localize GameLibrary}"
                                        Icon="Games"/>
 
             <controls:FluentIconButton Grid.Row="1"
                                        Grid.Column="1"
                                        Command="{Binding NavigateCommand}"
                                        CommandParameter="info"
-                                       Content="System Info"
+                                       Content="{localization:Localize SystemInfo}"
                                        Icon="Info"/>
 
             <controls:FluentIconButton Grid.Row="1"
                                        Grid.Column="2"
                                        Command="{Binding NavigateCommand}"
                                        CommandParameter="help"
-                                       Content="Need Help?"
+                                       Content="{localization:Localize NeedHelp}"
                                        Icon="ChatHelp"/>
 
             <controls:FluentIconButton Grid.Row="1"
                                        Grid.Column="3"
                                        Command="{Binding NavigateCommand}"
                                        CommandParameter="support"
-                                       Content="Support Us"
+                                       Content="{localization:Localize SupportUs}"
                                        Icon="Money"/>
         </Grid>
     </Grid>

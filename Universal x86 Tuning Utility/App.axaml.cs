@@ -7,6 +7,7 @@ using ApplicationCore.Utilities;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 using Avalonia.Threading;
 using DAL.Services;
 using HanumanInstitute.MvvmDialogs;
@@ -20,6 +21,7 @@ using Splat;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Helpers;
 using Universal_x86_Tuning_Utility.Interfaces;
+using Universal_x86_Tuning_Utility.Localization;
 using Universal_x86_Tuning_Utility.Navigation;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.Services;
@@ -112,6 +114,7 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            ProgramCore.Initialize(uri => AssetLoader.Exists(uri), uri => AssetLoader.GetAssets(uri, null), uri => AssetLoader.Open(uri));
             Settings.Default.Path = AppContext.BaseDirectory;
             _desktopApplicationLifetime = desktop;
             _desktopApplicationLifetime.MainWindow = new MainWindow()

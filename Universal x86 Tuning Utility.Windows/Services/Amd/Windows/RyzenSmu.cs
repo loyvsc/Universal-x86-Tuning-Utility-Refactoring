@@ -80,7 +80,7 @@ public static class Addresses
                 }
             }
             
-            WindowsSMUCommands.RyzenAccess.Initialize();
+            // WindowsSMUCommands.RyzenAccess.Initialize();
         }
     }
 
@@ -185,7 +185,7 @@ public static class Addresses
 
     private static void Socket_FT6_FP7_FP8()
     {
-        if(_cpuInfo.RyzenFamily == RyzenFamily.StrixPoint || _cpuInfo.RyzenFamily == Family.RyzenFamily.KrackanPoint || _cpuInfo.RyzenFamily == Family.RyzenFamily.KrackanPoint2 || _cpuInfo.RyzenFamily == Family.RyzenFamily.StrixHalo)
+        if(_cpuInfo.RyzenFamily == RyzenFamily.StrixPoint || _cpuInfo.RyzenFamily == RyzenFamily.KrackanPoint || _cpuInfo.RyzenFamily == RyzenFamily.KrackanPoint2 || _cpuInfo.RyzenFamily == RyzenFamily.StrixHalo)
         {
             Smu.MP1_ADDR_MSG = 0x3b10928;
             Smu.MP1_ADDR_RSP = 0x3b10978;
@@ -317,32 +317,32 @@ public static class Addresses
         Smu.PSMU_ADDR_RSP = 0x03B10570;
         Smu.PSMU_ADDR_ARG = 0x03B10A40;
 
-        WindowsSMUCommands.Commands = new List<(string, bool, uint)>
-        {
-            // Store the commands
-            ("ppt-limit",true, 0x3D), // Use MP1 address
-            ("ppt-limit",false, 0x53), // Use RSMU address
-            ("tdc-limit",true , 0x3B),
-            ("tdc-limit",false , 0x54),
-            ("edc-limit",true , 0x3c),
-            ("edc-limit",false , 0x55),
-            ("tctl-temp",true , 0x3E),
-            ("tctl-temp",false , 0x56),
-            ("pbo-scalar",false , 0x58),
-            ("oc-clk", true, 0x26),
-            ("oc-clk", false, 0x5c),
-            ("per-core-oc-clk",true , 0x27),
-            ("per-core-oc-clk",false , 0x5d),
-            ("oc-volt", true, 0x28),
-            ("oc-volt", false, 0x61),
-            ("set-coall", true, 0x36),
-            ("set-coall", false, 0xb),
-            ("set-coper", true, 0x35),
-            ("enable-oc",true , 0x24),
-            ("enable-oc",false , 0x5a),
-            ("disable-oc",true , 0x25),
-            ("disable-oc",false , 0x5b),
-        };
+        // WindowsSMUCommands.Commands = new List<(string, bool, uint)>
+        // {
+        //     // Store the commands
+        //     ("ppt-limit",true, 0x3D), // Use MP1 address
+        //     ("ppt-limit",false, 0x53), // Use RSMU address
+        //     ("tdc-limit",true , 0x3B),
+        //     ("tdc-limit",false , 0x54),
+        //     ("edc-limit",true , 0x3c),
+        //     ("edc-limit",false , 0x55),
+        //     ("tctl-temp",true , 0x3E),
+        //     ("tctl-temp",false , 0x56),
+        //     ("pbo-scalar",false , 0x58),
+        //     ("oc-clk", true, 0x26),
+        //     ("oc-clk", false, 0x5c),
+        //     ("per-core-oc-clk",true , 0x27),
+        //     ("per-core-oc-clk",false , 0x5d),
+        //     ("oc-volt", true, 0x28),
+        //     ("oc-volt", false, 0x61),
+        //     ("set-coall", true, 0x36),
+        //     ("set-coall", false, 0xb),
+        //     ("set-coper", true, 0x35),
+        //     ("enable-oc",true , 0x24),
+        //     ("enable-oc",false , 0x5a),
+        //     ("disable-oc",true , 0x25),
+        //     ("disable-oc",false , 0x5b),
+        // };
     }
 
     private static void Socket_AM5_V1()
@@ -432,22 +432,22 @@ internal class Smu
         // Check WinRing0 status
         switch (_ryzenNbAccess.GetDllStatus())
         {
-            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_LOADED:
+            case (uint)Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_LOADED:
                 throw new ApplicationException("WinRing OLS_DRIVER_NOT_LOADED");
 
-            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_UNSUPPORTED_PLATFORM:
+            case (uint)Ols.OlsDllStatus.OLS_DLL_UNSUPPORTED_PLATFORM:
                 throw new ApplicationException("WinRing OLS_UNSUPPORTED_PLATFORM");
 
-            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_FOUND:
+            case (uint)Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_FOUND:
                 throw new ApplicationException("WinRing OLS_DLL_DRIVER_NOT_FOUND");
 
-            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_DRIVER_UNLOADED:
+            case (uint)Ols.OlsDllStatus.OLS_DLL_DRIVER_UNLOADED:
                 throw new ApplicationException("WinRing OLS_DLL_DRIVER_UNLOADED");
 
-            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_LOADED_ON_NETWORK:
+            case (uint)Ols.OlsDllStatus.OLS_DLL_DRIVER_NOT_LOADED_ON_NETWORK:
                 throw new ApplicationException("WinRing DRIVER_NOT_LOADED_ON_NETWORK");
 
-            case (uint)OpenLibSys_Mem.Ols.OlsDllStatus.OLS_DLL_UNKNOWN_ERROR:
+            case (uint)Ols.OlsDllStatus.OLS_DLL_UNKNOWN_ERROR:
                 throw new ApplicationException("WinRing OLS_DLL_UNKNOWN_ERROR");
         }
 

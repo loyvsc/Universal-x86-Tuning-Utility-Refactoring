@@ -6,6 +6,7 @@
              xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
+             xmlns:localization="clr-namespace:Universal_x86_Tuning_Utility.Localization"
              d:DesignHeight="450"
              d:DesignWidth="800"
              x:DataType="viewModels:AutomationsViewModel"
@@ -17,7 +18,7 @@
                    DockPanel.Dock="Top"
                    FontSize="{StaticResource HeaderFontSize}"
                    FontWeight="Medium"
-                   Text="Automations" />
+                   Text="{localization:Localize Automations}" />
 
         <controls:IconCardControl Margin="0,9,0,0"
                                   DockPanel.Dock="Top"
@@ -25,8 +26,9 @@
             <StackPanel VerticalAlignment="Center">
                 <TextBlock FontSize="14"
                            FontWeight="Medium"
-                           Text="Preset on Battery Charge" />
-                <TextBlock FontSize="12" Text="Provides the ability to set a preset to apply when the battery is charging." />
+                           Text="{localization:Localize BatteryChargePreset}" />
+                <TextBlock FontSize="12"
+                           Text="{localization:Localize BatteryChargePresetDescription}" />
             </StackPanel>
             <controls:IconCardControl.RightMenuContent>
                 <StackPanel Orientation="Horizontal"
@@ -43,7 +45,7 @@
                             VerticalAlignment="Center"
                             Command="{Binding ReloadPResetsCommand}"
                             DockPanel.Dock="Bottom"
-                            ToolTip.Tip="Updates dropdown list with current presets">
+                            ToolTip.Tip="{localization:Localize ReloadPresetsTooltip}">
                         <fluent:FluentIcon FontSize="20" Icon="ArrowSync" />
                     </Button>
                 </StackPanel>
@@ -55,9 +57,9 @@
             <StackPanel VerticalAlignment="Center">
                 <TextBlock FontSize="14"
                            FontWeight="Medium"
-                           Text="Preset on Battery Discharge" />
+                           Text="{localization:Localize BatteryDischargePreset}" />
                 <TextBlock FontSize="12" 
-                           Text="Provides the ability to set a preset to apply when the battery is discharging." />
+                           Text="{localization:Localize BatteryDischargePresetDescription}" />
             </StackPanel>
             <controls:IconCardControl.RightMenuContent>
                 <StackPanel Orientation="Horizontal"
@@ -76,7 +78,7 @@
                             VerticalAlignment="Center"
                             Command="{Binding ReloadPResetsCommand}"
                             DockPanel.Dock="Bottom"
-                            ToolTip.Tip="Updates dropdown list with current presets">
+                            ToolTip.Tip="{localization:Localize ReloadPresetsTooltip}">
                         <fluent:FluentIcon FontSize="24" Icon="ArrowSync" />
                     </Button>
                 </StackPanel>
@@ -89,8 +91,9 @@
             <StackPanel VerticalAlignment="Center">
                 <TextBlock FontSize="14"
                            FontWeight="Medium"
-                           Text="Preset on System Resume" />
-                <TextBlock FontSize="12" Text="Provides the ability to set a preset to apply on system resume from sleep/hibernation." />
+                           Text="{localization:Localize SystemResumePreset}" />
+                <TextBlock FontSize="12" 
+                           Text="{localization:Localize SystemResumePresetDescription}" />
             </StackPanel>
             <controls:IconCardControl.RightMenuContent>
                 <StackPanel Orientation="Horizontal"
@@ -108,7 +111,7 @@
                             VerticalAlignment="Center"
                             Command="{Binding ReloadPResetsCommand}"
                             DockPanel.Dock="Bottom"
-                            ToolTip.Tip="Updates dropdown list with current presets">
+                            ToolTip.Tip="{localization:Localize ReloadPresetsTooltip}">
                         <fluent:FluentIcon FontSize="24" Icon="ArrowSync" />
                     </Button>
                 </StackPanel>

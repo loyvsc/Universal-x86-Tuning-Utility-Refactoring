@@ -15,11 +15,13 @@ using DesktopNotifications;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
 using Universal_x86_Tuning_Utility.Helpers;
+using Universal_x86_Tuning_Utility.Localization;
+using Universal_x86_Tuning_Utility.Localization.Models;
 using Universal_x86_Tuning_Utility.Properties;
 
 namespace Universal_x86_Tuning_Utility.ViewModels;
 
-public class AdaptiveViewModel : ReactiveObject
+public class AdaptiveViewModel : ReactiveObject, IDisposable
 {
     public ICommand ToggleAdaptiveModeCommand { get; }
     public ICommand SavePresetCommand { get; }
@@ -158,13 +160,16 @@ public class AdaptiveViewModel : ReactiveObject
 
         UXTUSuperResolutionScales = new List<UXTUSuperResolutionScale>()
         {
-            new UXTUSuperResolutionScale(ResolutionScale.ApplicationControlled, "Application Controlled"),
-            new UXTUSuperResolutionScale(ResolutionScale.UltraQuality, "Ultra Quality (77%)"),
-            new UXTUSuperResolutionScale(ResolutionScale.Quality, "Quality (67%)"),
-            new UXTUSuperResolutionScale(ResolutionScale.Balanced, "Balanced (59%)"),
-            new UXTUSuperResolutionScale(ResolutionScale.Performance, "Performance (50%)"),
-            new UXTUSuperResolutionScale(ResolutionScale.UltraPerformance, "Ultra Performance (33%)"),
+            new UXTUSuperResolutionScale(ResolutionScale.ApplicationControlled),
+            new UXTUSuperResolutionScale(ResolutionScale.UltraQuality),
+            new UXTUSuperResolutionScale(ResolutionScale.Quality),
+            new UXTUSuperResolutionScale(ResolutionScale.Balanced),
+            new UXTUSuperResolutionScale(ResolutionScale.Performance),
+            new UXTUSuperResolutionScale(ResolutionScale.UltraPerformance),
         };
+
+        LocalizeUXTUSuperResolutionScales();
+        ProgramCore.Localizer.LanguageChanged += LocalizerOnLanguageChanged;
 
         IsAsusPowerSettingsAvailable = _systemInfoService.LaptopInfo?.Brand == LaptopBrand.ASUS;
         
@@ -205,6 +210,19 @@ public class AdaptiveViewModel : ReactiveObject
                 ToggleAdaptiveMode();
             }
         }, null);
+    }
+
+    private void LocalizerOnLanguageChanged(object? sender, Language e)
+    {
+        LocalizeUXTUSuperResolutionScales();
+    }
+
+    private void LocalizeUXTUSuperResolutionScales()
+    {
+        foreach (var scale in UXTUSuperResolutionScales)
+        {
+            scale.Name = ProgramCore.Localizer[scale.ResolutionScale.ToString()];
+        }
     }
 
     private int CPUTemp, CPULoad, CPUClock, GPULoad, GPUClock, GPUMemClock, CPUPower;
@@ -485,5 +503,14 @@ public class AdaptiveViewModel : ReactiveObject
             _notificationManager.ShowTextNotification("Error occurred", ex.Message,
                 NotificationManagerExtensions.NotificationType.Error);
         }
+    }
+
+    public void Dispose()
+    {
+        ProgramCore.Localizer.LanguageChanged -= LocalizerOnLanguageChanged;
+        
+        _sensorsService.Dispose();
+        _notificationManager.Dispose();
+        _ryzenAdjService.Dispose();
     }
 }

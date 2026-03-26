@@ -17,6 +17,8 @@ using FluentAvalonia.UI.Controls;
 using FluentIcons.Common;
 using ReactiveUI;
 using Universal_x86_Tuning_Utility.Extensions;
+using Universal_x86_Tuning_Utility.Localization;
+using Universal_x86_Tuning_Utility.Localization.Models;
 using Universal_x86_Tuning_Utility.Navigation;
 using Universal_x86_Tuning_Utility.Properties;
 using Universal_x86_Tuning_Utility.Services.PresetServices;
@@ -41,6 +43,14 @@ public class MainWindowViewModel : ReactiveObject
 
     public ObservableCollection<NavigationViewModel> NavigationItems { get; set; }
     
+    public List<Language> AvailableLanguages { get; private set; }
+
+    public Language CurrentLanguage
+    {
+        get => field;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    }
+
     public NavigationViewModel SettingsItem { get; set; }
 
     public NavigationViewModel SelectedNavigationItem
@@ -106,6 +116,11 @@ public class MainWindowViewModel : ReactiveObject
         NavigationPageFactory = new NavigationFactory();
 
         NavigateCommand = ReactiveCommand.Create<string>(tag => OnNavigate(tag));
+
+        AvailableLanguages = ProgramCore.Localizer.AvailableLanguages;
+
+        this.WhenAnyValue(x => x.CurrentLanguage)
+            .Subscribe(x => ProgramCore.Localizer.SwitchLanguage(x.Key));
 
         Task.Run(ApplyStartupSettings);
     }

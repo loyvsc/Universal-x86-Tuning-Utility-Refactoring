@@ -30,4 +30,9 @@ public class UXTUSuperResolutionScale : NotifyPropertyChangedBase
         ResolutionScale = resolutionScale;
         Name = name;
     }
+
+    public UXTUSuperResolutionScale(ResolutionScale resolutionScale)
+    {
+        ResolutionScale = resolutionScale;
+    }
 }

@@ -9,6 +9,7 @@
              xmlns:converters="clr-namespace:Universal_x86_Tuning_Utility.Resources.Converters"
              xmlns:models="clr-namespace:ApplicationCore.Models;assembly=ApplicationCore"
              xmlns:controls="clr-namespace:Universal_x86_Tuning_Utility.Controls"
+             xmlns:localization="clr-namespace:Universal_x86_Tuning_Utility.Localization"
              x:DataType="viewModels:GamesViewModel"
              mc:Ignorable="d"
              d:DesignHeight="450"
@@ -18,7 +19,7 @@
         <TextBlock FontSize="{StaticResource HeaderFontSize}"
                        FontWeight="Medium"
                        Margin="18,10,0,0"
-                       Text="Game Library" />
+                       Text="{localization:Localize GameLibrary}" />
 
         <ScrollViewer Grid.Row="1"
                       Grid.RowSpan="2"
@@ -75,7 +76,7 @@
                                         <StackPanel DockPanel.Dock="Right"
                                                 VerticalAlignment="Center">
                                             <TextBlock HorizontalAlignment="Center"
-                                                       Text="Average Frametime"
+                                                       Text="{localization:Localize AverageFrametime}"
                                                        FontSize="14" />
                                             <TextBlock HorizontalAlignment="Center"
                                                        Text="{Binding AverageMillisecond}"
@@ -83,7 +84,7 @@
                                         </StackPanel>
                                         <StackPanel VerticalAlignment="Center">
                                             <TextBlock HorizontalAlignment="Center"
-                                                       Text="Average FPS"
+                                                       Text="{localization:Localize AverageFPS}"
                                                        FontSize="14" />
                                             <TextBlock HorizontalAlignment="Center"
                                                        Text="{Binding AverageFps}"
@@ -115,7 +116,7 @@
                     Height="40"
                     DockPanel.Dock="Bottom"
                     Width="50"
-                    ToolTip.Tip="Reload list of games"
+                    ToolTip.Tip="{localization:Localize ReloadGamesListTooltip}"
                     Command="{Binding ReloadGamesListCommand}">
                 <fluentAvaloniaControls:SymbolIcon Symbol="Sync"
                                      FontSize="24" />
@@ -125,7 +126,7 @@
                     Height="40"
                     Width="50"
                     DockPanel.Dock="Bottom"
-                    ToolTip.Tip="Add a game manually"
+                    ToolTip.Tip="{localization:Localize AddGameManuallyTooltip}"
                     Command="{Binding AddGameCommand}">
                 <fluentAvaloniaControls:SymbolIcon Symbol="Add"
                                      FontSize="24" />

@@ -10,6 +10,7 @@
                      xmlns:ui="using:FluentAvalonia.UI.Controls"
                      xmlns:viewModels="clr-namespace:Universal_x86_Tuning_Utility.ViewModels"
                      xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+                     xmlns:localization="clr-namespace:Universal_x86_Tuning_Utility.Localization"
                      mc:Ignorable="d"
                      x:DataType="viewModels:MainWindowViewModel"
                      Title="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
@@ -66,14 +67,18 @@
                             VerticalAlignment="Center"
                             Orientation="Horizontal"
                             Spacing="9">
+                    <ComboBox PlaceholderText="Language"
+                              ItemsSource="{Binding AvailableLanguages}"
+                              SelectedValue="{Binding CurrentLanguage, UpdateSourceTrigger=PropertyChanged}"
+                              Width="120"/>
                     <Button Classes="Transparent"
                             Command="{Binding NavigateCommand}"
                             CommandParameter="support"
-                            Content="Buy us a beer! &#9829;" />
+                            Content="{localization:Localize BuyUsABeer}" />
                     <Button Classes="Transparent"
                             Command="{Binding NavigateCommand}"
                             CommandParameter="discord"
-                            Content="Join our Discord!" />
+                            Content="{localization:Localize JoinOurDiscord}" />
                 </StackPanel>
             </Grid>
 
